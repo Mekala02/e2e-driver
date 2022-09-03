@@ -42,6 +42,10 @@ def receiver():
         queue.add(key)
     return information
 
+@app.route('/test')
+def get_current_user():
+    return jsonify(outputs)
+
 # Wrapper Class flask app problematic when inside the class
 class Web_Server:
     def __init__(self, memory):

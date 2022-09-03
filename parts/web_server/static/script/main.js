@@ -282,6 +282,14 @@ function load_parameters(outputs){
       Track.Update_Record(synchronize=1)
 }
 
+function test(){
+    fetch("test")
+    .then(response => response.json())
+    .then(data => {console.log(data)
+        // data is a parsed JSON object
+    })
+}
+
 
 
 // For Testing

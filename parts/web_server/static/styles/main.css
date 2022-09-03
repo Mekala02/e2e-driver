@@ -23,7 +23,7 @@ body, html {
   justify-content: space-between;
   align-items: center;
   height: 100px;
-  padding: 5vw;
+  padding: 3vw;
   padding-top: 3vh;
   padding-bottom: 3vh;
 }
@@ -141,7 +141,7 @@ body, html {
 }
 #Top #Emergency_Button {
   text-align: center;
-  width: 17vw;
+  width: 14vw;
   background-color: red;
   font-size: 1.5vw;
   color: white;
@@ -179,11 +179,11 @@ body, html {
 #Middle .Left {
   display: flex;
   flex-direction: column;
-  padding-left: 5vw;
+  padding-left: 7vw;
 }
 #Middle .Left #Camera_Brodcast {
-  height: 50vh;
-  width: 40vw;
+  width: 35vw;
+  height: 35vh;
   background-color: bisque;
   border-radius: 10px;
 }
@@ -346,18 +346,24 @@ body, html {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding-right: 5vw;
+  padding-right: 7vw;
 }
 #Middle .Right .Graph_Container {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 40vw;
-  height: 50vh;
+  width: 35vw;
+  height: 35vh;
+}
+@media (max-width: 1920) {
+  #Middle .Right .Graph_Container {
+    width: 20vw;
+    height: 20vh;
+  }
 }
 #Middle .Right .Graph_Container #Graph2, #Middle .Right .Graph_Container #Graph1 {
-  width: 40vw;
-  height: 20vh;
+  width: 35vw;
+  height: 16vh;
   background-color: bisque;
   border-radius: 10px;
 }
@@ -367,7 +373,7 @@ body, html {
   justify-content: space-around;
   align-items: center;
   height: 100px;
-  width: 40vw;
+  width: 35vw;
   padding-top: 40px;
 }
 @media (max-width: 1920px) {
