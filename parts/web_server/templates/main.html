@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href= "/static/styles/main.css" rel="stylesheet"></link>
+        <meta name="description" content="Autonomous Car Interface">
+        <title>Mekson</title>
+    </head>
+
+    <body>
+            <section id="Top">
+                <dir id="Logo">Mekson</dir>
+                <dir id="Indicators">
+                    <div class="Sign_Container">
+                        <div id="Stop">Stop</div>
+                        <div id="Taxi">Taxi</div>
+                    </div>
+                    <div id="Arrow_Container">
+                        <div id="Left_Arrow"><div id="Left_Arrow_Stick"></div></div>
+                        <div id="Forward_Arrow"><div id="Forward_Arrow_Stick"></div></div>
+                        <div id="Right_Arrow"><div id="Right_Arrow_Stick"></div></div>
+                    </div>
+                    <div id="Stop_Timer">60</div>
+                    <div class="Lane_Container">
+                        <div class="Lane"></div>
+                        <div id="Left_Lane" class="Lane_Indicator"></div>
+                        <div class="Lane"></div>
+                        <div id="Right_Lane" class="Lane_Indicator"></div>
+                        <div class="Lane"></div>
+                    </div>
+                </dir>
+
+                <button id="Emergency_Button">Emergency Stop</button>
+            </section>
+
+            <section id="Middle">
+
+                <div class="Left">
+                    <form action="#">
+                        <select class="Graph_Camera_Mod" id="Camera_Mode">
+                            <option value="RGB">RGB</option>
+                            <option value="Depth">Depth</option>
+                            <option value="Object_Detection">YOLO</option>
+                        </select>
+                    </form>
+                    <div id="Camera_Brodcast"><img src="{{ url_for('video') }}"/></div>
+                    <div class="Info">
+                        <div class="Bar_Container">
+                            <div class="Bar"><div id="Steering_Border"></div><div id="Steering"></div></div>
+                            <div class="Bar"><div id="Throttle_Border"></div><div id="Throttle"></div></div>
+                            <div id="Speed">0 m/s</div>
+                        </div>
+                        <div class="Action_Buttons">
+                            <div id="Speed_Factor">
+                                    <input title="1" id="Speed_Slider" type="range" min="1" max="100" value="50">
+                            </div>
+                            <div class="Go_Record_Container">
+                                <button id="Go">GO</button>
+                                <div id="Record_Timer"></div>
+                                <div class="Record_Border"> <button id="Record"></button> </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="Right">
+                    <form action="#" >
+                        <select class="Graph_Camera_Mod" id="Graph_Mode">
+                            <option value="Speed/IMU">Speed/IMU</option>
+                            <option value="Steering/Throttle">Steer/Throttle</option>
+                        </select>
+                    </form>
+                    <div class="Graph_Container">
+                        <div id="Graph1"></div>
+                        <div id="Graph2"></div>
+                    </div>
+                    <div class="Drive_Mode_Change">
+                        <div class="Pilot">
+                            <button id="Pilot_Full_Auto">Full Auto</button>
+                            <button id="Pilot_Angle">Angle</button>
+                            <button id="Pilot_Manuel">Manuel</button>
+                        </div>
+                        <div class="Route">
+                            <button id="Route_Route" class="Route_Button">Route</button>
+                            <button id="Route_Random" class="Route_Button">Random</button>
+                            <button id="Route_Manuel" class="Route_Button">Manuel</button>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <div id="Seperator_Line_Container"><div id=Seperator_Line></div></div>                
+
+            <section id="Bottom">
+
+            </section>
+        <script src="/static/script/main.js"></script>
+        <script>
+            var outputs = JSON.parse('{{outputs|tojson}}');
+            load_parameters(outputs)
+        </script>
+    </body>
+</html>

@@ -1,0 +1,399 @@
+#Middle .Right .Drive_Mode_Change #Route_Route, #Middle .Right .Drive_Mode_Change #Route_Random, #Middle .Right .Drive_Mode_Change #Route_Manuel, #Middle .Right .Drive_Mode_Change #Pilot_Full_Auto, #Middle .Right .Drive_Mode_Change #Pilot_Angle, #Middle .Right .Drive_Mode_Change #Pilot_Manuel {
+  text-align: center;
+  height: 35px;
+  background-color: rgba(0, 0, 0, 0);
+  color: white;
+  font-size: 20px;
+  margin: 4px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: white;
+  border-radius: 10px;
+}
+
+body, html {
+  width: 100%;
+  background-color: #272c2e;
+  margin: 0;
+}
+
+#Top {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px;
+  padding: 5vw;
+  padding-top: 3vh;
+  padding-bottom: 3vh;
+}
+#Top #Logo {
+  width: 17vw;
+  font-size: 4vw;
+  color: white;
+  font-family: "Cursive";
+  margin: 0;
+  padding: 0;
+}
+#Top #Indicators {
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+#Top #Indicators .Sign_Container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  width: 4vw;
+}
+#Top #Indicators .Sign_Container #Stop, #Top #Indicators .Sign_Container #Taxi {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 3.8vh;
+  width: 3.2vw;
+  font-size: 1.4vw;
+  border-style: solid;
+  border-color: white;
+}
+#Top #Indicators #Arrow_Container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: transparent;
+  margin-left: 1vw;
+  margin-right: 1vw;
+}
+#Top #Indicators #Arrow_Container #Right_Arrow, #Top #Indicators #Arrow_Container #Forward_Arrow, #Top #Indicators #Arrow_Container #Left_Arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 1.5vw;
+  width: 1.5vw;
+  margin: 1vw;
+  margin-top: 1vw;
+  border-style: solid;
+  border-width: 10px;
+  border-radius: 5px;
+  border-color: white;
+  border-bottom: 0;
+  border-left: 0;
+}
+#Top #Indicators #Arrow_Container #Left_Arrow {
+  transform: rotate(-135deg);
+}
+#Top #Indicators #Arrow_Container #Forward_Arrow {
+  transform: rotate(-45deg);
+  margin-top: 0;
+}
+#Top #Indicators #Arrow_Container #Right_Arrow {
+  transform: rotate(45deg);
+}
+#Top #Indicators #Arrow_Container #Right_Arrow_Stick, #Top #Indicators #Arrow_Container #Forward_Arrow_Stick, #Top #Indicators #Arrow_Container #Left_Arrow_Stick {
+  height: 5vh;
+  width: 0.5vw;
+  background-color: white;
+  border-radius: 5px;
+  transform: rotate(45deg);
+}
+#Top #Indicators #Stop_Timer {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  right: calc(50% - 50px);
+  font-size: 90px;
+  color: white;
+  -webkit-text-stroke: 1px #ffb700;
+}
+#Top #Indicators .Lane_Container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  width: 5vw;
+}
+#Top #Indicators .Lane_Container .Lane {
+  height: 100%;
+  width: 4px;
+  background-color: white;
+}
+#Top #Indicators .Lane_Container .Lane_Indicator {
+  height: 85px;
+  width: 25px;
+  background-color: #3c73ff;
+  margin-left: 7px;
+  margin-right: 5px;
+}
+#Top #Indicators .Lane_Container #Left_Lane {
+  visibility: hidden;
+}
+#Top #Indicators .Lane_Container #Right_Lane {
+  visibility: hidden;
+}
+#Top #Emergency_Button {
+  text-align: center;
+  width: 17vw;
+  background-color: red;
+  font-size: 1.5vw;
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  padding: 15px 32px;
+}
+#Top #Emergency_Button:hover {
+  background-color: rgba(255, 0, 0, 0.7529411765);
+}
+
+#Middle {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-top: 4vh;
+  padding-bottom: 4vh;
+}
+#Middle .Graph_Camera_Mod {
+  background-color: #ffb700;
+  color: black;
+  font-size: 20px;
+  font-weight: 530;
+  text-align: center;
+  margin-bottom: 5px;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 2px;
+}
+@media (max-width: 1920px) {
+  #Middle .Graph_Camera_Mod {
+    display: none;
+  }
+}
+#Middle .Left {
+  display: flex;
+  flex-direction: column;
+  padding-left: 5vw;
+}
+#Middle .Left #Camera_Brodcast {
+  height: 50vh;
+  width: 40vw;
+  background-color: bisque;
+  border-radius: 10px;
+}
+@media (max-width: 1920) {
+  #Middle .Left #Camera_Brodcast {
+    width: 20vw;
+    height: 20vh;
+  }
+}
+#Middle .Left #Camera_Brodcast img {
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+}
+#Middle .Left .Info {
+  display: flex;
+  justify-content: space-around;
+  height: 150px;
+  padding-top: 30px;
+}
+@media (max-width: 1920px) {
+  #Middle .Left .Info {
+    padding-top: 0px;
+  }
+}
+#Middle .Left .Info .Bar_Container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 25px;
+  color: white;
+  margin-top: 25px;
+}
+#Middle .Left .Info .Bar_Container .Bar {
+  display: relative;
+  justify-content: middle;
+  overflow: hidden;
+  height: 17px;
+  width: 20vw;
+  margin: 10px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: white;
+  border-radius: 10px;
+}
+#Middle .Left .Info .Bar_Container .Bar #Throttle_Border, #Middle .Left .Info .Bar_Container .Bar #Steering_Border {
+  position: absolute;
+  height: 19px;
+  width: 5px;
+  margin-top: -1px;
+  background-color: white;
+}
+#Middle .Left .Info .Bar_Container .Bar #Steering_Border {
+  margin-left: 10vw;
+}
+#Middle .Left .Info .Bar_Container .Bar #Throttle_Border {
+  margin-left: 6.6666666667vw;
+}
+#Middle .Left .Info .Bar_Container .Bar #Throttle, #Middle .Left .Info .Bar_Container .Bar #Steering {
+  height: 100%;
+  width: 0;
+}
+#Middle .Left .Info .Bar_Container .Bar #Steering {
+  background-color: #ff4e4e;
+}
+#Middle .Left .Info .Bar_Container .Bar #Throttle {
+  background-color: #3666ff;
+}
+#Middle .Left .Info .Bar_Container #Speed {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+#Middle .Left .Info .Action_Buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 10vw;
+  color: white;
+}
+#Middle .Left .Info .Action_Buttons #Speed_Factor {
+  width: 100%;
+  margin-top: 17px;
+}
+#Middle .Left .Info .Action_Buttons #Speed_Factor input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  background-color: transparent;
+  margin: 0 0;
+}
+#Middle .Left .Info .Action_Buttons #Speed_Factor input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 12px;
+  background: #ffb700;
+  cursor: pointer;
+  border-radius: 25px;
+}
+#Middle .Left .Info .Action_Buttons #Speed_Factor input[type=range]::-webkit-slider-thumb {
+  height: 20px;
+  width: 20px;
+  background: white;
+  margin-top: -3.6px;
+  border-radius: 15px;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+#Middle .Left .Info .Action_Buttons .Go_Record_Container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+  margin-top: 10px;
+}
+#Middle .Left .Info .Action_Buttons .Go_Record_Container #Go {
+  text-align: center;
+  height: 35px;
+  width: 60px;
+  background-color: rgba(0, 0, 0, 0);
+  font-size: 20px;
+  color: white;
+  margin: 2px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: white;
+  border-radius: 10px;
+}
+#Middle .Left .Info .Action_Buttons .Go_Record_Container #Record_Timer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 3vh;
+  width: 2vw;
+  font-size: 1.3vmax;
+  color: white;
+  visibility: hidden;
+}
+#Middle .Left .Info .Action_Buttons .Go_Record_Container .Record_Border {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 2vmax;
+  width: 2vmax;
+  border-color: white;
+  border-style: solid;
+  border-width: 5px;
+  border-radius: 40px;
+}
+#Middle .Left .Info .Action_Buttons .Go_Record_Container .Record_Border #Record {
+  height: 1.4vmax;
+  width: 1.4vmax;
+  background-color: red;
+  border-color: black;
+  border-style: solid;
+  border-radius: 100px;
+  border-width: 4px;
+}
+#Middle .Right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-right: 5vw;
+}
+#Middle .Right .Graph_Container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 40vw;
+  height: 50vh;
+}
+#Middle .Right .Graph_Container #Graph2, #Middle .Right .Graph_Container #Graph1 {
+  width: 40vw;
+  height: 20vh;
+  background-color: bisque;
+  border-radius: 10px;
+}
+#Middle .Right .Drive_Mode_Change {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+  height: 100px;
+  width: 40vw;
+  padding-top: 40px;
+}
+@media (max-width: 1920px) {
+  #Middle .Right .Drive_Mode_Change {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+}
+#Middle .Right .Drive_Mode_Change .Pilot, #Middle .Right .Drive_Mode_Change .Route {
+  display: flex;
+  justify-content: center;
+  margin: 1px;
+}
+#Seperator_Line_Container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+@media (max-width: 1920px) {
+  #Seperator_Line_Container {
+    display: none;
+  }
+}
+
+#Seperator_Line {
+  height: 1px;
+  width: 80%;
+  background-color: white;
+}/*# sourceMappingURL=main.css.map */
