@@ -48,9 +48,9 @@ def send_inputs():
 
 # Wrapper Class flask app problematic when inside the class
 class Web_Server:
-    def __init__(self, memory):
-        self.thread = True
-        self.memory = memory
+    def __init__(self):
+        self.threaded = True
+        self.memory = 0
         self.outputs = outputs
 
     def change_server_memory(self, name, value):
@@ -67,12 +67,13 @@ class Web_Server:
         for key in inputs:
             inputs[key] = self.memory.memory[key]
 
+    def start_thread(self):
+        app.run(host='0.0.0.0')
+        
     def update(self):
         self.update_vehicle_memory()
         self.update_local_memory()
 
-    def start_thread(self):
-        app.run(host='0.0.0.0')
 
 if __name__=="__main__":
     app.run(host='0.0.0.0', debug=True)
