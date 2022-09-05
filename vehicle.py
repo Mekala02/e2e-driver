@@ -13,8 +13,8 @@ class Vehicle:
     def start(self):
         for part in self.parts:
             # Adding parts output to the memory
-            for output in part.outputs:
-                self.memory.add(output)
+            for output, value in part.outputs.items():
+                self.memory.add(output, value)
             if part.threaded:
                 t = Thread(target=part.start_thread, args=())
                 t.daemon = True

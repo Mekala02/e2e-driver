@@ -29,5 +29,5 @@ vehicle.start()
 while True:
     now = time.time()
     vehicle.update()
-    vehicle.memory.print_memory()
-    print(time.time() - now)
+    # vehicle.memory.print_memory()
+    time.sleep(0.01)

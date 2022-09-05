@@ -1,4 +1,4 @@
-var update_hz = 100
+var update_interval = 10
 var xhr = new XMLHttpRequest()
 var button_clicked_color = "#912020"
 var indicator_color = "red"
@@ -288,5 +288,5 @@ function load_parameters(outputs){
         console.log(key, value);
       }
       Track.update_client_side()
-      setInterval(Track.update_indicators, update_hz)
+      setInterval(Track.update_indicators, update_interval)
 }
