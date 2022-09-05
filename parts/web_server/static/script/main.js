@@ -20,7 +20,7 @@ class Status {
         xhr.open("POST", "/outputs", true)
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.send(JSON.stringify(data))
-        console.log(data)
+        // console.log(data)
     }
 
     activated_color(ID, color){
@@ -109,8 +109,8 @@ class Status {
             document.getElementById("Camera_Mode").value = camera_mode
         else{
             this.outputs["camera_mode"] = camera_mode
-            console.log('Camera Mode: ', this.outputs["camera_mode"]);
             this.send_data({camera_mode: this.outputs["camera_mode"]})
+            // console.log('Camera Mode: ', this.outputs["camera_mode"]);
         }
     }
 
@@ -119,8 +119,8 @@ class Status {
             document.getElementById("Graph_Mode").value = graph_mode
         else{
             this.outputs["graph_mode"] = graph_mode
-            console.log('Graph Mode: ', this.outputs["graph_mode"]);
             this.send_data({graph_mode: this.outputs["graph_mode"]})
+            // console.log('Graph Mode: ', this.outputs["graph_mode"]);
         }
     }
 
@@ -164,8 +164,8 @@ class Status {
         else{
             this.outputs["speed_factor"] = document.getElementById("Speed_Slider").value / 50
             document.getElementById("Speed_Slider").title = this.outputs["speed_factor"]
-            console.log(this.outputs["speed_factor"])
             this.send_data({speed_factor: this.outputs["speed_factor"]})
+            // console.log(this.outputs["speed_factor"])
         }
     }
 
@@ -200,8 +200,8 @@ class Status {
                 this.outputs["record"] = 1
             else if (this.outputs["record"] == 1)
                 this.outputs["record"] = 0
-            console.log("Record:", this.outputs["record"])
-            this.send_data({record: this.outputs["record"]})
+                this.send_data({record: this.outputs["record"]})
+                // console.log("Record:", this.outputs["record"])
         }
         this.record_style_change(this.outputs["record"])
     }
@@ -212,8 +212,8 @@ class Status {
                 this.outputs["motor_power"] = 0
             else if (this.outputs["motor_power"] == 0)
                 this.outputs["motor_power"] = 1
-            console.log("Motor_Power:", this.outputs["motor_power"])
-            this.send_data({motor_power: this.outputs["motor_power"]})
+                this.send_data({motor_power: this.outputs["motor_power"]})
+                // console.log("Motor_Power:", this.outputs["motor_power"])
         }
         if (this.outputs["motor_power"] == 1)
             this.activated_color("Go", "red")
@@ -225,16 +225,16 @@ class Status {
         this.unactivated_color("Pilot_"+this.outputs["pilot"])
         this.outputs["pilot"] = mode
         this.activated_color("Pilot_"+mode, button_clicked_color)
-        console.log("Pilot:", this.outputs["pilot"])
         this.send_data({pilot: this.outputs["pilot"]})
+        // console.log("Pilot:", this.outputs["pilot"])
     }
     
     Update_Route_Mode(mode){
         this.unactivated_color("Route_"+this.outputs["route"])
         this.outputs["route"] = mode
         this.activated_color("Route_"+mode, button_clicked_color)
-        console.log("Route:", this.outputs["route"])
         this.send_data({route: this.outputs["route"]})
+        // console.log("Route:", this.outputs["route"])
     }
     
     update_client_side(){

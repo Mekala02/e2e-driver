@@ -8,10 +8,12 @@ camera=cv2.VideoCapture(0)
 queue = set()
 
 outputs = {"pilot": "Manuel", "route": "Manuel", "motor_power": 0, "record": 0,
-        "speed_factor": 1, "camera_mode": "RGB", "graph_mode": "Speed/IMU"}
+        "speed_factor": 1}
 
 inputs = {"stop": 0, "taxi": 0, "direction": "Forward", "lane": "Right",
-        "steering": 0, "throttle": 0, "speed": 0, "graph": 0}
+        "steering": 0, "throttle": 0, "speed": 0, "speed": 0, "IMU": 0}
+
+web_special = {"camera_mode": "RGB", "graph_mode": "Speed/IMU"}
 
 def generate_frames():
     while True:
@@ -28,7 +30,7 @@ def generate_frames():
 
 @app.route('/')
 def index():
-    return render_template('main.html', outputs=outputs, inputs=inputs)
+    return render_template('main.html', outputs={**outputs, **web_special})
 
 @app.route('/video')
 def video():
@@ -38,8 +40,11 @@ def video():
 def receive_outputs():
     information = request.get_json()
     for key in information.keys():
-        outputs[key] = information[key]
-        queue.add(key)
+        if key in web_special:
+            web_special[key] = information[key]
+        else:
+            outputs[key] = information[key]
+            queue.add(key)
     return information
 
 @app.route('/inputs')
