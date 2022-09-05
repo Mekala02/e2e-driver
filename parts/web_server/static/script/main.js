@@ -188,12 +188,10 @@ class Status {
         }
         else if (style == 1){
             var style = document.getElementById("Record").style
-            style.height = "1.25vw"
-            style.width = "1.25vw"
+            style.height = "60%"
+            style.width = "60%"
             style.backgroundColor = "red"
             style.borderStyle = "solid"
-            style.borderWidth = "4px"
-            style.borderColor = "black"
             style.borderRadius = "5px"
             document.getElementById("Record_Timer").style.visibility = "visible"
             this.print_record_time_interval = setInterval(this.print_record_time, 100)
