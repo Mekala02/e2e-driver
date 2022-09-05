@@ -27,7 +27,7 @@ vehicle.add(Web_Server())
 vehicle.start()
 
 while True:
+    now = time.time()
     vehicle.update()
     vehicle.memory.print_memory()
-    time.sleep(0.5)
-    # pass
+    print(time.time() - now)
