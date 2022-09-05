@@ -436,8 +436,9 @@ body, html {
 #Middle .Right .Graph_Container #Graph2, #Middle .Right .Graph_Container #Graph1 {
   width: 35vw;
   height: 16vh;
-  background-color: bisque;
+  background-color: transparent;
   border-radius: 10px;
+  overflow: hidden;
 }
 #Middle .Right .Drive_Mode_Change {
   display: flex;
