@@ -34,17 +34,17 @@ def index():
 def video():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/data', methods=['GET', 'POST'])
-def receiver():
+@app.route('/outputs', methods=['GET', 'POST'])
+def receive_outputs():
     information = request.get_json()
     for key in information.keys():
         outputs[key] = information[key]
         queue.add(key)
     return information
 
-@app.route('/test')
-def get_current_user():
-    return jsonify(outputs)
+@app.route('/inputs')
+def send_inputs():
+    return jsonify(inputs)
 
 # Wrapper Class flask app problematic when inside the class
 class Web_Server:
@@ -57,17 +57,19 @@ class Web_Server:
         self.server_memory[name] = value
 
     def update_vehicle_memory(self):
+        # Updates outputs(to vehicle) coming from web server client side
         for key in queue:
             self.memory.memory[key] = outputs[key]
         queue.clear()
 
     def update_local_memory(self):
+        # Updates Inputs(to web server) coming from vehicle
         for key in inputs:
             inputs[key] = self.memory.memory[key]
 
     def update(self):
         self.update_vehicle_memory()
-        # self.update_local_memory()
+        self.update_local_memory()
 
     def start_thread(self):
         app.run(host='0.0.0.0')

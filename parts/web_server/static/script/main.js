@@ -1,3 +1,4 @@
+var update_hz = 100
 var xhr = new XMLHttpRequest()
 var button_clicked_color = "#912020"
 var indicator_color = "red"
@@ -11,20 +12,12 @@ class Status {
         speed_factor: 1, camera_mode: "RGB", graph_mode: "Speed/IMU"}
 
         this.not_record_style = document.getElementById("Record").style
-        this.stop = 0
-        this.taxi = 0
         this.direction = "Forward"
-        document.getElementById(this.direction+"_Arrow").style.borderColor = first_color
-        document.getElementById(this.direction+"_Arrow_Stick").style.backgroundColor = first_color
         this.lane = "Right"
-        document.getElementById(this.lane+"_Lane").style.visibility = "visible"
-        this.steering = 0
-        this.throttle = 0
-        this.speed = 0
     }
 
     send_data(data){
-        xhr.open("POST", "/data", true)
+        xhr.open("POST", "/outputs", true)
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.send(JSON.stringify(data))
         console.log(data)
@@ -60,7 +53,7 @@ class Status {
             this.Print_Stop_Timer_Interval = setInterval(this.Print_Stop_Timer, 1000)
         }
         this.stop = stopped
-        console.log("Stop:", this.stop)
+        // console.log("Stop:", this.stop)
     }
 
     Update_Taxi(pull_over){
@@ -69,7 +62,7 @@ class Status {
         else if (pull_over == 1)
             this.activated_color("Taxi", indicator_color)
         this.taxi = pull_over
-        console.log("Taxi:", this.taxi)
+        // console.log("Taxi:", this.taxi)
     }
 
     turn_signal(direction){
@@ -97,14 +90,14 @@ class Status {
             this.turn_signal_interval = setInterval(this.turn_signal, 500, direction)
         }
         this.direction = direction
-        console.log("Direction:", this.direction)
+        // console.log("Direction:", this.direction)
     }
 
     Update_Lane(lane){
         document.getElementById(this.lane+"_Lane").style.visibility = "hidden"
         this.lane = lane
         document.getElementById(this.lane+"_Lane").style.visibility = "visible"
-        console.log("Lane:", this.lane)
+        // console.log("Lane:", this.lane)
     }
 
     Emergency_Stop(){
@@ -147,19 +140,22 @@ class Status {
         bar.style.width = calculated_value + "%"
     }
 
-    Update_Bars(steering, throttle){
+    Update_Steering(steering){
         this.steering = steering
-        this.throttle = throttle
         this.bar_lengthen("Steering", this.steering, 50)
+        // console.log('Steering: ', this.steering)
+    }
+
+    Update_Throttle(throttle){
+        this.throttle = throttle
         this.bar_lengthen("Throttle", this.throttle, 33.33)
-        console.log('Steering: ', this.steering)
-        console.log('Throttle: ', this.throttle)
+        // console.log('Throttle: ', this.throttle)
     }
 
     Update_Speed(speed){
         this.speed = speed
         document.getElementById("Speed").innerHTML = this.speed + " m/s"
-        console.log('You selected: ', this.speed)
+        // console.log('You selected: ', this.speed)
     }
 
     Update_Speed_Factor(synchronize=0){
@@ -244,6 +240,25 @@ class Status {
     update_client_side(){
         this.Update_Pilot_Mode(this.outputs["pilot"])
         this.Update_Route_Mode(this.outputs["route"])
+        this.Update_Camera_Mode(this.outputs["camera_mode"], 1)
+        this.Update_Graph_Mode(this.outputs["graph_mode"], 1)
+        this.Update_Speed_Factor(1)
+        this.Update_Motor_Power(1)
+        this.Update_Record(1)
+    }
+
+    update_indicators(){
+        fetch("inputs")
+        .then(response => response.json())
+        .then(inputs => {
+        Track.Update_Stop(inputs["stop"])
+        Track.Update_Taxi(inputs["taxi"])
+        Track.Update_Direction(inputs["direction"])
+        Track.Update_Lane(inputs["lane"])
+        Track.Update_Steering(inputs["steering"])
+        Track.Update_Throttle(inputs["throttle"])
+        Track.Update_Speed(inputs["speed"])
+        })
     }
 }
 
@@ -273,36 +288,5 @@ function load_parameters(outputs){
         console.log(key, value);
       }
       Track.update_client_side()
-      Track.Update_Camera_Mode(Track.outputs["camera_mode"], synchronize=1)
-      Track.Update_Graph_Mode(Track.outputs["graph_mode"], synchronize=1)
-      Track.Update_Speed_Factor(synchronize=1)
-      Track.Update_Motor_Power(synchronize=1)
-      Track.Update_Record(synchronize=1)
+      setInterval(Track.update_indicators, update_hz)
 }
-
-function test(){
-    fetch("test")
-    .then(response => response.json())
-    .then(data => {console.log(data)
-        // data is a parsed JSON object
-    })
-}
-
-
-
-// For Testing
-// Track.Update_Stop(1)
-// Track.Update_Taxi(1)
-// Track.Update_Direction("Forward")
-
-// function test(){
-//     const outputs = ["pilot", "route", "motor_power", "record", "speed_factor", "direction", "lane", "camera_mode", "graph_mode"]
-//     xhr.open("POST", "/data", true)
-//     xhr.setRequestHeader('Content-Type', 'application/json');
-//     xhr.send(JSON.stringify(outputs))
-//     console.log("sended")
-// }
-
-// setTimeout(function(){
-// test()
-// }, 3000);

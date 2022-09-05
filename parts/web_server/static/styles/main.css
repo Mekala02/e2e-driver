@@ -459,7 +459,7 @@ body, html {
   margin: 1px;
 }
 #Seperator_Line_Container {
-  display: flex;
+  display: none;
   justify-content: center;
   align-items: center;
 }
