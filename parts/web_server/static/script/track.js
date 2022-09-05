@@ -1,4 +1,3 @@
-var update_interval = 10
 var record_timer = 0
 var stop_timer = 0
 
