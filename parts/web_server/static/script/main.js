@@ -39,10 +39,6 @@ document.getElementById("Route_Route").addEventListener("click", function() {Tra
 document.getElementById("Route_Random").addEventListener("click", function() {Track.Update_Route_Mode("Random")})
 document.getElementById("Route_Manuel").addEventListener("click", function() {Track.Update_Route_Mode("Manuel")})
 
-function getData() {
-  return Math.random();
-}  
-
 var layout1 = {
   autosize: true,
   margin: {
@@ -67,38 +63,26 @@ var trace1 = {
   width: 4
 }}
 
-Plotly.react('Graph1', [trace1], layout1, {displayModeBar: false});
-
 var length1 = 0
-
-setInterval(function(){
+function graph(graph){
   length1 = Track.graph["timestamp"].length
-  trace1["x"] = Track.graph["timestamp"].slice(Math.max(0, length1 - 500), length1 - 1)
-  trace1["y"] = Track.graph["steering"].slice(Math.max(0, length1 - 500), length1 - 1)
+
+  var traces = []
+  for (let mode of Track.outputs[`graph${graph}_mode`]){
+    traces.push({
+      x: Track.graph["timestamp"].slice(Math.max(0, length1 - 500), length1 - 1),
+      y: Track.graph[mode].slice(Math.max(0, length1 - 500), length1 - 1),
+      type:'line',
+      line: {
+      // color: 'red',
+      width: 4
+    }})
+  }
+
   layout1["xaxis"]["range"] = [trace1["x"][0], trace1["x"][500]]
-  Plotly.relayout('Graph1', layout1);
-}, update_interval);
 
+  Plotly.react(`Graph${graph}`, traces, layout1, {displayModeBar: false})
+}
 
-var layout2 = JSON.parse(JSON.stringify(layout1))
-
-var trace2 = {
-  x:[],
-  y:[],
-  type:'line',
-  line: {
-  color: 'blue',
-  width: 4
-}}
-
-Plotly.react('Graph2', [trace2], layout2, {displayModeBar: false});
-
-var length2 = 0
-
-setInterval(function(){
-  length2 = Track.graph["timestamp"].length
-  trace2['x'] = Track.graph["timestamp"].slice(Math.max(0, length2 - 500), length2 - 1)
-  trace2["y"] = Track.graph["throttle"].slice(Math.max(0, length2 - 500), length2 - 1)
-  layout2["xaxis"]["range"] = [trace2["x"][0], trace2["x"][500]]
-  Plotly.relayout('Graph2', layout2);
-}, update_interval);
+setInterval(function(){graph(1)}, update_interval)
+setInterval(function(){graph(2)}, update_interval)

@@ -14,7 +14,7 @@ class Status {
         this.direction = "Forward"
         this.lane = "Right"
 
-        this.graph = {steering: [], throttle: [], speed: [], IMU: [], timestamp: []}
+        this.graph = {Steering: [], Throttle: [], Speed: [], IMU: [], timestamp: []}
     }
 
     send_data(data){
@@ -113,12 +113,14 @@ class Status {
     }
 
     Update_Graph_Mode(mode, graph=0, synchronize=0){
+        // If we synchronizing we only activating the colors on client side
         if (synchronize){
             for (let value of this.outputs[`graph${graph}_mode`]) {
                 this.activated_color(`G${graph}_${value}`, this.button_clicked_color)
               }
         }
         else{
+            // If clicked button already selected we turning off it and deleting from list
             if (this.outputs[`graph${graph}_mode`].includes(mode)){
                 this.unactivated_color(`G${graph}_${mode}`)
                 const index = this.outputs[`graph${graph}_mode`].indexOf(mode)
@@ -128,6 +130,7 @@ class Status {
                 this.activated_color(`G${graph}_${mode}`, this.button_clicked_color)
                 this.outputs[`graph${graph}_mode`].push(mode)
             }
+            // Finaly sending list to the server
             if (graph == 1){
                 const dict = {}
                 dict["test"] = this.outputs["graph1_mode"]
@@ -138,13 +141,6 @@ class Status {
                 // console.log({graph2_mode: this.outputs["graph2_mode"]})
                 this.send_data({graph2_mode: this.outputs["graph2_mode"]})
         }
-        // this.unactivated_color(`G${graph}_${this.outputs[`graph${graph}_mode`]}`)
-        // this.outputs[`graph${graph}_mode`] = mode
-        // this.activated_color(`G${graph}_${mode}`, this.button_clicked_color)
-        // if (graph == 1)
-        //     this.send_data({graph1_mode: this.outputs["graph1_mode"]})
-        // else if(graph == 2)
-        //     this.send_data({graph2_mode: this.outputs["graph2_mode"]})
     }
 
     bar_lengthen(ID, value, center){
@@ -284,9 +280,9 @@ class Status {
         Track.Update_Throttle(inputs["throttle"])
         Track.Update_Speed(inputs["speed"])
 
-        Track.graph["steering"].push(inputs["steering"])
-        Track.graph["throttle"].push(inputs["throttle"])
-        Track.graph["speed"].push(inputs["speed"])
+        Track.graph["Steering"].push(inputs["steering"])
+        Track.graph["Throttle"].push(inputs["throttle"])
+        Track.graph["Speed"].push(inputs["speed"])
         Track.graph["IMU"].push(inputs["IMU"])
         Track.graph["timestamp"].push(inputs["timestamp"] / 10**24)
         })
