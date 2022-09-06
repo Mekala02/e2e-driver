@@ -13,7 +13,7 @@ outputs = {"pilot": "Manuel", "route": "Manuel", "motor_power": 0, "record": 0,
 inputs = {"stop": 0, "taxi": 0, "direction": "Forward", "lane": "Right",
         "steering": 0, "throttle": 0, "speed": 0, "IMU": 0, "timestamp": 0}
 
-web_special = {"camera_mode": "RGB", "graph_mode": "Speed/IMU"}
+web_special = {"camera_mode": "RGB", "graph1_mode": "Steering", "graph2_mode": "Throttle"}
 
 def generate_frames():
     while True:

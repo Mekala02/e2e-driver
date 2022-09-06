@@ -25,6 +25,42 @@ $max-width: 1920px
         width: auto
         font-size: 20px
 
+%Mode_Select
+    display: flex
+    position: absolute
+    justify-content: center
+    height: 25px
+    width: 60px
+    color: white
+    font-size: 20px
+    background-color: #00000000
+    border-style: solid
+    border-width: 3px
+    border-color: white
+    border-radius: $Fillet
+    margin: 0
+    z-index: 1000
+
+%Mode_Select_Menu
+    display: none
+    flex-direction: column
+    position: absolute
+    z-index: 1000
+    padding: 30px
+
+%Mode_Select_Button
+    height: 30px
+    width: 90px
+    color: white
+    font-size: 20px
+    text-align: center
+    background-color: #00000000
+    border-style: solid
+    border-width: 3px
+    border-color: white
+    border-radius: $Fillet
+    margin: 2px
+
 body, html
     width: 100%
     background-color: $Background_Color
@@ -194,17 +230,6 @@ body, html
     @media (max-width: $max-width)
         padding-top: 70px
 
-    .Graph_Camera_Mod
-        background-color: $First_Color
-        color: black
-        font-size: 20px
-        font-weight: 400
-        text-align: center
-        margin-bottom: 5px
-        border: 0
-        border-radius: $Fillet
-        padding: 10px 2px
-
     .Left
         display: flex
         flex-direction: column
@@ -213,6 +238,7 @@ body, html
         #Camera_Brodcast
             width: 35vw
             height: 35vh
+            position: relative
             background-color: bisque
             border-radius: $Fillet
             margin-bottom: 40px 
@@ -222,6 +248,16 @@ body, html
                 height: 100%
                 width: 100%
                 border-radius: $Fillet
+            #Camera_Mode_Select
+                @extend %Mode_Select
+                top: 15px
+                left: 25px
+                &:hover > #C_Menu
+                    display: flex
+                #C_Menu
+                    @extend %Mode_Select_Menu
+                    .Camera_Select_Button
+                        @extend %Mode_Select_Button
 
         .Info
             display: flex
@@ -398,13 +434,16 @@ body, html
         .Graph_Container
             display: flex
             flex-direction: column
+            position: relative
             justify-content: space-between
             width: 35vw
             height: 35vh
             @media (max-width: $max_width)
                 margin-bottom: 10px
 
+
             %Graph
+                position: relative
                 width: 35vw
                 height: 16vh
                 background-color: transparent
@@ -413,9 +452,29 @@ body, html
 
             #Graph1
                 @extend %Graph
+                #Graph1_Mode_Select
+                    @extend %Mode_Select
+                    top: 15px
+                    right: 25px
+                    &:hover > #G1_Menu
+                        display: flex
+                    #G1_Menu
+                        @extend %Mode_Select_Menu
+                        .Graph_Select_Button
+                            @extend %Mode_Select_Button
 
             #Graph2
                 @extend %Graph
+                #Graph2_Mode_Select
+                    @extend %Mode_Select
+                    top: 15px
+                    right: 25px
+                    &:hover > #G2_Menu
+                        display: flex
+                    #G2_Menu
+                        @extend %Mode_Select_Menu
+                        .Graph_Select_Button
+                            @extend %Mode_Select_Button
 
         .Drive_Mode_Change
             display: flex

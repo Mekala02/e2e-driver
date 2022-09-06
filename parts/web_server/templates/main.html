@@ -37,14 +37,16 @@
 
             <section id="Middle">
                 <div class="Left">
-                    <form action="#">
-                        <select class="Graph_Camera_Mod" id="Camera_Mode">
-                            <option value="RGB">RGB</option>
-                            <option value="Depth">Depth</option>
-                            <option value="Object_Detection">YOLO</option>
-                        </select>
-                    </form>
-                    <div id="Camera_Brodcast"><img src="{{ url_for('video') }}"/></div>
+                    <div id="Camera_Brodcast">
+                        <div id="Camera_Mode_Select">Mode
+                            <div id="C_Menu">
+                                <button id="C_RGB" class="Camera_Select_Button">RGB</button>
+                                <button id="C_Depth" class="Camera_Select_Button">Depth</button>
+                                <button id="C_Object_Detection" class="Camera_Select_Button">YOLO</button>
+                            </div>
+                        </div>
+                        <img src="{{ url_for('video') }}"/>
+                    </div>
                     <div class="Info">
                         <div class="Bar_Container">
                             <div class="Bar"><div id="Steering_Border"></div><div id="Steering"></div></div>
@@ -64,16 +66,28 @@
                     </div>
                 </div>
 
-                <div class="Right">
-                    <form action="#" >
-                        <select class="Graph_Camera_Mod" id="Graph_Mode">
-                            <option value="Speed/IMU">Speed/IMU</option>
-                            <option value="Steering/Throttle">Steer/Throttle</option>
-                        </select>
-                    </form>
+                <div class="Right">                    
                     <div class="Graph_Container">
-                        <div id="Graph1"></div>
-                        <div id="Graph2"></div>
+                        <div id="Graph1">                          
+                            <div id="Graph1_Mode_Select">Mode
+                                <div id="G1_Menu">
+                                    <button id="G1_Steering" class="Graph_Select_Button">Steering</button>
+                                    <button id="G1_Throttle" class="Graph_Select_Button">Throttle</button>
+                                    <button id="G1_Speed" class="Graph_Select_Button">Speed</button>
+                                    <button id="G1_IMU" class="Graph_Select_Button">IMU</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="Graph2">
+                            <div id="Graph2_Mode_Select">Mode
+                                <div id="G2_Menu">
+                                    <button id="G2_Steering" class="Graph_Select_Button">Steering</button>
+                                    <button id="G2_Throttle" class="Graph_Select_Button">Throttle</button>
+                                    <button id="G2_Speed" class="Graph_Select_Button">Speed</button>
+                                    <button id="G2_IMU" class="Graph_Select_Button">Imu</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="Drive_Mode_Change">
                         <div class="Pilot">

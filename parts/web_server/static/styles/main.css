@@ -19,6 +19,45 @@
   }
 }
 
+#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select, #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select, #Middle .Left #Camera_Brodcast #Camera_Mode_Select {
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  height: 25px;
+  width: 60px;
+  color: white;
+  font-size: 20px;
+  background-color: rgba(0, 0, 0, 0);
+  border-style: solid;
+  border-width: 3px;
+  border-color: white;
+  border-radius: 10px;
+  margin: 0;
+  z-index: 1000;
+}
+
+#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu, #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu, #Middle .Left #Camera_Brodcast #Camera_Mode_Select #C_Menu {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  z-index: 1000;
+  padding: 30px;
+}
+
+#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu .Graph_Select_Button, #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu .Graph_Select_Button, #Middle .Left #Camera_Brodcast #Camera_Mode_Select #C_Menu .Camera_Select_Button {
+  height: 30px;
+  width: 90px;
+  color: white;
+  font-size: 20px;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0);
+  border-style: solid;
+  border-width: 3px;
+  border-color: white;
+  border-radius: 10px;
+  margin: 2px;
+}
+
 body, html {
   width: 100%;
   background-color: #272c2e;
@@ -208,17 +247,6 @@ body, html {
     padding-top: 70px;
   }
 }
-#Middle .Graph_Camera_Mod {
-  background-color: #ffb700;
-  color: black;
-  font-size: 20px;
-  font-weight: 400;
-  text-align: center;
-  margin-bottom: 5px;
-  border: 0;
-  border-radius: 10px;
-  padding: 10px 2px;
-}
 #Middle .Left {
   display: flex;
   flex-direction: column;
@@ -227,6 +255,7 @@ body, html {
 #Middle .Left #Camera_Brodcast {
   width: 35vw;
   height: 35vh;
+  position: relative;
   background-color: bisque;
   border-radius: 10px;
   margin-bottom: 40px;
@@ -240,6 +269,13 @@ body, html {
   height: 100%;
   width: 100%;
   border-radius: 10px;
+}
+#Middle .Left #Camera_Brodcast #Camera_Mode_Select {
+  top: 15px;
+  left: 25px;
+}
+#Middle .Left #Camera_Brodcast #Camera_Mode_Select:hover > #C_Menu {
+  display: flex;
 }
 #Middle .Left .Info {
   display: flex;
@@ -424,6 +460,7 @@ body, html {
 #Middle .Right .Graph_Container {
   display: flex;
   flex-direction: column;
+  position: relative;
   justify-content: space-between;
   width: 35vw;
   height: 35vh;
@@ -434,11 +471,26 @@ body, html {
   }
 }
 #Middle .Right .Graph_Container #Graph2, #Middle .Right .Graph_Container #Graph1 {
+  position: relative;
   width: 35vw;
   height: 16vh;
   background-color: transparent;
   border-radius: 10px;
   overflow: hidden;
+}
+#Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select {
+  top: 15px;
+  right: 25px;
+}
+#Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select:hover > #G1_Menu {
+  display: flex;
+}
+#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select {
+  top: 15px;
+  right: 25px;
+}
+#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select:hover > #G2_Menu {
+  display: flex;
 }
 #Middle .Right .Drive_Mode_Change {
   display: flex;

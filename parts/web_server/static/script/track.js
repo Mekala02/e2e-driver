@@ -8,7 +8,7 @@ class Status {
         this.indicator_color = "red"
         this.first_color = "#ffb700"
         this.outputs = {pilot: "Manuel", route: "Manuel", motor_power: 0, record: 0,
-        speed_factor: 1, camera_mode: "RGB", graph_mode: "Speed/IMU"}
+        speed_factor: 1, camera_mode: "RGB", graph1_mode: "Steering", graph2_mode: "Throttle"}
 
         this.not_record_style = document.getElementById("Record").style
         this.direction = "Forward"
@@ -105,24 +105,20 @@ class Status {
         alert("Emergency Stop")
     }
     
-    Update_Camera_Mode(camera_mode, synchronize=0){
-        if (synchronize == 1)
-            document.getElementById("Camera_Mode").value = camera_mode
-        else{
-            this.outputs["camera_mode"] = camera_mode
-            this.send_data({camera_mode: this.outputs["camera_mode"]})
-            // console.log('Camera Mode: ', this.outputs["camera_mode"]);
-        }
+    Update_Camera_Mode(mode){
+        this.unactivated_color("C_"+this.outputs["camera_mode"])
+        this.outputs["camera_mode"] = mode
+        this.activated_color("C_"+mode, this.button_clicked_color)
+        this.send_data({camera_mode: this.outputs["camera_mode"]})
     }
-
-    Update_Graph_Mode(graph_mode, synchronize=0){
-        if (synchronize == 1)
-            document.getElementById("Graph_Mode").value = graph_mode
-        else{
-            this.outputs["graph_mode"] = graph_mode
-            this.send_data({graph_mode: this.outputs["graph_mode"]})
-            // console.log('Graph Mode: ', this.outputs["graph_mode"]);
-        }
+    Update_Graph_Mode(mode, graph=0){
+        this.unactivated_color(`G${graph}_${this.outputs[`graph${graph}_mode`]}`)
+        this.outputs[`graph${graph}_mode`] = mode
+        this.activated_color(`G${graph}_${mode}`, this.button_clicked_color)
+        if (graph == 1)
+            this.send_data({graph1_mode: this.outputs["graph1_mode"]})
+        else if(graph == 2)
+            this.send_data({graph2_mode: this.outputs["graph2_mode"]})
     }
 
     bar_lengthen(ID, value, center){
@@ -241,8 +237,9 @@ class Status {
     update_client_side(){
         this.Update_Pilot_Mode(this.outputs["pilot"])
         this.Update_Route_Mode(this.outputs["route"])
-        this.Update_Camera_Mode(this.outputs["camera_mode"], 1)
-        this.Update_Graph_Mode(this.outputs["graph_mode"], 1)
+        this.Update_Camera_Mode(this.outputs["camera_mode"])
+        this.Update_Graph_Mode(this.outputs["graph1_mode"], 1)
+        this.Update_Graph_Mode(this.outputs["graph2_mode"], 2)
         this.Update_Speed_Factor(1)
         this.Update_Motor_Power(1)
         this.Update_Record(1)

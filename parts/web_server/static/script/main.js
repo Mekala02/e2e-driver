@@ -12,8 +12,19 @@ function load_parameters(outputs){
 
 document.getElementById("Emergency_Button").addEventListener("click", function() {Track.Emergency_Stop()})
 
-document.getElementById('Camera_Mode').addEventListener('change', function() {Track.Update_Camera_Mode(this.value)});
-document.getElementById('Graph_Mode').addEventListener('change', function() {Track.Update_Graph_Mode(this.value)});
+document.getElementById('C_RGB').addEventListener("click", function() {Track.Update_Camera_Mode("RGB")});
+document.getElementById('C_Depth').addEventListener("click", function() {Track.Update_Camera_Mode("Depth")});
+document.getElementById('C_Object_Detection').addEventListener("click", function() {Track.Update_Camera_Mode("Object_Detection")});
+
+document.getElementById('G1_Steering').addEventListener("click", function() {Track.Update_Graph_Mode("Steering", 1)});
+document.getElementById('G1_Throttle').addEventListener("click", function() {Track.Update_Graph_Mode("Throttle", 1)});
+document.getElementById('G1_Speed').addEventListener("click", function() {Track.Update_Graph_Mode("Speed", 1)});
+document.getElementById('G1_IMU').addEventListener("click", function() {Track.Update_Graph_Mode("IMU", 1)});
+
+document.getElementById('G2_Steering').addEventListener("click", function() {Track.Update_Graph_Mode("Steering", 2)});
+document.getElementById('G2_Throttle').addEventListener("click", function() {Track.Update_Graph_Mode("Throttle", 2)});
+document.getElementById('G2_Speed').addEventListener("click", function() {Track.Update_Graph_Mode("Speed", 2)});
+document.getElementById('G2_IMU').addEventListener("click", function() {Track.Update_Graph_Mode("IMU", 2)});
 
 document.getElementById("Speed_Slider").addEventListener("input", function() {Track.Update_Speed_Factor()})
 
