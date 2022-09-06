@@ -13,6 +13,8 @@ class Status {
         this.not_record_style = document.getElementById("Record").style
         this.direction = "Forward"
         this.lane = "Right"
+
+        this.graph = {steering: [], throttle: [], speed: [], IMU: [], index: []}
     }
 
     send_data(data){
@@ -254,9 +256,16 @@ class Status {
         Track.Update_Taxi(inputs["taxi"])
         Track.Update_Direction(inputs["direction"])
         Track.Update_Lane(inputs["lane"])
+
         Track.Update_Steering(inputs["steering"])
         Track.Update_Throttle(inputs["throttle"])
         Track.Update_Speed(inputs["speed"])
+
+        Track.graph["steering"].push(inputs["steering"])
+        Track.graph["throttle"].push(inputs["throttle"])
+        Track.graph["speed"].push(inputs["speed"])
+        Track.graph["IMU"].push(inputs["IMU"])
+        Track.graph["index"].push(inputs["index"])
         })
     }
 }
