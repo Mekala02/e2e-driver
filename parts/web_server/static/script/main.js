@@ -69,7 +69,7 @@ setInterval(function(){
           range: [trace1["x"][0], trace1["x"][500]]
       }
   });
-},update_interval);
+}, update_interval);
 
 
 var trace2 = {
@@ -94,4 +94,4 @@ setInterval(function(){
           range: [trace2["x"][0], trace2["x"][500]]
       }
   });
-},update_interval);
+}, update_interval);
