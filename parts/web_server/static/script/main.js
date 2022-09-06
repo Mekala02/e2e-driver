@@ -69,7 +69,7 @@ setInterval(function(){
 }, update_interval);
 
 
-var layout2 = {... layout1}
+var layout2 = JSON.parse(JSON.stringify(layout1))
 
 var trace2 = {
   x:[],

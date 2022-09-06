@@ -16,4 +16,4 @@ class Data_Logger:
         if self.memory.memory["record"]:
             json.dump(self.memory.memory, self.file)
             self.file.write('\n')
-        self.index += 1
+            self.index += 1
