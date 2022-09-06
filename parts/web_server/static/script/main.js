@@ -39,7 +39,7 @@ document.getElementById("Route_Route").addEventListener("click", function() {Tra
 document.getElementById("Route_Random").addEventListener("click", function() {Track.Update_Route_Mode("Random")})
 document.getElementById("Route_Manuel").addEventListener("click", function() {Track.Update_Route_Mode("Manuel")})
 
-var layout1 = {
+var layout = {
   autosize: true,
   margin: {
       l: 25,
@@ -51,7 +51,21 @@ var layout1 = {
   paper_bgcolor: '#222222',
   plot_bgcolor: '#222222',
   xaxis: {showticklabels: false},
-  yaxis: {showticklabels: false}
+  yaxis: {showticklabels: false},
+  showlegend: true,
+  legend:{
+    font:{
+      family: "Courier",
+      size: 12,
+      color: "white",
+    },
+    bgcolor: "transparent",
+    orientation: "h",
+    yanchor: "bottom",
+    y: 0,
+    xanchor: "right",
+    x: 1
+  }
 };
 
 var trace1 = {
@@ -72,6 +86,7 @@ function graph(graph){
     traces.push({
       x: Track.graph["timestamp"].slice(Math.max(0, length1 - 500), length1 - 1),
       y: Track.graph[mode].slice(Math.max(0, length1 - 500), length1 - 1),
+      name: mode,
       type:'line',
       line: {
       // color: 'red',
@@ -79,9 +94,9 @@ function graph(graph){
     }})
   }
 
-  layout1["xaxis"]["range"] = [trace1["x"][0], trace1["x"][500]]
+  layout["xaxis"]["range"] = [trace1["x"][0], trace1["x"][500]]
 
-  Plotly.react(`Graph${graph}`, traces, layout1, {displayModeBar: false})
+  Plotly.react(`Graph${graph}`, traces, layout, {displayModeBar: false})
 }
 
 setInterval(function(){graph(1)}, update_interval)

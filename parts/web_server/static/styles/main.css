@@ -476,7 +476,6 @@ body, html {
   height: 16vh;
   background-color: transparent;
   border-radius: 10px;
-  overflow: hidden;
 }
 #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select {
   top: 15px;
