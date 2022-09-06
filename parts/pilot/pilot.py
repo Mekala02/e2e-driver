@@ -12,4 +12,4 @@ class Pilot:
     def update(self):
         # Sin vave for testing web server
         self.memory.memory["steering"] = math.sin(time.time())
-        self.memory.memory["throttle"] = math.sin(time.time() + 1)
+        self.memory.memory["throttle"] = math.sin(time.time() + 2)

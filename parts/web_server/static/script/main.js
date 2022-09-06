@@ -32,7 +32,7 @@ function getData() {
   return Math.random();
 }  
 
-var layout = {
+var layout1 = {
   autosize: true,
   margin: {
       l: 25,
@@ -43,55 +43,51 @@ var layout = {
   },
   paper_bgcolor: '#222222',
   plot_bgcolor: '#222222',
-  yaxis: {tickfont: {size:15}},
-  xaxis: {tickfont: {size:15}}
+  xaxis: {showticklabels: false},
+  yaxis: {showticklabels: false}
 };
 
 var trace1 = {
-  y: [],
   x: [],
+  y: [],
   type:'line',
   line: {
   color: 'red',
   width: 4
 }}
 
-Plotly.react('Graph1', [trace1], layout, {displayModeBar: false});
+Plotly.react('Graph1', [trace1], layout1, {displayModeBar: false});
 
 var length1 = 0
 
 setInterval(function(){
-  length1 = Track.graph["index"].length
-  trace1["x"] = Track.graph["index"].slice(Math.max(0, length1 - 500), length1 - 1)
+  length1 = Track.graph["timestamp"].length
+  trace1["x"] = Track.graph["timestamp"].slice(Math.max(0, length1 - 500), length1 - 1)
   trace1["y"] = Track.graph["steering"].slice(Math.max(0, length1 - 500), length1 - 1)
-  Plotly.relayout('Graph1',{
-      xaxis: {
-          range: [trace1["x"][0], trace1["x"][500]]
-      }
-  });
+  layout1["xaxis"]["range"] = [trace1["x"][0], trace1["x"][500]]
+  Plotly.relayout('Graph1', layout1);
 }, update_interval);
 
 
+var layout2 = {... layout1}
+
 var trace2 = {
-  y:[],
   x:[],
+  y:[],
   type:'line',
   line: {
   color: 'blue',
   width: 4
 }}
 
-Plotly.react('Graph2', [trace2], layout, {displayModeBar: false});
+Plotly.react('Graph2', [trace2], layout2, {displayModeBar: false});
 
 var length2 = 0
 
 setInterval(function(){
-  length2 = Track.graph["index"].length
-  trace2['x'] = Track.graph["index"].slice(Math.max(0, length2 - 500), length2 - 1)
+  length2 = Track.graph["timestamp"].length
+  trace2['x'] = Track.graph["timestamp"].slice(Math.max(0, length2 - 500), length2 - 1)
   trace2["y"] = Track.graph["throttle"].slice(Math.max(0, length2 - 500), length2 - 1)
-  Plotly.relayout('Graph2',{
-      xaxis: {
-          range: [trace2["x"][0], trace2["x"][500]]
-      }
-  });
+  layout2["xaxis"]["range"] = [trace2["x"][0], trace2["x"][500]]
+  Plotly.relayout('Graph2', layout2);
 }, update_interval);

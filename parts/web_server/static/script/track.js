@@ -14,7 +14,7 @@ class Status {
         this.direction = "Forward"
         this.lane = "Right"
 
-        this.graph = {steering: [], throttle: [], speed: [], IMU: [], index: []}
+        this.graph = {steering: [], throttle: [], speed: [], IMU: [], timestamp: []}
     }
 
     send_data(data){
@@ -265,7 +265,7 @@ class Status {
         Track.graph["throttle"].push(inputs["throttle"])
         Track.graph["speed"].push(inputs["speed"])
         Track.graph["IMU"].push(inputs["IMU"])
-        Track.graph["index"].push(inputs["index"])
+        Track.graph["timestamp"].push(inputs["timestamp"] / 10**24)
         })
     }
 }
