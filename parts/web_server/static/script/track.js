@@ -8,7 +8,7 @@ class Status {
         this.indicator_color = "red"
         this.first_color = "#ffb700"
         this.outputs = {pilot: "Manuel", route: "Manuel", motor_power: 0, record: 0,
-        speed_factor: 1, camera_mode: "RGB", graph1_mode: "Steering", graph2_mode: "Throttle"}
+        speed_factor: 1, camera_mode: "RGB", graph1_mode: [], graph2_mode: []}
 
         this.not_record_style = document.getElementById("Record").style
         this.direction = "Forward"
@@ -111,14 +111,40 @@ class Status {
         this.activated_color("C_"+mode, this.button_clicked_color)
         this.send_data({camera_mode: this.outputs["camera_mode"]})
     }
-    Update_Graph_Mode(mode, graph=0){
-        this.unactivated_color(`G${graph}_${this.outputs[`graph${graph}_mode`]}`)
-        this.outputs[`graph${graph}_mode`] = mode
-        this.activated_color(`G${graph}_${mode}`, this.button_clicked_color)
-        if (graph == 1)
-            this.send_data({graph1_mode: this.outputs["graph1_mode"]})
-        else if(graph == 2)
-            this.send_data({graph2_mode: this.outputs["graph2_mode"]})
+
+    Update_Graph_Mode(mode, graph=0, synchronize=0){
+        if (synchronize){
+            for (let value of this.outputs[`graph${graph}_mode`]) {
+                this.activated_color(`G${graph}_${value}`, this.button_clicked_color)
+              }
+        }
+        else{
+            if (this.outputs[`graph${graph}_mode`].includes(mode)){
+                this.unactivated_color(`G${graph}_${mode}`)
+                const index = this.outputs[`graph${graph}_mode`].indexOf(mode)
+                this.outputs[`graph${graph}_mode`].splice(index, 1)
+            }
+            else{
+                this.activated_color(`G${graph}_${mode}`, this.button_clicked_color)
+                this.outputs[`graph${graph}_mode`].push(mode)
+            }
+            if (graph == 1){
+                const dict = {}
+                dict["test"] = this.outputs["graph1_mode"]
+                // console.log(dict["test"])
+                this.send_data({graph1_mode: this.outputs["graph1_mode"]})
+            }
+            else if(graph == 2)
+                // console.log({graph2_mode: this.outputs["graph2_mode"]})
+                this.send_data({graph2_mode: this.outputs["graph2_mode"]})
+        }
+        // this.unactivated_color(`G${graph}_${this.outputs[`graph${graph}_mode`]}`)
+        // this.outputs[`graph${graph}_mode`] = mode
+        // this.activated_color(`G${graph}_${mode}`, this.button_clicked_color)
+        // if (graph == 1)
+        //     this.send_data({graph1_mode: this.outputs["graph1_mode"]})
+        // else if(graph == 2)
+        //     this.send_data({graph2_mode: this.outputs["graph2_mode"]})
     }
 
     bar_lengthen(ID, value, center){
@@ -238,8 +264,8 @@ class Status {
         this.Update_Pilot_Mode(this.outputs["pilot"])
         this.Update_Route_Mode(this.outputs["route"])
         this.Update_Camera_Mode(this.outputs["camera_mode"])
-        this.Update_Graph_Mode(this.outputs["graph1_mode"], 1)
-        this.Update_Graph_Mode(this.outputs["graph2_mode"], 2)
+        this.Update_Graph_Mode(this.outputs["graph1_mode"], 1, 1) // First 1 is graph no second 1 is syncronize mode on
+        this.Update_Graph_Mode(this.outputs["graph2_mode"], 2, 1)
         this.Update_Speed_Factor(1)
         this.Update_Motor_Power(1)
         this.Update_Record(1)
