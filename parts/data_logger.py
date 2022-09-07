@@ -12,7 +12,7 @@ class Data_Logger:
 
     def update(self):
         self.memory.memory["index"] = self.index
-        self.memory.memory["timestamp"] = int(time.time_ns() / 1e-6)
+        self.memory.memory["timestamp"] = int(time.time_ns() * 1e-6)
         if self.memory.memory["record"]:
             json.dump(self.memory.memory, self.file)
             self.file.write('\n')

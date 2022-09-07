@@ -277,6 +277,16 @@ body, html {
 #Middle .Left #Camera_Brodcast #Camera_Mode_Select:hover > #C_Menu {
   display: flex;
 }
+#Middle .Left #Camera_Brodcast #Fps {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-weight: bold;
+  font-size: 25px;
+  color: green;
+}
 #Middle .Left .Info {
   display: flex;
   justify-content: space-around;

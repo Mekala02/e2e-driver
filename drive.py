@@ -7,6 +7,7 @@ from parts.pilot.pilot import Pilot
 from parts.arduino import Arduino
 from parts.data_logger import Data_Logger
 from parts.web_server.app import Web_Server
+from parts.fps_counter import FPS_Counter
 import time
 
 vehicle = Vehicle()
@@ -20,6 +21,7 @@ vehicle.add(Pilot())
 vehicle.add(Arduino())
 vehicle.add(Data_Logger())
 vehicle.add(Web_Server())
+vehicle.add(FPS_Counter())
 
 vehicle.start()
 

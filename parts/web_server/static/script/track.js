@@ -112,6 +112,10 @@ class Status {
         this.send_data({camera_mode: this.outputs["camera_mode"]})
     }
 
+    Update_FPS(fps){
+        document.getElementById("Fps").innerHTML = fps
+    }
+
     Update_Graph_Mode(mode, graph=0, synchronize=0){
         // If we synchronizing we only activating the colors on client side
         if (synchronize){
@@ -279,6 +283,8 @@ class Status {
         Track.Update_Steering(inputs["steering"])
         Track.Update_Throttle(inputs["throttle"])
         Track.Update_Speed(inputs["speed"])
+
+        Track.Update_FPS(inputs["fps"])
 
         Track.graph["Steering"].push(inputs["steering"])
         Track.graph["Throttle"].push(inputs["throttle"])
