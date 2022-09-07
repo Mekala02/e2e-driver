@@ -7,7 +7,8 @@ class Camera_IMU:
     def __init__(self):
         self.threaded = True
         self.memory = 0
-        self.outputs = {"img": 0, "IMU":0}
+        self.outputs = {"img_id": 0, "IMU":0}
+        self.big_outputs = {"rgb": 0, "depth": 0, "object_detection": 0}
         self.camera=cv2.VideoCapture(0)
         self.frame = 0
 
@@ -16,10 +17,8 @@ class Camera_IMU:
         if not success:
             return "camera_error"
         else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame=buffer.tobytes()
-            
-        self.frame = frame
+            # Frame is a numpy array
+            self.frame = frame
         
 
     def start_thread(self):
@@ -27,4 +26,4 @@ class Camera_IMU:
             self.generate_frames()
 
     def update(self):
-        self.memory.camera["rgb"] = self.frame
+        self.memory.big_memory["rgb"] = self.frame

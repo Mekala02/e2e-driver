@@ -16,11 +16,14 @@ class Vehicle:
             # Adding parts output to the memory
             for output, value in part.outputs.items():
                 self.memory.add(output, value)
+            if hasattr(part, "big_outputs"):
+                for big_output, value in part.big_outputs.items():
+                    self.memory.add_big(big_output, value)
             if part.threaded:
                 t = Thread(target=part.start_thread, args=())
                 t.daemon = True
                 t.start()
-            time.sleep(0.5)
+            time.sleep(0.01)
 
     def update(self):
         for part in self.parts:

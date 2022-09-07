@@ -23,7 +23,10 @@ web_special = {"camera_mode": "RGB", "graph1_mode": ["Steering"], "graph2_mode":
 def generate_frames():
     while True:
         if camera["new"]:
-            yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + camera[web_special["camera_mode"].lower()] + b'\r\n')
+            frame = camera[web_special["camera_mode"].lower()]
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame=buffer.tobytes()
+            yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             camera["new"] = False
 
 @app.route('/')
@@ -66,8 +69,8 @@ class Web_Server:
         # Updates Inputs(to web server) coming from vehicle
         for key in self.memory.memory:
             inputs[key] = self.memory.memory[key]
-        for key in self.memory.camera:
-            camera[key] = self.memory.camera[key]
+        for key in self.memory.big_memory:
+            camera[key] = self.memory.big_memory[key]
         camera["new"] = True
 
     def start_thread(self):

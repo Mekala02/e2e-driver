@@ -28,4 +28,4 @@ vehicle.start()
 while True:
     vehicle.update()
     # vehicle.memory.print_memory()
-    time.sleep(0.001)
+    # time.sleep(0.005)
