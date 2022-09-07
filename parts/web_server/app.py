@@ -1,5 +1,4 @@
 from flask import Flask, render_template, Response, request, jsonify, after_this_request
-import copy
 import cv2
 
 app=Flask(__name__)
@@ -10,8 +9,10 @@ queue = set()
 outputs = {"pilot": "Manuel", "route": "Manuel", "motor_power": 0, "record": 0,
         "speed_factor": 1}
 
-inputs = {"stop": 0, "taxi": 0, "direction": "Forward", "lane": "Right",
-        "steering": 0, "throttle": 0, "speed": 0, "IMU": 0, "timestamp": 0, "fps": 0}
+inputs = {}
+
+# inputs = {"stop": 0, "taxi": 0, "direction": "Forward", "lane": "Right",
+#         "steering": 0, "throttle": 0, "speed": 0, "IMU": 0, "timestamp": 0, "fps": 0}
 
 web_special = {"camera_mode": "RGB", "graph1_mode": ["Steering"], "graph2_mode": ["Throttle"]}
 
@@ -69,7 +70,7 @@ class Web_Server:
 
     def update_local_memory(self):
         # Updates Inputs(to web server) coming from vehicle
-        for key in inputs:
+        for key in self.memory.memory:
             inputs[key] = self.memory.memory[key]
 
     def start_thread(self):
