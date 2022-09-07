@@ -25,7 +25,12 @@ vehicle.add(FPS_Counter())
 
 vehicle.start()
 
+
+rate_hz = 1000
 while True:
+    start_time = time.time()
     vehicle.update()
+    sleep_time = 1.0 / rate_hz - (time.time() - start_time)
+    if sleep_time > 0.0:
+        time.sleep(sleep_time)
     # vehicle.memory.print_memory()
-    time.sleep(0.01)

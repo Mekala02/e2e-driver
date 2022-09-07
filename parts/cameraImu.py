@@ -9,7 +9,7 @@ class Camera_IMU:
         self.memory = 0
         self.outputs = {"img_id": 0, "IMU":0}
         self.big_outputs = {"rgb": 0, "depth": 0, "object_detection": 0}
-        self.camera=cv2.VideoCapture(0)
+        self.camera=cv2.VideoCapture(0+cv2.CAP_DSHOW)
         self.frame = 0
 
     def generate_frames(self):
@@ -27,3 +27,5 @@ class Camera_IMU:
 
     def update(self):
         self.memory.big_memory["rgb"] = self.frame
+        self.memory.big_memory["depth"] = self.frame
+        self.memory.big_memory["object_detection"] = self.frame
