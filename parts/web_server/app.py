@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, request, jsonify, after_this_request
+from flask import Flask, render_template, Response, request, jsonify
 import cv2
 
 app=Flask(__name__)
@@ -11,6 +11,10 @@ outputs = {"pilot": "Manuel", "route": "Manuel", "motor_power": 0, "record": 0,
 
 inputs = {}
 
+# It contains latest image like rgb, depth, yolo and new is for
+# tracking if there is new image on it
+camera = {"new": False}
+
 # inputs = {"stop": 0, "taxi": 0, "direction": "Forward", "lane": "Right",
 #         "steering": 0, "throttle": 0, "speed": 0, "IMU": 0, "timestamp": 0, "fps": 0}
 
@@ -18,16 +22,9 @@ web_special = {"camera_mode": "RGB", "graph1_mode": ["Steering"], "graph2_mode":
 
 def generate_frames():
     while True:
-        ## read the camera frame
-        success,frame=camera.read()
-        if not success:
-            break
-        else:
-            ret, buffer=cv2.imencode('.jpg',frame)
-            frame=buffer.tobytes()
-
-        yield(b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        if camera["new"]:
+            yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + camera[web_special["camera_mode"].lower()] + b'\r\n')
+            camera["new"] = False
 
 @app.route('/')
 def index():
@@ -59,9 +56,6 @@ class Web_Server:
         self.memory = 0
         self.outputs = outputs
 
-    def change_server_memory(self, name, value):
-        self.server_memory[name] = value
-
     def update_vehicle_memory(self):
         # Updates outputs(to vehicle) coming from web server client side
         for key in queue:
@@ -72,6 +66,9 @@ class Web_Server:
         # Updates Inputs(to web server) coming from vehicle
         for key in self.memory.memory:
             inputs[key] = self.memory.memory[key]
+        for key in self.memory.camera:
+            camera[key] = self.memory.camera[key]
+        camera["new"] = True
 
     def start_thread(self):
         app.run(host='0.0.0.0')

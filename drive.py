@@ -26,7 +26,6 @@ vehicle.add(FPS_Counter())
 vehicle.start()
 
 while True:
-    now = time.time_ns()
     vehicle.update()
     # vehicle.memory.print_memory()
-    time.sleep(0.01)
+    time.sleep(0.001)

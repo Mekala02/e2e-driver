@@ -1,4 +1,5 @@
 from threading import Thread
+import time
 
 class Vehicle:
     def __init__(self):
@@ -19,6 +20,7 @@ class Vehicle:
                 t = Thread(target=part.start_thread, args=())
                 t.daemon = True
                 t.start()
+            time.sleep(0.5)
 
     def update(self):
         for part in self.parts:
