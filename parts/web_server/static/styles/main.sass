@@ -233,14 +233,16 @@ body, html
     flex-direction: row
     justify-content: space-between
     padding-top: 150px
-    padding-bottom: 100px
+    padding-left: 7vw
+    padding-right: 7vw 
     @media (max-width: $max-width)
-        padding-top: 70px
+        padding-left: 4vw
+        padding-right: 4vw 
+        padding-top: 80px
 
     .Left
         display: flex
         flex-direction: column
-        padding-left: 7vw
 
         #Camera_Brodcast
             width: 35vw
@@ -250,6 +252,8 @@ body, html
             border-radius: $Fillet
             margin-bottom: 40px 
             @media (max-width: $max_width)
+                width: 43vw
+                height: 48vh
                 margin-bottom: 10px
             img
                 height: 100%
@@ -318,7 +322,7 @@ body, html
 
                     %Bar_Border
                         position: absolute
-                        height: 26px
+                        height: 100%
                         width: 5px
                         margin-top: -1px
                         background-color: white
@@ -451,7 +455,6 @@ body, html
         display: flex
         flex-direction: column
         align-items: flex-end
-        padding-right: 7vw
 
         .Graph_Container
             display: flex
@@ -461,13 +464,15 @@ body, html
             width: 35vw
             height: 35vh
             @media (max-width: $max_width)
+                width: 43vw
+                height: 48vh
                 margin-bottom: 10px
 
 
             %Graph
                 position: relative
-                width: 35vw
-                height: 16vh
+                width: 100%
+                height: 45%
                 background-color: transparent
                 border-radius: $Fillet
                 // overflow: hidden
@@ -546,6 +551,8 @@ body, html
             height: 150px
             width: 35vw
             padding-top: 28px
+            @media (max-width: $max_width)
+                width: 40vw
             @media (max-width: 2300px)
                 height: 100px
             .Pilot, .Route

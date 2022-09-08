@@ -247,17 +247,19 @@ body, html {
   flex-direction: row;
   justify-content: space-between;
   padding-top: 150px;
-  padding-bottom: 100px;
+  padding-left: 7vw;
+  padding-right: 7vw;
 }
 @media (max-width: 1920px) {
   #Middle {
-    padding-top: 70px;
+    padding-left: 4vw;
+    padding-right: 4vw;
+    padding-top: 80px;
   }
 }
 #Middle .Left {
   display: flex;
   flex-direction: column;
-  padding-left: 7vw;
 }
 #Middle .Left #Camera_Brodcast {
   width: 35vw;
@@ -269,6 +271,8 @@ body, html {
 }
 @media (max-width: 1920px) {
   #Middle .Left #Camera_Brodcast {
+    width: 43vw;
+    height: 48vh;
     margin-bottom: 10px;
   }
 }
@@ -340,7 +344,7 @@ body, html {
 }
 #Middle .Left .Info .Bar_Container .Bar #Throttle_Border, #Middle .Left .Info .Bar_Container .Bar #Steering_Border {
   position: absolute;
-  height: 26px;
+  height: 100%;
   width: 5px;
   margin-top: -1px;
   background-color: white;
@@ -480,7 +484,6 @@ body, html {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding-right: 7vw;
 }
 #Middle .Right .Graph_Container {
   display: flex;
@@ -492,13 +495,15 @@ body, html {
 }
 @media (max-width: 1920px) {
   #Middle .Right .Graph_Container {
+    width: 43vw;
+    height: 48vh;
     margin-bottom: 10px;
   }
 }
 #Middle .Right .Graph_Container #Graph2, #Middle .Right .Graph_Container #Graph1 {
   position: relative;
-  width: 35vw;
-  height: 16vh;
+  width: 100%;
+  height: 45%;
   background-color: transparent;
   border-radius: 10px;
 }
@@ -558,6 +563,11 @@ body, html {
   height: 150px;
   width: 35vw;
   padding-top: 28px;
+}
+@media (max-width: 1920px) {
+  #Middle .Right .Drive_Mode_Change {
+    width: 40vw;
+  }
 }
 @media (max-width: 2300px) {
   #Middle .Right .Drive_Mode_Change {
