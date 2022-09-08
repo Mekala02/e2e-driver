@@ -27,6 +27,8 @@ document.getElementById('G1_IMU_Gyro_X').addEventListener("click", function() {T
 document.getElementById('G1_IMU_Gyro_Y').addEventListener("click", function() {Track.Update_Graph_Mode("IMU_Gyro_Y", 1)});
 document.getElementById('G1_IMU_Gyro_Z').addEventListener("click", function() {Track.Update_Graph_Mode("IMU_Gyro_Z", 1)});
 
+// document.getElementById('G1_IMU_Mode_Select').addEventListener("click", function() {Track.Update_Graph_Mode("IMU_Mode_Select", 1)});
+
 document.getElementById('G2_Steering').addEventListener("click", function() {Track.Update_Graph_Mode("Steering", 2)});
 document.getElementById('G2_Throttle').addEventListener("click", function() {Track.Update_Graph_Mode("Throttle", 2)});
 document.getElementById('G2_Speed').addEventListener("click", function() {Track.Update_Graph_Mode("Speed", 2)});

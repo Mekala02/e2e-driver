@@ -44,6 +44,10 @@
   position: absolute;
   z-index: 1000;
   padding-top: 30px;
+  padding-right: 40px;
+  padding-left: 40px;
+  margin-right: -40px;
+  margin-left: -40px;
 }
 
 #Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select #G2_IMU_Menu .IMU_Select_Button, #Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu .Graph_Select_Button, #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu .IMU_Select_Button, #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu .Graph_Select_Button, #Middle .Left #Camera_Brodcast #Camera_Mode_Select #C_Menu .Camera_Select_Button {
@@ -513,10 +517,11 @@ body, html {
   position: absolute;
   justify-content: center;
   bottom: 0px;
-  right: 70px;
+  right: 115px;
   color: white;
   background-color: rgba(0, 0, 0, 0);
-  margin: 0;
+  padding: 40px;
+  margin: -40px;
   z-index: 1000;
 }
 #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select {
