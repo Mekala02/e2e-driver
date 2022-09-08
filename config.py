@@ -29,16 +29,13 @@ Config = dict(
     DEPTH_IMAGE_FORMAT = "jpg",
     OBJECT_DETECTION_FORMAT = "npy",
 
-    THROTTLE_MIN_PWM = 1350,
-    THROTTLE_MID_PWM = 1500,
-    THROTTLE_MAX_PWM = 1800,
-    # Full right
-    STEERING_MIN_PWM = 1200,
-    STEERING_MID_PWM = 1540,
-    # Ful left
-    STEERING_MAX_PWM = 1900,
-    ENCODER_UNITS = "m/s",
-    ENCODER_TICKS_PER_UNIT = 11.7 * 10**2,
+
+    STEERING_MIN = -0.45,
+    STEERING_MAX = 0.45,
+    THROTTLE_MIN = -0.4,
+    THROTTLE_MAX = 0.4,
+    STEERING_OFFSET = 0.53,
+    
 
     # Copilot
     # Thresholds for turning off turn signals (pwm)

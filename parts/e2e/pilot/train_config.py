@@ -57,35 +57,35 @@ TRANSFORMS:             Thoose transformations will be applied to all data
 TRAIN_TRANSFORMS:       Thoose transformations will be applied only to train set
 '''
 TRANSFORMS = dict(
-    color_image = [
-        ["custom", CustomTransforms.Resize(Train_Config["IMAGE_RESOLUTION"]["width"], Train_Config["IMAGE_RESOLUTION"]["height"])]
-    ],
-    depth_image = [
-        ["custom", CustomTransforms.Resize(Train_Config["IMAGE_RESOLUTION"]["width"], Train_Config["IMAGE_RESOLUTION"]["height"])]
-    ]
+    # color_image = [
+    #     ["custom", CustomTransforms.Resize(Train_Config["IMAGE_RESOLUTION"]["width"], Train_Config["IMAGE_RESOLUTION"]["height"])]
+    # ],
+    # depth_image = [
+    #     ["custom", CustomTransforms.Resize(Train_Config["IMAGE_RESOLUTION"]["width"], Train_Config["IMAGE_RESOLUTION"]["height"])]
+    # ]
 )
 TRAIN_TRANSFORMS = dict(
-    color_image = [
-        *TRANSFORMS["color_image"],
-        ["albumation", 
-            A.Compose([
-                A.RandomBrightnessContrast(p=0.6, brightness_limit=(-0.30, 0.35), contrast_limit=(-0.2, 0.2), brightness_by_max=True),
-                A.RandomGamma(p=0.15, gamma_limit=(80, 120), eps=None),
-                A.Blur(p=0.15, blur_limit=(3, 7)),
-                A.Sharpen(p=0.1, alpha=(0.2, 0.5), lightness=(0.5, 1.0)),
-                A.CLAHE(p=0.03, clip_limit=(2, 5), tile_grid_size=(8, 8)),
-                A.Equalize(p=0.05, mode='cv', by_channels=True),
-                A.FancyPCA(p=0.05, alpha=0.1),
-                A.RandomToneCurve(p=0.1, scale=0.1),
-                A.CoarseDropout(p=0.06, max_holes=8, max_height=6, max_width=6, min_holes=4, min_height=6, min_width=6, fill_value=(0, 0, 0), mask_fill_value=None),
-                A.RandomRain(p=0.02, slant_lower=-5, slant_upper=5, drop_length=10, drop_width=1, drop_color=(0, 0, 0), blur_value=4, brightness_coefficient=0.7, rain_type='drizzle'),
-                A.GaussNoise(p=0.15, var_limit=(10.0, 50.0), per_channel=True, mean=0.0),
-            ])
-        ],
-        ["custom", CustomTransforms.Crop_Without_Remove(p=0.5, crop_top=45)],
-        ["custom", CustomTransforms.Crop_Without_Remove(p=0.35, crop_left=30, crop_right=30)]
-    ],
-    depth_image = [
-        *TRANSFORMS["depth_image"]
-    ]
+    # color_image = [
+    #     *TRANSFORMS["color_image"],
+    #     ["albumation", 
+    #         A.Compose([
+    #             A.RandomBrightnessContrast(p=0.6, brightness_limit=(-0.30, 0.35), contrast_limit=(-0.2, 0.2), brightness_by_max=True),
+    #             A.RandomGamma(p=0.15, gamma_limit=(80, 120), eps=None),
+    #             A.Blur(p=0.15, blur_limit=(3, 7)),
+    #             A.Sharpen(p=0.1, alpha=(0.2, 0.5), lightness=(0.5, 1.0)),
+    #             A.CLAHE(p=0.03, clip_limit=(2, 5), tile_grid_size=(8, 8)),
+    #             A.Equalize(p=0.05, mode='cv', by_channels=True),
+    #             A.FancyPCA(p=0.05, alpha=0.1),
+    #             A.RandomToneCurve(p=0.1, scale=0.1),
+    #             A.CoarseDropout(p=0.06, max_holes=8, max_height=6, max_width=6, min_holes=4, min_height=6, min_width=6, fill_value=(0, 0, 0), mask_fill_value=None),
+    #             A.RandomRain(p=0.02, slant_lower=-5, slant_upper=5, drop_length=10, drop_width=1, drop_color=(0, 0, 0), blur_value=4, brightness_coefficient=0.7, rain_type='drizzle'),
+    #             A.GaussNoise(p=0.15, var_limit=(10.0, 50.0), per_channel=True, mean=0.0),
+    #         ])
+    #     ],
+    #     ["custom", CustomTransforms.Crop_Without_Remove(p=0.5, crop_top=45)],
+    #     ["custom", CustomTransforms.Crop_Without_Remove(p=0.35, crop_left=30, crop_right=30)]
+    # ],
+    # depth_image = [
+    #     *TRANSFORMS["depth_image"]
+    # ]
 )

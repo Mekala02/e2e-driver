@@ -135,4 +135,5 @@ class Camera_IMU:
         self.run = False
         # Zed close calls disable_recording so we don't have to explicitly turn of recording
         self.zed.close()
+        time.sleep(0.05)
         logger.info("Stopped")

@@ -28,13 +28,6 @@ class Arduino:
         self.Act_Value = 0
         self.Speed = 0
         self.Throttle = 0
-        self.ticks_per_unit = memory.cfg["ENCODER_TICKS_PER_UNIT"]
-        self.stick_multiplier = memory.cfg["TRANSMITTER_STICK_SPEED_MULTIPLIER"]
-        self.steering_limiter = Limiter(min_=pwm2float(memory.cfg["STEERING_MIN_PWM"]), max_=pwm2float(memory.cfg["STEERING_MAX_PWM"]))
-        self.throttle_limiter = Limiter(min_=pwm2float(memory.cfg["THROTTLE_MIN_PWM"]), max_=pwm2float(memory.cfg["THROTTLE_MAX_PWM"]))
-        if self.act_value_type == "Speed":
-            self.Target_Speed = 0
-            self.pid = PID(Kp=memory.cfg["K_PID"]["Kp"], Ki=memory.cfg["K_PID"]["Ki"], Kd=memory.cfg["K_PID"]["Kd"], I_max=memory.cfg["K_PID"]["I_max"])
         self.arduino = serial.Serial(port='/dev/ttyUSB0', baudrate=115200, timeout=0.006, write_timeout=0.006)
         time.sleep(0.04)
         logger.info("Successfully Added")
@@ -65,45 +58,18 @@ class Arduino:
                 time.sleep(sleep_time)
 
     def update(self):
-        '''
-        We want to send the data as fast as we can so we are only sending 2 int as string, those
-        strings encode motor power and drive mode parameters to throttle and steering values
-        If char is between 1000, 2000 arduino will use that value to drive motors
-        If char is = 0 arduino won't use that value for controlling the actuator
-        '''
-        # Speed_A is ticks/sec we converting it to unit/sec
-        self.Speed = self.Speed_A / self.ticks_per_unit
         pilot_mode_string = self.memory.memory["Pilot_Mode"]
         self.Act_Value = pwm2float(self.Act_Value_A)
-        if pilot_mode_string == "Full_Auto":
-            Steering_Signal = float2pwm(-self.memory.memory["Steering"])
-            Throttle_Signal = float2pwm(self.memory.memory["Throttle"] * self.memory.memory["Motor_Power"])
-        elif pilot_mode_string == "Manuel" or pilot_mode_string == "Angle":
+        if pilot_mode_string == "Manuel" or pilot_mode_string == "Angle":
             if self.act_value_type == "Throttle":
                 self.Throttle = self.Act_Value
-                Throttle_Signal = 0
-            elif self.act_value_type == "Speed":
-                self.Target_Speed = self.stick_multiplier * self.Act_Value
-                self.Throttle = self.throttle_limiter(self.pid(self.Speed, self.Target_Speed))
-                Throttle_Signal = float2pwm(self.Throttle)
-                self.memory.memory["Target_Speed"] = self.Target_Speed
             self.memory.memory["Throttle"] = self.Throttle
             if pilot_mode_string == "Manuel":
                 self.Steering = -pwm2float(self.Steering_A)
                 self.memory.memory["Steering"] = self.Steering
-                Steering_Signal = 0
-            if pilot_mode_string == "Angle":
-                Steering_Signal = float2pwm(-self.memory.memory["Steering"])
 
-        self.memory.memory["Speed"] = self.Speed
         self.memory.memory["Mode1"] = self.Mode1
         self.memory.memory["Mode2"] = self.Mode2
-
-        # s is for stating start of steering value t is for throttle and e is for end, \r for read ending
-        formatted_data = "s" + str(Steering_Signal) + "t" + str(Throttle_Signal) + 'e' + '\r'
-        try: self.arduino.write(formatted_data.encode())
-        except Exception as e: pass # logger.warning(e)
-        else: pass # logger.info("Succes !!!")
 
     def shut_down(self):
         self.run = False

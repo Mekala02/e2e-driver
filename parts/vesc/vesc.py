@@ -22,12 +22,10 @@ class Vesc:
         self.throttle = 0
 
         self.act_value_type = memory.cfg["ACT_VALUE_TYPE"]
-        self.steering_limiter = Limiter(min_=pwm2float(memory.cfg["STEERING_MIN_PWM"]), max_=pwm2float(memory.cfg["STEERING_MAX_PWM"]))
-        self.throttle_limiter = Limiter(min_=pwm2float(memory.cfg["THROTTLE_MIN_PWM"]), max_=pwm2float(memory.cfg["THROTTLE_MAX_PWM"]))
-        if self.act_value_type == "Speed":
-            self.Target_Speed = 0
-            self.pid = PID(Kp=memory.cfg["K_PID"]["Kp"], Ki=memory.cfg["K_PID"]["Ki"], Kd=memory.cfg["K_PID"]["Kd"], I_max=memory.cfg["K_PID"]["I_max"])
-        
+        self.steering_limiter = Limiter(min_=memory.cfg["STEERING_MIN"], max_=memory.cfg["STEERING_MAX"])
+        self.throttle_limiter = Limiter(min_=memory.cfg["THROTTLE_MIN"], max_=memory.cfg["THROTTLE_MAX"])
+        self.steering_offset = memory.cfg["STEERING_OFFSET"]
+
         self.vesc = pyvesc.VESC(serial_port="/dev/ttyACM0")
 
         time.sleep(0.04)
@@ -35,9 +33,10 @@ class Vesc:
         
 
     def update(self):
-        self.vesc.set_servo(-self.memory.memory["Steering"]+0.53)
-        throttle = self.memory.memory["Throttle"] * self.memory.memory["Motor_Power"]
-        self.vesc.set_duty_cycle(min(max(throttle, -0.05), 0.05))
+        steering = self.steering_limiter(-self.memory.memory["Steering"])
+        self.vesc.set_servo(steering+self.steering_offset)
+        throttle = self.throttle_limiter(self.memory.memory["Throttle"] * self.memory.memory["Motor_Power"])
+        self.vesc.set_duty_cycle(throttle)
 
     def shut_down(self):
         self.run = False
