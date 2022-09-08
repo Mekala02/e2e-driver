@@ -191,4 +191,10 @@ RUN arduino-cli core install arduino:avr && \
 	arduino-cli lib install servo && \
 	arduino-cli lib install ewma
 
+
+RUN pip3 install --no-cache-dir --verbose -U inputs
+RUN pip3 install --no-cache-dir --verbose -U git+https://github.com/LiamBindle/PyVESC
+RUN pip3 install --no-cache-dir --verbose -U --force-reinstall protobuf==3.20.2
+
+
 WORKDIR /root
