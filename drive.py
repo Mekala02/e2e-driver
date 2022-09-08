@@ -8,7 +8,7 @@ Options:
   [--data_folder=<data_folder>]     Specify Data Folders Name
 """
 
-from parts.e2e.config import Config
+from config import Config
 from parts.memory import Memory
 from vehicle import Vehicle
 from parts.data_logger import Data_Logger
