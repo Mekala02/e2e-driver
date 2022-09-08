@@ -1,7 +1,4 @@
-from tkinter import Frame
 import cv2
-
-from parts.web_server.app import generate_frames
 
 class Camera_IMU:
     def __init__(self):

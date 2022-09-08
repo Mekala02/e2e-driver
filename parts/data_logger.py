@@ -2,8 +2,6 @@ import json
 import time
 import numpy as np
 import threading
-import multiprocessing
-import copy
 
 class Data_Logger:
     def __init__(self):
