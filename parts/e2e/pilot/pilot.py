@@ -79,7 +79,7 @@ class Pilot:
             if self.shared_dict["pilot_mode"] == "Angle" or self.shared_dict["pilot_mode"] == "Full_Auto":
                 # (H x W x C) to (C x H x W) then [0, 1]
                 images = self.shared_dict["cpu_image"] 
-                if sself.network_input_type == "RGBD":
+                if self.network_input_type == "RGBD":
                     depth_image = self.shared_dict["depth_image"]
                     depth_array = cv2.cvtColor(depth_image, cv2.COLOR_BGR2GRAY)
                     depth_array = depth_array.reshape(images.shape[0], images.shape[1], 1)
