@@ -29,7 +29,13 @@ logger = logging.getLogger("train")
 
 
 def main():
-    in_channels = 4 if t_cfg["USE_DEPTH"] else 3
+    if t_cfg["NETWORK_INPUT_TYPE"] == "RGB":
+        in_channels = 3
+    elif t_cfg["NETWORK_INPUT_TYPE"] == "RGBD":
+        in_channels = 4
+    elif t_cfg["NETWORK_INPUT_TYPE"] == "D":
+        in_channels = 1
+
     model = t_cfg["MODEL"](in_channels=in_channels).to(device)
     criterion = t_cfg["CRITERION"]()
     optimizer = t_cfg["OPTIMIZER"](model.parameters(), lr=t_cfg["LEARNING_RATE"])
@@ -41,18 +47,18 @@ def main():
     if model_path:
         model.load_state_dict(torch.load(model_path))
 
-    train_set = Load_Data(data_dirs, act_value_type=t_cfg["ACT_VALUE_TYPE"], transform=TRAIN_TRANSFORMS, reduce_fps=t_cfg["REDUCE_FPS"], use_depth=t_cfg["USE_DEPTH"], other_inputs=t_cfg["OTHER_INPUTS"])
+    train_set = Load_Data(data_dirs, act_value_type=t_cfg["ACT_VALUE_TYPE"], transform=TRAIN_TRANSFORMS, reduce_fps=t_cfg["REDUCE_FPS"], use_depth=t_cfg["USE_DEPTH"], network_input_type=t_cfg["NETWORK_INPUT_TYPE"], other_inputs=t_cfg["OTHER_INPUTS"])
 
     test_sets = []
     if t_cfg["VALIDATION_SPLIT"]:
-        test_set = Load_Data(data_dirs, act_value_type=t_cfg["ACT_VALUE_TYPE"], transform=TRANSFORMS, reduce_fps=t_cfg["REDUCE_FPS"], use_depth=t_cfg["USE_DEPTH"], other_inputs=t_cfg["OTHER_INPUTS"])
+        test_set = Load_Data(data_dirs, act_value_type=t_cfg["ACT_VALUE_TYPE"], transform=TRANSFORMS, reduce_fps=t_cfg["REDUCE_FPS"], use_depth=t_cfg["USE_DEPTH"], network_input_type=t_cfg["NETWORK_INPUT_TYPE"], other_inputs=t_cfg["OTHER_INPUTS"])
         assert len(train_set) == len(test_set)
         len_dataset = len(train_set)
         test_len = math.floor(len_dataset * t_cfg["VALIDATION_SPLIT"])
         train_set = torch.utils.data.random_split(train_set, [len_dataset-test_len, test_len])[0]
         test_sets.append(torch.utils.data.random_split(test_set, [len_dataset-test_len, test_len])[1])
     if test_dirs:
-        test_sets.append(Load_Data(test_dirs, act_value_type=t_cfg["ACT_VALUE_TYPE"], transform=TRANSFORMS, reduce_fps=t_cfg["REDUCE_FPS"], use_depth=t_cfg["USE_DEPTH"], other_inputs=t_cfg["OTHER_INPUTS"]))
+        test_sets.append(Load_Data(test_dirs, act_value_type=t_cfg["ACT_VALUE_TYPE"], transform=TRANSFORMS, reduce_fps=t_cfg["REDUCE_FPS"], use_depth=t_cfg["USE_DEPTH"], network_input_type=t_cfg["NETWORK_INPUT_TYPE"], other_inputs=t_cfg["OTHER_INPUTS"]))
 
     trainloader = DataLoader(dataset=train_set, batch_size=t_cfg["BATCH_SIZE"], shuffle=t_cfg["SHUFFLE_TRAINSET"], num_workers=4, pin_memory=True, drop_last=t_cfg["DROP_LAST"])
     if test_sets:

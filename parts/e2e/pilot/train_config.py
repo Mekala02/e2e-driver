@@ -13,6 +13,7 @@ OPTIMIZER
 IMAGE_RESOLUTION:       None or {"height": x, "width": y} if None zed's resolution will be used
 ACT_VALUE_TYPE:         if throttle network predict throttle value; elif speed network will predict speed; elif encoder_speed network will predict encoder speed
 USE_DEPTH:              If you want to use depth data
+NETWORK_INPUT_TYPE:     Choose RGB, RGBD, D for Camera, Camera + Depth, and Depth for input type.
 REDUCE_FPS:             If set to value like 30 it will make training data ~30fps. It wont work great if datasets fps is close to reduce_fps
 OTHER_INPUTS:           None or list like ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
 VALIDATION_SPLIT:       Splits the training data [0,1]
@@ -34,6 +35,7 @@ Train_Config = dict(
     IMAGE_RESOLUTION = {"height": 120, "width": 160},
     ACT_VALUE_TYPE = "Throttle",
     USE_DEPTH = False,
+    NETWORK_INPUT_TYPE = "RGBD",
     REDUCE_FPS = 10,
     OTHER_INPUTS = None,
     VALIDATION_SPLIT = 0.2,
@@ -41,12 +43,12 @@ Train_Config = dict(
     LEARNING_RATE = 2e-3,
     BATCH_SIZE = 1024,
     NUM_EPOCHS = 512,
-    PATIENCE = 5 ,
+    PATIENCE = 15,
     DELTA = 0.000005,
     USE_CUDNN_BENCHMARK = True,
     DROP_LAST = True,
     CALC_DIFF = True,
-    USE_TB = False,
+    USE_TB = True,
     TB_ADD_GRAPH = False,
     DETAILED_TB = False,
 )
@@ -58,7 +60,7 @@ TRAIN_TRANSFORMS:       Thoose transformations will be applied only to train set
 '''
 TRANSFORMS = dict(
     # color_image = [
-    #     ["custom", CustomTransforms.Resize(Train_Config["IMAGE_RESOLUTION"]["width"], Train_Config["IMAGE_RESOLUTION"]["height"])]
+    #     ["custoRGBD", CustomTransforms.Resize(Train_Config["IMAGE_RESOLUTION"]["width"], Train_Config["IMAGE_RESOLUTION"]["height"])]
     # ],
     # depth_image = [
     #     ["custom", CustomTransforms.Resize(Train_Config["IMAGE_RESOLUTION"]["width"], Train_Config["IMAGE_RESOLUTION"]["height"])]

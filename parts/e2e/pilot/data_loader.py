@@ -21,16 +21,17 @@ import cv2
 logger = logging.getLogger(__name__)
 
 class Load_Data(Dataset):
-    def __init__(self, data_folder_paths, act_value_type="Throttle", transform=None, reduce_fps=False, use_depth=False, other_inputs=False):
+    def __init__(self, data_folder_paths, act_value_type="Throttle", transform=None, reduce_fps=False, use_depth=False, network_input_type="RGB", other_inputs=False):
         self.data_folder_paths = data_folder_paths
         self.act_value_type = act_value_type
         self.transform = transform
         self.reduce_fps = reduce_fps
         self.use_depth = use_depth
+        self.network_input_type = network_input_type
         self.other_inputs = other_inputs
         self.data_folders = []
         for folder_path in self.data_folder_paths:
-            self.data_folders.append(Data_Folder(folder_path, act_value_type=self.act_value_type, transform=self.transform, reduce_fps=self.reduce_fps, use_depth=self.use_depth, other_inputs=self.other_inputs))
+            self.data_folders.append(Data_Folder(folder_path, act_value_type=self.act_value_type, transform=self.transform, reduce_fps=self.reduce_fps, use_depth=self.use_depth, network_input_type=self.network_input_type, other_inputs=self.other_inputs))
         self.len_data_fodlers = len(self.data_folders)
         self.lenght = 0
         for datas in self.data_folders:
@@ -60,12 +61,13 @@ class Load_Data(Dataset):
 
 
 class Data_Folder():
-    def __init__(self, data_folder_path, act_value_type="Throttle", transform=None, reduce_fps=False, use_depth=False, other_inputs=False):
+    def __init__(self, data_folder_path, act_value_type="Throttle", transform=None, reduce_fps=False, use_depth=False, network_input_type="RGB" ,other_inputs=False):
         self.data_folder_path = data_folder_path
         self.act_value_type = act_value_type
         self.transform = transform
         self.reduce_fps = reduce_fps
         self.use_depth = use_depth
+        self.network_input_type = network_input_type
         self.other_inputs = other_inputs
         self.changes = None
 
@@ -159,6 +161,7 @@ class Data_Folder():
         # Applying transforms such as resizing, data augmentation
         if self.transform and self.transform["color_image"]:
             color_image = self.apply_transforms(color_image, self.transform["color_image"])
+        
         images = color_image
         if self.use_depth:
             depth_image_path = os.path.join(self.Depth_Image_folder_path, str(self.datas[index]["Data_Id"]) + "." + self.Depth_Image_format)
@@ -168,7 +171,12 @@ class Data_Folder():
             depth_array = cv2.cvtColor(depth_image, cv2.COLOR_BGR2GRAY)
             depth_array = depth_array.reshape(color_image.shape[0], color_image.shape[1], 1)
             # np.nan_to_num(depth_array, copy=False)
-            images = np.concatenate((color_image, depth_array), axis=2)
+            if self.network_input_type == "D":
+                images = depth_array
+            elif self.network_input_type == "RGBD":
+                images = np.concatenate((color_image, depth_array), axis=2)
+            else: 
+                raise Exception("Config settings network_input_type and use_depth contradict each other!")
         # (H x W x C) to (C x H x W)
         images = images.transpose(2, 0, 1)
         # Making image contiguous on memory

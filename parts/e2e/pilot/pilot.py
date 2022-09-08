@@ -25,7 +25,7 @@ class Pilot:
         self.steering_limiter = Limiter(min_=memory.cfg["STEERING_MIN"], max_=memory.cfg["STEERING_MAX"])
         self.throttle_limiter = Limiter(min_=memory.cfg["THROTTLE_MIN"], max_=memory.cfg["THROTTLE_MAX"])
         self.network_input_type = memory.cfg["NETWORK_INPUT_TYPE"]
-        self.use_depth = False if memory.cfg["DEPTH_MODE"] == "RGB" else True
+        self.use_depth = False if self.network_input_type == "RGB" else True
 
         # Shared memory for multiprocessing
         if "Model_Path" in  memory.memory.keys():
@@ -64,12 +64,17 @@ class Pilot:
         with torch.no_grad():
             #logger.info(self.shared_dict["cpu_image"].shape)
             images = self.shared_dict["cpu_image"]
-            if self.network_input_type == "RGBD":
+            if self.use_depth:
                 depth_image = self.shared_dict["depth_image"]
                 depth_array = cv2.cvtColor(depth_image, cv2.COLOR_BGR2GRAY)
                 depth_array = depth_array.reshape(images.shape[0], images.shape[1], 1)
                 # np.nan_to_num(depth_array, copy=False)
-                images = np.concatenate((images, depth_array), axis=2)
+                if self.network_input_type == "D":
+                    images = depth_array
+                elif self.network_input_type == "RGBD":
+                    images = np.concatenate((images, depth_array), axis=2)
+                else: 
+                    raise Exception("Config settings network_input_type and use_depth contradict each other!")
 
             model((torch.from_numpy(images.transpose(2, 0, 1))/255).to(device, non_blocking=True).unsqueeze(0))
 
@@ -79,12 +84,17 @@ class Pilot:
             if self.shared_dict["pilot_mode"] == "Angle" or self.shared_dict["pilot_mode"] == "Full_Auto":
                 # (H x W x C) to (C x H x W) then [0, 1]
                 images = self.shared_dict["cpu_image"] 
-                if self.network_input_type == "RGBD":
+                if self.use_depth:
                     depth_image = self.shared_dict["depth_image"]
                     depth_array = cv2.cvtColor(depth_image, cv2.COLOR_BGR2GRAY)
                     depth_array = depth_array.reshape(images.shape[0], images.shape[1], 1)
                     # np.nan_to_num(depth_array, copy=False)
-                    images = np.concatenate((images, depth_array), axis=2) 
+                    if self.network_input_type == "D":
+                        images = depth_array
+                    elif self.network_input_type == "RGBD":
+                        images = np.concatenate((images, depth_array), axis=2)
+                    else: 
+                        raise Exception("Config settings network_input_type and use_depth contradict each other!")
 
                 # Unsqueeze adds dimension to image (batch dimension)
                 gpu_image = (torch.from_numpy(images.transpose(2, 0, 1))/255).to(device, non_blocking=True).unsqueeze(0)                

@@ -22,7 +22,7 @@ Config = dict(
     COORDINATE_SYSTEM = "RIGHT_HANDED_Z_UP",
 
     # RGB, RGBD, D
-    NETWORK_INPUT_TYPE = "RGBD"
+    NETWORK_INPUT_TYPE = "RGBD",
     # If SVO_COMPRESSION_MODE != None other formats won't be used
     # None H264, H264_LOSSLESS
     SVO_COMPRESSION_MODE = "H264",
@@ -34,8 +34,8 @@ Config = dict(
 
     STEERING_MIN = -0.45,
     STEERING_MAX = 0.45,
-    THROTTLE_MIN = -0.4,
-    THROTTLE_MAX = 0.4,
+    THROTTLE_MIN = -0.1,
+    THROTTLE_MAX = 0.1,
     STEERING_OFFSET = 0.53,
     
 
