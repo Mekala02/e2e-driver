@@ -13,7 +13,7 @@ class Camera_IMU:
         self.thread = "Single"
         self.thread_hz = memory.cfg["DRIVE_LOOP_HZ"]
         self.run = True
-        self.use_depth = memory.cfg["DEPTH_MODE"]
+        self.use_depth = False if memory.cfg["DEPTH_MODE"] == "RGB" else True
         self.svo_mode = True if memory.cfg["SVO_COMPRESSION_MODE"] else False
         self.reduced_camera_resolution = memory.cfg["REDUCED_CAMERA_RESOLUTION"]
         self.outputs = {"Color_Image": 0, "Zed_Timestamp": 0, "Zed_Data_Id": 0,
