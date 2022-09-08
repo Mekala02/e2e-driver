@@ -42,12 +42,13 @@ $max-width: 1920px
     z-index: 1000
 
 %Mode_Select_Menu
-    height: 120px
-    width: 70px
     display: none
     flex-direction: column
     position: absolute
+    height: 120px
+    width: 70px
     z-index: 1000
+    top: 0
     padding-top: 30px
     padding-right: 40px
     padding-left: 40px
@@ -262,15 +263,16 @@ body, html
                 border-radius: $Fillet
             #Camera_Mode_Select
                 @extend %Mode_Select
-                top: 15px
-                left: 15px
+                top: 10px
+                left: 10px
                 &:hover > #C_Menu
                     display: flex
                 #C_Menu
                     @extend %Mode_Select_Menu
+                    left: -5px
                     .Camera_Select_Button
                         @extend %Mode_Select_Button
-                        font-size: 20px
+                        // font-size: 20px
             #Fps
                 display: flex
                 align-items: center
@@ -471,7 +473,6 @@ body, html
                 height: 48vh
                 margin-bottom: 10px
 
-
             %Graph
                 position: relative
                 width: 100%
@@ -506,14 +507,15 @@ body, html
                 @extend %Graph
                 #Graph1_Mode_Select
                     @extend %Mode_Select
-                    top: 15px
-                    right: 15px
-                    @media (max-width: $max_width)
-                        top: 6px
+                    top: 10px
+                    right: 10px
+                    // @media (max-width: $max_width)
+                    //     top: 10px
                     &:hover > #G1_Menu
                         display: flex
                     #G1_Menu
                         @extend %Mode_Select_Menu
+                        right: -5px
                         .Graph_Select_Button
                             @extend %Mode_Select_Button
                         #G1_IMU_Mode_Select
@@ -524,20 +526,20 @@ body, html
                                 @extend %IMU_Menu
                                 .IMU_Select_Button
                                     @extend %Mode_Select_Button
-                                    width: 70px
-
+                                    width: 69px
             #Graph2
                 @extend %Graph
                 #Graph2_Mode_Select
                     @extend %Mode_Select
                     top: 15px
-                    right: 15px
+                    right: 10px
                     @media (max-width: $max_width)
                         top: 6px
                     &:hover > #G2_Menu
                         display: flex
                     #G2_Menu
                         @extend %Mode_Select_Menu
+                        right: -5px
                         .Graph_Select_Button
                             @extend %Mode_Select_Button
                         #G2_IMU_Mode_Select

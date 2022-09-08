@@ -37,12 +37,13 @@
 }
 
 #Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu, #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu, #Middle .Left #Camera_Brodcast #Camera_Mode_Select #C_Menu {
-  height: 120px;
-  width: 70px;
   display: none;
   flex-direction: column;
   position: absolute;
+  height: 120px;
+  width: 70px;
   z-index: 1000;
+  top: 0;
   padding-top: 30px;
   padding-right: 40px;
   padding-left: 40px;
@@ -282,14 +283,14 @@ body, html {
   border-radius: 10px;
 }
 #Middle .Left #Camera_Brodcast #Camera_Mode_Select {
-  top: 15px;
-  left: 15px;
+  top: 10px;
+  left: 10px;
 }
 #Middle .Left #Camera_Brodcast #Camera_Mode_Select:hover > #C_Menu {
   display: flex;
 }
-#Middle .Left #Camera_Brodcast #Camera_Mode_Select #C_Menu .Camera_Select_Button {
-  font-size: 20px;
+#Middle .Left #Camera_Brodcast #Camera_Mode_Select #C_Menu {
+  left: -5px;
 }
 #Middle .Left #Camera_Brodcast #Fps {
   display: flex;
@@ -535,26 +536,24 @@ body, html {
   z-index: 1000;
 }
 #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select {
-  top: 15px;
-  right: 15px;
-}
-@media (max-width: 1920px) {
-  #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select {
-    top: 6px;
-  }
+  top: 10px;
+  right: 10px;
 }
 #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select:hover > #G1_Menu {
   display: flex;
+}
+#Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu {
+  right: -5px;
 }
 #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select:hover > #G1_IMU_Menu {
   display: flex;
 }
 #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu .IMU_Select_Button {
-  width: 70px;
+  width: 69px;
 }
 #Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select {
   top: 15px;
-  right: 15px;
+  right: 10px;
 }
 @media (max-width: 1920px) {
   #Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select {
@@ -563,6 +562,9 @@ body, html {
 }
 #Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select:hover > #G2_Menu {
   display: flex;
+}
+#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu {
+  right: -5px;
 }
 #Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select:hover > #G2_IMU_Menu {
   display: flex;
