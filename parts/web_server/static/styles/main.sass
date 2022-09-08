@@ -66,7 +66,8 @@ $max-width: 1920px
     border-color: white
     border-radius: $Fillet
     margin: 2px
-    margin-right: 0 
+    margin-right: 0
+
 
 body, html
     width: 100%
@@ -262,7 +263,7 @@ body, html
             #Camera_Mode_Select
                 @extend %Mode_Select
                 top: 15px
-                left: 25px
+                left: 15px
                 &:hover > #C_Menu
                     display: flex
                 #C_Menu
@@ -506,7 +507,9 @@ body, html
                 #Graph1_Mode_Select
                     @extend %Mode_Select
                     top: 15px
-                    right: 25px
+                    right: 15px
+                    @media (max-width: $max_width)
+                        top: 6px
                     &:hover > #G1_Menu
                         display: flex
                     #G1_Menu
@@ -528,7 +531,9 @@ body, html
                 #Graph2_Mode_Select
                     @extend %Mode_Select
                     top: 15px
-                    right: 25px
+                    right: 15px
+                    @media (max-width: $max_width)
+                        top: 6px
                     &:hover > #G2_Menu
                         display: flex
                     #G2_Menu

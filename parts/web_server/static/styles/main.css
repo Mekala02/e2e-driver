@@ -283,7 +283,7 @@ body, html {
 }
 #Middle .Left #Camera_Brodcast #Camera_Mode_Select {
   top: 15px;
-  left: 25px;
+  left: 15px;
 }
 #Middle .Left #Camera_Brodcast #Camera_Mode_Select:hover > #C_Menu {
   display: flex;
@@ -536,7 +536,12 @@ body, html {
 }
 #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select {
   top: 15px;
-  right: 25px;
+  right: 15px;
+}
+@media (max-width: 1920px) {
+  #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select {
+    top: 6px;
+  }
 }
 #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select:hover > #G1_Menu {
   display: flex;
@@ -549,7 +554,12 @@ body, html {
 }
 #Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select {
   top: 15px;
-  right: 25px;
+  right: 15px;
+}
+@media (max-width: 1920px) {
+  #Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select {
+    top: 6px;
+  }
 }
 #Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select:hover > #G2_Menu {
   display: flex;
