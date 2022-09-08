@@ -56,9 +56,9 @@ def main():
 
     trainloader = DataLoader(dataset=train_set, batch_size=t_cfg["BATCH_SIZE"], shuffle=t_cfg["SHUFFLE_TRAINSET"], num_workers=4, pin_memory=True, drop_last=t_cfg["DROP_LAST"])
     if test_sets:
-        testlaoder = DataLoader(dataset=torch.utils.data.ConcatDataset(test_sets), batch_size=t_cfg["BATCH_SIZE"], num_workers=4, pin_memory=True)
+        testloader = DataLoader(dataset=torch.utils.data.ConcatDataset(test_sets), batch_size=t_cfg["BATCH_SIZE"], num_workers=4, pin_memory=True)
     else:
-        testlaoder = None
+        testloader = None
 
     if t_cfg["USE_TB"]:
         writer = SummaryWriter(f"tb_logs/{model_save_name}")
@@ -74,21 +74,21 @@ def main():
             images = torch.flip(data[0], [1])
             grid = torchvision.utils.make_grid(images)
             writer.add_image(f"Train Set First Batch", grid, 0)
-            if testlaoder:
-                data = next(iter(testlaoder))
+            if testloader:
+                data = next(iter(testloader))
                 images = torch.flip(data[0], [1])
                 grid = torchvision.utils.make_grid(images)
                 writer.add_image(f"Test Set First Batch", grid, 0)
     else: writer=None
 
     trainer = Trainer(model, criterion, optimizer, device, t_cfg["NUM_EPOCHS"], trainloader, t_cfg["ACT_VALUE_TYPE"], calc_diff=t_cfg["CALC_DIFF"], writer=writer,
-                    testlaoder=testlaoder, model_name=model_save_name, other_inputs=t_cfg["OTHER_INPUTS"], patience=t_cfg["PATIENCE"], delta=t_cfg["DELTA"])
+                    testloader=testloader, model_name=model_save_name, other_inputs=t_cfg["OTHER_INPUTS"], patience=t_cfg["PATIENCE"], delta=t_cfg["DELTA"])
     trainer.fit()
     if t_cfg["USE_TB"]:
         writer.close()
 
 class Trainer:
-    def __init__(self, model, criterion, optimizer, device, num_epochs, trainloader, act_value_type, calc_diff=False, writer=None, testlaoder=None, model_name="model", other_inputs=False, patience=5, delta=0.00005):
+    def __init__(self, model, criterion, optimizer, device, num_epochs, trainloader, act_value_type, calc_diff=False, writer=None, testloader=None, model_name="model", other_inputs=False, patience=5, delta=0.00005):
         self.model = model
         self.criterion = criterion
         self.optimizer = optimizer
@@ -97,7 +97,7 @@ class Trainer:
         self.act_value_type = act_value_type
         self.calc_diff = calc_diff
         self.writer = writer
-        self.testlaoder = testlaoder
+        self.testloader = testloader
         self.model_name = model_name
         self.other_inputs = other_inputs
         self.num_epochs = num_epochs
@@ -110,8 +110,8 @@ class Trainer:
         if self.calc_diff:
             self.diff_criterion = torch.nn.L1Loss()
         self.nu_of_train_batches = len(self.trainloader)
-        if self.testlaoder:
-            self.nu_of_test_batches = len(self.testlaoder)
+        if self.testloader:
+            self.nu_of_test_batches = len(self.testloader)
         self.train_not_improved_count = 0
         self.test_not_improved_count = 0
         self.train_set_min_loss = float('inf')
@@ -122,7 +122,7 @@ class Trainer:
     def fit(self):
         # torch.autograd.set_detect_anomaly(True)
         # logger.info(self.model)
-        logger.info(f"Trainig on {self.device}...")
+        logger.info(f"Training on {self.device}...")
         epoch_losses = dict(steering=[], act_value=[], loss=[])
         epoch_diffs = dict(steering=[], act_value=[], diff=[])
         for epoch in range(1, self.num_epochs+1):
@@ -180,7 +180,7 @@ class Trainer:
                 epoch_diffs["act_value"].append(epoch_act_value_diff)
                 epoch_diffs["diff"].append(epoch_diff)
                 self.loss_table.add_row(["Diff Train", f"{epoch_diff:.4f}", f"{epoch_steering_diff:.4f}", f"{epoch_act_value_diff:.4f}"])
-            if self.testlaoder:
+            if self.testloader:
                 logger.info("\nEvaluating on test set ...")
                 if self.calc_diff:
                     eval_loss, eval_steering_loss, eval_act_value_loss, eval_diff, eval_steering_diff, eval_act_value_diff = self.evaluate()
@@ -196,14 +196,14 @@ class Trainer:
                 self.writer.add_scalar("Train/Loss", epoch_loss, epoch)
                 self.writer.add_scalar("Train/Steering_Loss", epoch_steering_loss, epoch)
                 self.writer.add_scalar(f"Train/{self.act_value_type}_Loss", epoch_act_value_loss, epoch)
-                if self.testlaoder:
+                if self.testloader:
                     self.writer.add_scalar("Test/Loss", eval_loss, global_step=epoch)
                     self.writer.add_scalar("Test/Steering_Loss", eval_steering_loss, global_step=epoch)
                     self.writer.add_scalar(f"Test/{self.act_value_type}_Loss", eval_act_value_loss, global_step=epoch)
                 self.writer.flush()
 
             # If this model is better than previous model we saving it
-            if self.testlaoder:
+            if self.testloader:
                 if eval_loss < self.test_set_min_loss:
                     self.save_model()
             else:
@@ -218,7 +218,7 @@ class Trainer:
                 self.train_not_improved_count += 1
             self.train_set_min_loss = min(self.train_set_min_loss, epoch_loss)
 
-            if self.testlaoder:
+            if self.testloader:
                 if eval_loss + self.delta < self.test_set_min_loss:
                     self.test_not_improved_count = 0
                 else:
@@ -236,7 +236,7 @@ class Trainer:
         losses = dict(steering=[], act_value=[], loss=[])
         diffs = dict(steering=[], act_value=[], diff=[])
         with torch.no_grad():
-            for batch_no, data in enumerate(tqdm(self.testlaoder, file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}'), 1):
+            for batch_no, data in enumerate(tqdm(self.testloader, file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}'), 1):
                 if self.other_inputs:
                     images, other_inputs, steering_labels, act_value_labels = data
                     other_inputs = other_inputs.to(self.device)
