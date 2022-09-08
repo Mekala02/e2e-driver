@@ -46,13 +46,13 @@
                             </div>
                         </div>
                         <div id="Fps">0</div>
+                        <div id="Speed">0 m/s</div>
                         <img src="{{ url_for('video') }}"/>
                     </div>
                     <div class="Info">
                         <div class="Bar_Container">
                             <div class="Bar"><div id="Steering_Border"></div><div id="Steering"></div></div>
                             <div class="Bar"><div id="Throttle_Border"></div><div id="Throttle"></div></div>
-                            <div id="Speed">0 m/s</div>
                         </div>
                         <div class="Action_Buttons">
                             <div id="Speed_Factor">
@@ -75,7 +75,16 @@
                                     <button id="G1_Steering" class="Graph_Select_Button">Steering</button>
                                     <button id="G1_Throttle" class="Graph_Select_Button">Throttle</button>
                                     <button id="G1_Speed" class="Graph_Select_Button">Speed</button>
-                                    <button id="G1_IMU" class="Graph_Select_Button">IMU</button>
+                                    <div id="G1_IMU_Mode_Select" class="Graph_Select_Button">IMU
+                                        <div id="G1_IMU_Menu">
+                                            <button id="G1_IMU_Accel_X" class="IMU_Select_Button">Accel X</button>
+                                            <button id="G1_IMU_Accel_Y" class="IMU_Select_Button">Accel Y</button>
+                                            <button id="G1_IMU_Accel_Z" class="IMU_Select_Button">Accel Z</button>
+                                            <button id="G1_IMU_Gyro_X" class="IMU_Select_Button">Gyro X</button>
+                                            <button id="G1_IMU_Gyro_Y" class="IMU_Select_Button">Gyro Y</button>
+                                            <button id="G1_IMU_Gyro_Z" class="IMU_Select_Button">Gyro Z</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -85,7 +94,16 @@
                                     <button id="G2_Steering" class="Graph_Select_Button">Steering</button>
                                     <button id="G2_Throttle" class="Graph_Select_Button">Throttle</button>
                                     <button id="G2_Speed" class="Graph_Select_Button">Speed</button>
-                                    <button id="G2_IMU" class="Graph_Select_Button">Imu</button>
+                                    <div id="G2_IMU_Mode_Select" class="Graph_Select_Button">IMU
+                                        <div id="G2_IMU_Menu">
+                                            <button id="G2_IMU_Accel_X" class="IMU_Select_Button">Accel X</button>
+                                            <button id="G2_IMU_Accel_Y" class="IMU_Select_Button">Accel Y</button>
+                                            <button id="G2_IMU_Accel_Z" class="IMU_Select_Button">Accel Z</button>
+                                            <button id="G2_IMU_Gyro_X" class="IMU_Select_Button">Gyro X</button>
+                                            <button id="G2_IMU_Gyro_Y" class="IMU_Select_Button">Gyro Y</button>
+                                            <button id="G2_IMU_Gyro_Z" class="IMU_Select_Button">Gyro Z</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

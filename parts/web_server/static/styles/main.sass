@@ -42,17 +42,19 @@ $max-width: 1920px
     z-index: 1000
 
 %Mode_Select_Menu
+    height: 120px
+    width: 70px
     display: none
     flex-direction: column
     position: absolute
     z-index: 1000
-    padding: 30px
+    padding-top: 30px
 
 %Mode_Select_Button
-    height: 30px
-    width: 90px
+    height: 100%
+    width: 100%
     color: white
-    font-size: 20px
+    font-size: auto
     text-align: center
     background-color: #00000000
     border-style: solid
@@ -60,6 +62,7 @@ $max-width: 1920px
     border-color: white
     border-radius: $Fillet
     margin: 2px
+    margin-right: 0 
 
 body, html
     width: 100%
@@ -258,6 +261,7 @@ body, html
                     @extend %Mode_Select_Menu
                     .Camera_Select_Button
                         @extend %Mode_Select_Button
+                        font-size: 20px
             #Fps
                 display: flex
                 align-items: center
@@ -267,6 +271,16 @@ body, html
                 font-weight: bold
                 font-size: 25px
                 color: green
+            
+            #Speed
+                display: flex
+                align-items: center
+                position: absolute
+                bottom: 10px
+                left: calc(50% - 40px)
+                font-weight: bold
+                font-size: 25px
+                color: white
 
         .Info
             display: flex
@@ -282,7 +296,7 @@ body, html
                 justify-content: center
                 font-size: 25px
                 color: white
-                margin-top: 25px
+                margin-top: 0px
 
                 .Bar
                     display: relative
@@ -327,11 +341,6 @@ body, html
                     #Throttle
                         @extend %Bar_Inside
                         background-color: #3666ff
-
-                #Speed
-                    display: flex
-                    justify-content: center
-                    text-align: center
 
             .Action_Buttons
                 display: flex
@@ -459,6 +468,27 @@ body, html
                 border-radius: $Fillet
                 // overflow: hidden
 
+            %IMU_Mode_Select
+                height: 25px
+                width: calc(100% - 5px)
+                margin: 0
+                font-size: auto
+                justify-content: center
+                align-items: center
+                background-color: black
+
+            %IMU_Menu
+                display: none
+                flex-direction: row
+                position: absolute
+                justify-content: center
+                bottom: 0px
+                right: 70px
+                color: white
+                background-color: #00000000
+                margin: 0
+                z-index: 1000
+
             #Graph1
                 @extend %Graph
                 #Graph1_Mode_Select
@@ -471,6 +501,15 @@ body, html
                         @extend %Mode_Select_Menu
                         .Graph_Select_Button
                             @extend %Mode_Select_Button
+                        #G1_IMU_Mode_Select
+                            @extend %IMU_Mode_Select
+                            &:hover > #G1_IMU_Menu
+                                display: flex
+                            #G1_IMU_Menu
+                                @extend %IMU_Menu
+                                .IMU_Select_Button
+                                    @extend %Mode_Select_Button
+                                    width: 70px
 
             #Graph2
                 @extend %Graph
@@ -484,6 +523,15 @@ body, html
                         @extend %Mode_Select_Menu
                         .Graph_Select_Button
                             @extend %Mode_Select_Button
+                        #G2_IMU_Mode_Select
+                            @extend %IMU_Mode_Select
+                            &:hover > #G2_IMU_Menu
+                                display: flex
+                            #G2_IMU_Menu
+                                @extend %IMU_Menu
+                                .IMU_Select_Button
+                                    @extend %Mode_Select_Button
+                                    width: 70px
 
         .Drive_Mode_Change
             display: flex

@@ -14,7 +14,8 @@ class Status {
         this.direction = "Forward"
         this.lane = "Right"
 
-        this.graph = {Steering: [], Throttle: [], Speed: [], IMU: [], timestamp: []}
+        this.graph = {Steering: [], Throttle: [], Speed: [], timestamp: [],
+            IMU_Accel_X: [], IMU_Accel_Y: [], IMU_Accel_Z: [], IMU_Gyro_X: [], IMU_Gyro_Y: [], IMU_Gyro_Z: []}
     }
 
     send_data(data){
@@ -289,8 +290,13 @@ class Status {
         Track.graph["Steering"].push(inputs["steering"])
         Track.graph["Throttle"].push(inputs["throttle"])
         Track.graph["Speed"].push(inputs["speed"])
-        Track.graph["IMU"].push(inputs["IMU"])
         Track.graph["timestamp"].push(inputs["timestamp"] / 10**24)
+        Track.graph["IMU_Accel_X"].push(inputs["IMU_Accel_X"])
+        Track.graph["IMU_Accel_Y"].push(inputs["IMU_Accel_Y"])
+        Track.graph["IMU_Accel_Z"].push(inputs["IMU_Accel_Z"])
+        Track.graph["IMU_Gyro_X"].push(inputs["IMU_Gyro_X"])
+        Track.graph["IMU_Gyro_Y"].push(inputs["IMU_Gyro_Y"])
+        Track.graph["IMU_Gyro_Z"].push(inputs["IMU_Gyro_Z"])
         })
     }
 }

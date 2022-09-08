@@ -4,7 +4,7 @@ class Camera_IMU:
     def __init__(self):
         self.threaded = True
         self.memory = 0
-        self.outputs = {"img_id": 0, "IMU":0}
+        self.outputs = {"IMU_Accel_X": 0, "IMU_Accel_Y": 0, "IMU_Accel_Z": 0, "IMU_Gyro_X": 0, "IMU_Gyro_Y": 0, "IMU_Gyro_Z": 0}
         self.big_outputs = {"rgb": 0, "depth": 0, "object_detection": 0}
         self.camera=cv2.VideoCapture(0+cv2.CAP_DSHOW)
         self.frame = 0
