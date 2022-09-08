@@ -378,6 +378,11 @@ body, html {
   width: 10vw;
   color: white;
 }
+@media (max-width: 1920px) {
+  #Middle .Left .Info .Action_Buttons {
+    width: 12vw;
+  }
+}
 #Middle .Left .Info .Action_Buttons #Speed_Factor {
   width: 100%;
   margin-top: 17px;
