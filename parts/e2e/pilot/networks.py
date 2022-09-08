@@ -8,11 +8,18 @@ class Linear(nn.Module):
         super(Linear, self).__init__()
         self.drop = nn.Dropout(p=0.1)
         self.flatten = nn.Flatten()
+        # 120 x 160 x in_channels
         self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels =24, kernel_size =(5, 5), stride=(2, 2))
+        # 78 x 58 x 24
         self.conv2 = nn.Conv2d(in_channels=24, out_channels=32, kernel_size=(5, 5), stride=(2, 2))
+        # 37 x 27 x 32
         self.conv3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(5, 5), stride=(2, 2))
+        # 17 x 12 x 64
         self.conv4 = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=(3, 3), stride=(1, 1))
+        # 15 x 10 x 64
         self.conv5 = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=(3, 3), stride=(1, 1))
+        # 13 x 8 x 64
+
         self.fc1 = nn.Linear(6656, 100)
         self.fc2 = nn.Linear(100, 50)
 
