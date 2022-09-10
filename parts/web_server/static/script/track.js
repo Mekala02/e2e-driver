@@ -12,12 +12,12 @@ class Status {
         this.outputs = {}
 
         this.not_record_style = document.getElementById("Record").style
-        this.direction = "Forward"
-        this.lane = "Right"
-        this.stop = 0
-        this.taxi = 0
+        this.Direction = "Forward"
+        this.Lane = "Right"
+        this.Stop = 0
+        this.Taxi = 0
 
-        this.graph = {Steering: [], Throttle: [], Speed: [], timestamp: [],
+        this.graph = {Steering: [], Throttle: [], Speed: [], Timestamp: [],
             IMU_Accel_X: [], IMU_Accel_Y: [], IMU_Accel_Z: [], IMU_Gyro_X: [], IMU_Gyro_Y: [], IMU_Gyro_Z: []}
     }
 
@@ -57,7 +57,7 @@ class Status {
             stop_timer = stop_time
             this.Print_Stop_Timer_Interval = setInterval(this.Print_Stop_Timer, 1000)
         }
-        this.stop = stopped
+        this.Stop = stopped
         // console.log("Stop:", this.stop)
     }
 
@@ -66,7 +66,7 @@ class Status {
             this.unactivated_color("Taxi", this.indicator_color)
         else if (pull_over == 1)
             this.activated_color("Taxi", this.indicator_color)
-        this.taxi = pull_over
+        this.Taxi = pull_over
         // console.log("Taxi:", this.taxi)
     }
 
@@ -84,8 +84,8 @@ class Status {
     }
 
     Update_Direction(direction){
-        document.getElementById(this.direction+"_Arrow").style.borderColor = "white"
-        document.getElementById(this.direction+"_Arrow_Stick").style.backgroundColor = "white"
+        document.getElementById(this.Direction+"_Arrow").style.borderColor = "white"
+        document.getElementById(this.Direction+"_Arrow_Stick").style.backgroundColor = "white"
         clearInterval(this.turn_signal_interval)
         if (direction == "Forward"){
             document.getElementById(direction+"_Arrow").style.borderColor = this.first_color
@@ -94,14 +94,14 @@ class Status {
         else{
             this.turn_signal_interval = setInterval(this.turn_signal, 500, direction)
         }
-        this.direction = direction
+        this.Direction = direction
         // console.log("Direction:", this.direction)
     }
 
     Update_Lane(lane){
-        document.getElementById(this.lane+"_Lane").style.visibility = "hidden"
-        this.lane = lane
-        document.getElementById(this.lane+"_Lane").style.visibility = "visible"
+        document.getElementById(this.Lane+"_Lane").style.visibility = "hidden"
+        this.Lane = lane
+        document.getElementById(this.Lane+"_Lane").style.visibility = "visible"
         // console.log("Lane:", this.lane)
     }
 
@@ -290,21 +290,21 @@ class Status {
         fetch("inputs")
         .then(response => response.json())
         .then(inputs => {
-        Track.Update_Stop(inputs["stop"])
-        Track.Update_Taxi(inputs["taxi"])
-        Track.Update_Direction(inputs["direction"])
-        Track.Update_Lane(inputs["lane"])
+        Track.Update_Stop(inputs["Stop"])
+        Track.Update_Taxi(inputs["Taxi"])
+        Track.Update_Direction(inputs["Direction"])
+        Track.Update_Lane(inputs["Lane"])
 
-        Track.Update_Steering(inputs["steering"])
-        Track.Update_Throttle(inputs["throttle"])
-        Track.Update_Speed(inputs["speed"])
+        Track.Update_Steering(inputs["Steering"])
+        Track.Update_Throttle(inputs["Throttle"])
+        Track.Update_Speed(inputs["Speed"])
 
-        Track.Update_FPS(inputs["fps"])
+        Track.Update_FPS(inputs["Fps"])
 
-        Track.graph["Steering"].push(inputs["steering"])
-        Track.graph["Throttle"].push(inputs["throttle"])
-        Track.graph["Speed"].push(inputs["speed"])
-        Track.graph["timestamp"].push(inputs["timestamp"] / 10**24)
+        Track.graph["Steering"].push(inputs["Steering"])
+        Track.graph["Throttle"].push(inputs["Throttle"])
+        Track.graph["Speed"].push(inputs["Speed"])
+        Track.graph["Timestamp"].push(inputs["Timestamp"] / 10**24)
         Track.graph["IMU_Accel_X"].push(inputs["IMU_Accel_X"])
         Track.graph["IMU_Accel_Y"].push(inputs["IMU_Accel_Y"])
         Track.graph["IMU_Accel_Z"].push(inputs["IMU_Accel_Z"])
