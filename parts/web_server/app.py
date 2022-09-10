@@ -6,6 +6,7 @@ camera=cv2.VideoCapture(0)
 
 queue = set()
 
+# Default values
 outputs = {"pilot": "Manuel", "route": "Manuel", "motor_power": 0, "record": 0,
         "speed_factor": 1}
 

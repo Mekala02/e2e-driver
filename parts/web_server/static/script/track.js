@@ -13,6 +13,8 @@ class Status {
         this.not_record_style = document.getElementById("Record").style
         this.direction = "Forward"
         this.lane = "Right"
+        this.stop = 0
+        this.taxi = 0
 
         this.graph = {Steering: [], Throttle: [], Speed: [], timestamp: [],
             IMU_Accel_X: [], IMU_Accel_Y: [], IMU_Accel_Z: [], IMU_Gyro_X: [], IMU_Gyro_Y: [], IMU_Gyro_Z: []}
