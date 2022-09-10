@@ -6,7 +6,7 @@ app=Flask(__name__)
 queue = set()
 
 # Default values
-outputs = {"Pilot": "Manuel", "Route": "Manuel", "Motor_Power": 0, "Record": 0,
+outputs = {"Pilot_Mode": "Manuel", "Route_Mode": "Manuel", "Motor_Power": 0, "Record": 0,
         "Speed_Factor": 1}
 
 inputs = {}

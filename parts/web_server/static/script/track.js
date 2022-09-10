@@ -153,6 +153,14 @@ class Status {
         }
     }
 
+    Update_Graph1_Mode(mode, synchronize=0){
+        this.Update_Graph_Mode(mode, 1, synchronize)
+    }
+
+    Update_Graph2_Mode(mode, synchronize=0){
+        this.Update_Graph_Mode(mode, 2, synchronize)
+    }
+
     bar_lengthen(ID, value, center){
         var bar = document.getElementById(ID)
         var calculated_value = 0
@@ -253,37 +261,38 @@ class Status {
     Update_Pilot_Mode(mode, synchronize=0){
         if (synchronize == 0)
         {
-            this.unactivated_color("Pilot_"+this.outputs["Pilot"])
-            this.outputs["Pilot"] = mode
-            this.send_data({Pilot: this.outputs["Pilot"]})
+            this.unactivated_color("Pilot_"+this.outputs["Pilot_Mode"])
+            this.outputs["Pilot_Mode"] = mode
+            this.send_data({Pilot_Mode: this.outputs["Pilot_Mode"]})
         }
-        this.activated_color(`Pilot_${this.outputs["Pilot"]}`, this.button_clicked_color)
+        this.activated_color(`Pilot_${this.outputs["Pilot_Mode"]}`, this.button_clicked_color)
         // console.log("Pilot:", this.outputs["Pilot"])
     }
     
     Update_Route_Mode(mode, synchronize=0){
         if (synchronize == 0){
-            this.unactivated_color("Route_"+this.outputs["Route"])
-            this.outputs["Route"] = mode
-            this.send_data({Route: this.outputs["Route"]})
+            this.unactivated_color("Route_"+this.outputs["Route_Mode"])
+            this.outputs["Route_Mode"] = mode
+            this.send_data({Route_Mode: this.outputs["Route_Mode"]})
         }
-        this.activated_color(`Route_${this.outputs["Route"]}`, this.button_clicked_color)
+        this.activated_color(`Route_${this.outputs["Route_Mode"]}`, this.button_clicked_color)
         // console.log("Route:", this.outputs["Route"])
     }
     
     update_client_side(){
-        // for (const [key, value] of Object.entries(outputs)){
-        //     `this.Update_${key}_Mode`(this.outputs[value.lower()])
-        // }
+        for (const [key, value] of Object.entries(outputs)){
+            eval(`this.Update_${key}(undefined, 1)`)
+        }
 
-        this.Update_Pilot_Mode(undefined, 1)
-        this.Update_Route_Mode(undefined, 1)
-        this.Update_Camera_Mode(undefined, 1)
-        this.Update_Speed_Factor(undefined, 1)
-        this.Update_Graph_Mode(undefined, 1, 1) // First 1 is graph no second 1 is syncronize mode on
-        this.Update_Graph_Mode(this.outputs["Graph2_Mode"], 2, 1)
-        this.Update_Motor_Power(undefined, 1)
-        this.Update_Record(undefined, 1)
+        // eval("this.Update_Pilot_Mode(undefined, 1)")
+        // this.Update_Route_Mode(undefined, 1)
+        // this.Update_Camera_Mode(undefined, 1)
+        // this.Update_Speed_Factor(undefined, 1)
+        // this.Update_Motor_Power(undefined, 1)
+        // this.Update_Record(undefined, 1)
+
+        // this.Update_Graph_Mode(undefined, 1, 1) // First 1 is graph no second 1 is syncronize mode on
+        // this.Update_Graph_Mode(this.outputs["Graph2_Mode"], 2, 1)
     }
 
     update_indicators(){
