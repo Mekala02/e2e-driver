@@ -39,7 +39,8 @@ document.getElementById('G2_IMU_Gyro_X').addEventListener("click", function() {T
 document.getElementById('G2_IMU_Gyro_Y').addEventListener("click", function() {Track.Update_Graph_Mode("IMU_Gyro_Y", 2)});
 document.getElementById('G2_IMU_Gyro_Z').addEventListener("click", function() {Track.Update_Graph_Mode("IMU_Gyro_Z", 2)});
 
-document.getElementById("Speed_Slider").addEventListener("input", function() {Track.Update_Speed_Factor()})
+const  speed_slider = document.getElementById("Speed_Slider")
+speed_slider.addEventListener("input", function() {Track.Update_Speed_Factor(speed_slider.value)})
 
 document.getElementById("Go").addEventListener("click", function() {Track.Update_Motor_Power()})
 document.getElementById("Record").addEventListener("click", function() {Track.Update_Record()})

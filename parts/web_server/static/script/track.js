@@ -7,8 +7,9 @@ class Status {
         this.button_clicked_color = "#912020"
         this.indicator_color = "red"
         this.first_color = "#ffb700"
-        this.outputs = {pilot: "Manuel", route: "Manuel", motor_power: 0, record: 0,
-        speed_factor: 1, camera_mode: "RGB", graph1_mode: [], graph2_mode: []}
+        // this.outputs = {pilot: "Manuel", route: "Manuel", motor_power: 0, record: 0,
+        // speed_factor: 1, camera_mode: "RGB", graph1_mode: [], graph2_mode: []}
+        this.outputs = {}
 
         this.not_record_style = document.getElementById("Record").style
         this.direction = "Forward"
@@ -184,11 +185,11 @@ class Status {
         // console.log('You selected: ', this.speed)
     }
 
-    Update_Speed_Factor(synchronize=0){
+    Update_Speed_Factor(speed_factor, synchronize=0){
         if (synchronize == 1)
-            document.getElementById("Speed_Slider").value = this.outputs["speed_factor"] * 50
+            document.getElementById("Speed_Slider").value = speed_factor * 50
         else{
-            this.outputs["speed_factor"] = document.getElementById("Speed_Slider").value / 50
+            this.outputs["speed_factor"] = speed_factor / 50
             document.getElementById("Speed_Slider").title = this.outputs["speed_factor"]
             this.send_data({speed_factor: this.outputs["speed_factor"]})
             // console.log(this.outputs["speed_factor"])
@@ -264,12 +265,16 @@ class Status {
     }
     
     update_client_side(){
+        // for (const [key, value] of Object.entries(outputs)){
+        //     `this.Update_${key}_Mode`(this.outputs[value.lower()])
+        // }
+
         this.Update_Pilot_Mode(this.outputs["pilot"])
         this.Update_Route_Mode(this.outputs["route"])
         this.Update_Camera_Mode(this.outputs["camera_mode"])
         this.Update_Graph_Mode(this.outputs["graph1_mode"], 1, 1) // First 1 is graph no second 1 is syncronize mode on
         this.Update_Graph_Mode(this.outputs["graph2_mode"], 2, 1)
-        this.Update_Speed_Factor(1)
+        this.Update_Speed_Factor(this.outputs["speed_factor"], 1)
         this.Update_Motor_Power(1)
         this.Update_Record(1)
     }
