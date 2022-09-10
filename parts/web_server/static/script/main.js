@@ -96,7 +96,7 @@ function graph(graph){
   length1 = Track.graph["timestamp"].length
 
   var traces = []
-  for (let mode of Track.outputs[`graph${graph}_mode`]){
+  for (let mode of Track.outputs[`Graph${graph}_Mode`]){
     traces.push({
       x: Track.graph["timestamp"].slice(Math.max(0, length1 - 500), length1 - 1),
       y: Track.graph[mode].slice(Math.max(0, length1 - 500), length1 - 1),

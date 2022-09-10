@@ -109,11 +109,13 @@ class Status {
         alert("Emergency Stop")
     }
     
-    Update_Camera_Mode(mode){
-        this.unactivated_color("C_"+this.outputs["camera_mode"])
-        this.outputs["camera_mode"] = mode
-        this.activated_color("C_"+mode, this.button_clicked_color)
-        this.send_data({camera_mode: this.outputs["camera_mode"]})
+    Update_Camera_Mode(mode, synchronize=0){
+        if (synchronize == 0){
+            this.unactivated_color("C_"+this.outputs["Camera_Mode"])
+            this.outputs["Camera_Mode"] = mode
+            this.send_data({Camera_Mode: this.outputs["Camera_Mode"]})
+        }
+        this.activated_color(`C_${this.outputs["Camera_Mode"]}`, this.button_clicked_color)
     }
 
     Update_FPS(fps){
@@ -122,32 +124,32 @@ class Status {
 
     Update_Graph_Mode(mode, graph=0, synchronize=0){
         // If we synchronizing we only activating the colors on client side
-        if (synchronize){
-            for (let value of this.outputs[`graph${graph}_mode`]) {
-                this.activated_color(`G${graph}_${value}`, this.button_clicked_color)
-              }
-        }
-        else{
+        if (synchronize == 0){
             // If clicked button already selected we turning off it and deleting from list
-            if (this.outputs[`graph${graph}_mode`].includes(mode)){
+            if (this.outputs[`Graph${graph}_Mode`].includes(mode)){
                 this.unactivated_color(`G${graph}_${mode}`)
-                const index = this.outputs[`graph${graph}_mode`].indexOf(mode)
-                this.outputs[`graph${graph}_mode`].splice(index, 1)
+                const index = this.outputs[`Graph${graph}_Mode`].indexOf(mode)
+                this.outputs[`Graph${graph}_Mode`].splice(index, 1)
             }
             else{
                 this.activated_color(`G${graph}_${mode}`, this.button_clicked_color)
-                this.outputs[`graph${graph}_mode`].push(mode)
+                this.outputs[`Graph${graph}_Mode`].push(mode)
             }
             // Finaly sending list to the server
             if (graph == 1){
                 const dict = {}
-                dict["test"] = this.outputs["graph1_mode"]
+                dict["test"] = this.outputs["Graph1_Mode"]
                 // console.log(dict["test"])
-                this.send_data({graph1_mode: this.outputs["graph1_mode"]})
+                this.send_data({Graph1_Mode: this.outputs["Graph1_Mode"]})
             }
             else if(graph == 2)
                 // console.log({graph2_mode: this.outputs["graph2_mode"]})
-                this.send_data({graph2_mode: this.outputs["graph2_mode"]})
+                this.send_data({Graph2_Mode: this.outputs["Graph2_Mode"]})
+        }
+        else{
+            for (let value of this.outputs[`Graph${graph}_Mode`]) {
+                this.activated_color(`G${graph}_${value}`, this.button_clicked_color)
+              }
         }
     }
 
@@ -186,14 +188,14 @@ class Status {
     }
 
     Update_Speed_Factor(speed_factor, synchronize=0){
-        if (synchronize == 1)
-            document.getElementById("Speed_Slider").value = speed_factor * 50
-        else{
-            this.outputs["speed_factor"] = speed_factor / 50
-            document.getElementById("Speed_Slider").title = this.outputs["speed_factor"]
-            this.send_data({speed_factor: this.outputs["speed_factor"]})
-            // console.log(this.outputs["speed_factor"])
+        if (synchronize == 0){
+            this.outputs["Speed_Factor"] = speed_factor / 50
+            document.getElementById("Speed_Slider").title = this.outputs["Speed_Factor"]
+            this.send_data({Speed_Factor: this.outputs["Speed_Factor"]})
         }
+        else
+            document.getElementById("Speed_Slider").value = this.outputs["Speed_Factor"] * 50
+        // console.log(this.outputs["Speed_Factor"])
     }
 
     print_record_time(){
@@ -221,47 +223,52 @@ class Status {
         }
     }
 
-    Update_Record(synchronize=0){
+    Update_Record(mode=undefined, synchronize=0){
         if (synchronize == 0){
-            if (this.outputs["record"] == 0)
-                this.outputs["record"] = 1
-            else if (this.outputs["record"] == 1)
-                this.outputs["record"] = 0
-                this.send_data({record: this.outputs["record"]})
-                // console.log("Record:", this.outputs["record"])
+            if (this.outputs["Record"] == 0)
+                this.outputs["Record"] = 1
+            else if (this.outputs["Record"] == 1)
+                this.outputs["Record"] = 0
+                this.send_data({Record: this.outputs["Record"]})
+                // console.log("Record:", this.outputs["Record"])
         }
-        this.record_style_change(this.outputs["record"])
+        this.record_style_change(this.outputs["Record"])
     }
 
-    Update_Motor_Power(synchronize=0){
+    Update_Motor_Power(mode=undefined, synchronize=0){
         if (synchronize == 0){
-            if (this.outputs["motor_power"] == 1)
-                this.outputs["motor_power"] = 0
-            else if (this.outputs["motor_power"] == 0)
-                this.outputs["motor_power"] = 1
-                this.send_data({motor_power: this.outputs["motor_power"]})
+            if (this.outputs["Motor_Power"] == 1)
+                this.outputs["Motor_Power"] = 0
+            else if (this.outputs["Motor_Power"] == 0)
+                this.outputs["Motor_Power"] = 1
+                this.send_data({Motor_Power: this.outputs["Motor_Power"]})
                 // console.log("Motor_Power:", this.outputs["motor_power"])
         }
-        if (this.outputs["motor_power"] == 1)
+        if (this.outputs["Motor_Power"] == 1)
             this.activated_color("Go", "red")
-        else if(this.outputs["motor_power"] == 0)
+        else if(this.outputs["Motor_Power"] == 0)
             this.unactivated_color("Go")
     }
     
-    Update_Pilot_Mode(mode){
-        this.unactivated_color("Pilot_"+this.outputs["pilot"])
-        this.outputs["pilot"] = mode
-        this.activated_color("Pilot_"+mode, this.button_clicked_color)
-        this.send_data({pilot: this.outputs["pilot"]})
-        // console.log("Pilot:", this.outputs["pilot"])
+    Update_Pilot_Mode(mode, synchronize=0){
+        if (synchronize == 0)
+        {
+            this.unactivated_color("Pilot_"+this.outputs["Pilot"])
+            this.outputs["Pilot"] = mode
+            this.send_data({Pilot: this.outputs["Pilot"]})
+        }
+        this.activated_color(`Pilot_${this.outputs["Pilot"]}`, this.button_clicked_color)
+        // console.log("Pilot:", this.outputs["Pilot"])
     }
     
-    Update_Route_Mode(mode){
-        this.unactivated_color("Route_"+this.outputs["route"])
-        this.outputs["route"] = mode
-        this.activated_color("Route_"+mode, this.button_clicked_color)
-        this.send_data({route: this.outputs["route"]})
-        // console.log("Route:", this.outputs["route"])
+    Update_Route_Mode(mode, synchronize=0){
+        if (synchronize == 0){
+            this.unactivated_color("Route_"+this.outputs["Route"])
+            this.outputs["Route"] = mode
+            this.send_data({Route: this.outputs["Route"]})
+        }
+        this.activated_color(`Route_${this.outputs["Route"]}`, this.button_clicked_color)
+        // console.log("Route:", this.outputs["Route"])
     }
     
     update_client_side(){
@@ -269,14 +276,14 @@ class Status {
         //     `this.Update_${key}_Mode`(this.outputs[value.lower()])
         // }
 
-        this.Update_Pilot_Mode(this.outputs["pilot"])
-        this.Update_Route_Mode(this.outputs["route"])
-        this.Update_Camera_Mode(this.outputs["camera_mode"])
-        this.Update_Graph_Mode(this.outputs["graph1_mode"], 1, 1) // First 1 is graph no second 1 is syncronize mode on
-        this.Update_Graph_Mode(this.outputs["graph2_mode"], 2, 1)
-        this.Update_Speed_Factor(this.outputs["speed_factor"], 1)
-        this.Update_Motor_Power(1)
-        this.Update_Record(1)
+        this.Update_Pilot_Mode(undefined, 1)
+        this.Update_Route_Mode(undefined, 1)
+        this.Update_Camera_Mode(undefined, 1)
+        this.Update_Speed_Factor(undefined, 1)
+        this.Update_Graph_Mode(undefined, 1, 1) // First 1 is graph no second 1 is syncronize mode on
+        this.Update_Graph_Mode(this.outputs["Graph2_Mode"], 2, 1)
+        this.Update_Motor_Power(undefined, 1)
+        this.Update_Record(undefined, 1)
     }
 
     update_indicators(){

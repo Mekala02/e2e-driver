@@ -2,30 +2,29 @@ from flask import Flask, render_template, Response, request, jsonify
 import cv2
 
 app=Flask(__name__)
-camera=cv2.VideoCapture(0)
 
 queue = set()
 
 # Default values
-outputs = {"pilot": "Manuel", "route": "Manuel", "motor_power": 0, "record": 0,
-        "speed_factor": 1}
+outputs = {"Pilot": "Manuel", "Route": "Manuel", "Motor_Power": 0, "Record": 0,
+        "Speed_Factor": 1}
 
 inputs = {}
 
 # It contains latest image like rgb, depth, yolo and new is for
 # tracking if there is new image on it
-camera = {"new": False}
+camera = {"New": False}
 
-web_special = {"camera_mode": "RGB", "graph1_mode": ["Steering"], "graph2_mode": ["Throttle"]}
+web_special = {"Camera_Mode": "RGB", "Graph1_Mode": ["Steering"], "Graph2_Mode": ["Throttle"]}
 
 def generate_frames():
     while True:
         if camera["new"]:
-            frame = camera[web_special["camera_mode"].lower()]
+            frame = camera[web_special["Camera_Mode"]]
             ret, buffer = cv2.imencode('.jpg', frame)
             frame=buffer.tobytes()
             yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-            camera["new"] = False
+            camera["New"] = False
 
 @app.route('/')
 def index():

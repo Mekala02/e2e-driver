@@ -5,7 +5,7 @@ class Camera_IMU:
         self.threaded = True
         self.memory = 0
         self.outputs = {"IMU_Accel_X": 0, "IMU_Accel_Y": 0, "IMU_Accel_Z": 0, "IMU_Gyro_X": 0, "IMU_Gyro_Y": 0, "IMU_Gyro_Z": 0}
-        self.big_outputs = {"rgb": 0, "depth": 0, "object_detection": 0}
+        self.big_outputs = {"RGB": 0, "Depth": 0, "Object_Detection": 0}
         self.camera=cv2.VideoCapture(0+cv2.CAP_DSHOW)
         self.frame = 0
 
@@ -23,6 +23,6 @@ class Camera_IMU:
             self.generate_frames()
 
     def update(self):
-        self.memory.big_memory["rgb"] = self.frame
-        self.memory.big_memory["depth"] = self.frame
-        self.memory.big_memory["object_detection"] = self.frame
+        self.memory.big_memory["RGB"] = self.frame
+        self.memory.big_memory["Depth"] = self.frame
+        self.memory.big_memory["Object_Detection"] = self.frame

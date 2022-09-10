@@ -19,7 +19,7 @@ class Data_Logger:
     def update(self):
         self.memory.memory["index"] = self.index
         self.memory.memory["timestamp"] = int(time.time_ns() * 1e-6)
-        if self.memory.memory["record"]:
+        if self.memory.memory["Record"]:
             for key, value in self.memory.memory.items():
                 if key in self.save_list:
                     self.save_list[key] = self.memory.memory[key]
