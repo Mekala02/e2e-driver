@@ -71,7 +71,7 @@ class Web_Server:
         camera["new"] = True
 
     def start_thread(self):
-        app.run(host='0.0.0.0')
+        app.run(host="0.0.0.0")
         
     def update(self):
         self.update_vehicle_memory()

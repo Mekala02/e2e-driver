@@ -1,5 +1,5 @@
 let Track = new Status()
-update_interval = 10 //ms
+update_interval = 30 //ms
 
 function load_parameters(outputs){
     for (const [key, value] of Object.entries(outputs)) {

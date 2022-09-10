@@ -280,7 +280,7 @@ class Status {
     }
     
     update_client_side(){
-        for (const [key, value] of Object.entries(outputs)){
+        for (const key in outputs){
             eval(`this.Update_${key}(undefined, 1)`)
         }
 
