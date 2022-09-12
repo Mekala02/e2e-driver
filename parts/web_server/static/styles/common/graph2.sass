@@ -1,0 +1,24 @@
+#Graph2
+    @extend %Graph
+    #Graph2_Mode_Select
+        @extend %Mode_Select
+        top: 15px
+        right: 10px
+        @media (max-width: $max_width)
+            top: 6px
+        &:hover > #G2_Menu
+            display: flex
+        #G2_Menu
+            @extend %Mode_Select_Menu
+            right: -5px
+            .Graph_Select_Button
+                @extend %Mode_Select_Button
+            #G2_IMU_Mode_Select
+                @extend %IMU_Mode_Select
+                &:hover > #G2_IMU_Menu
+                    display: flex
+                #G2_IMU_Menu
+                    @extend %IMU_Menu
+                    .IMU_Select_Button
+                        @extend %Mode_Select_Button
+                        width: 70px
