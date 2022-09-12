@@ -6,16 +6,11 @@ class Status {
         this.xhr = new XMLHttpRequest()
         this.button_clicked_color = "#912020"
         this.indicator_color = "red"
-        this.first_color = "#ffb700"
         // this.outputs = {pilot: "Manuel", route: "Manuel", motor_power: 0, record: 0,
         // speed_factor: 1, camera_mode: "RGB", graph1_mode: [], graph2_mode: []}
         this.outputs = {}
 
         this.not_record_style = document.getElementById("Record").style
-        this.Direction = "Forward"
-        this.Lane = "Right"
-        this.Stop = 0
-        this.Taxi = 0
 
         this.graph = {Steering: [], Throttle: [], Speed: [], Timestamp: [],
             IMU_Accel_X: [], IMU_Accel_Y: [], IMU_Accel_Z: [], IMU_Gyro_X: [], IMU_Gyro_Y: [], IMU_Gyro_Z: []}
@@ -50,12 +45,14 @@ class Status {
             clearInterval(this.Print_Stop_Timer_Interval)
         }
         else if (stopped == 1){
+            if (stop_time != 0){
+                document.getElementById("Arrow_Container").style.visibility = "hidden"
+                document.getElementById("Stop_Timer").style.display = "flex"
+                document.getElementById("Stop_Timer").innerHTML = stop_time
+                stop_timer = stop_time
+                this.Print_Stop_Timer_Interval = setInterval(this.Print_Stop_Timer, 1000)
+            }
             this.activated_color("Stop", this.indicator_color)
-            document.getElementById("Arrow_Container").style.visibility = "hidden"
-            document.getElementById("Stop_Timer").style.display = "flex"
-            document.getElementById("Stop_Timer").innerHTML = stop_time
-            stop_timer = stop_time
-            this.Print_Stop_Timer_Interval = setInterval(this.Print_Stop_Timer, 1000)
         }
         this.Stop = stopped
         // console.log("Stop:", this.stop)
@@ -74,8 +71,8 @@ class Status {
         var arrow = document.getElementById(direction+"_Arrow")
         var arrow_stick = document.getElementById(direction+"_Arrow_Stick")
         if (arrow.style.borderColor == "white"){
-            arrow.style.borderColor = this.first_color
-            arrow_stick.style.backgroundColor = this.first_color
+            arrow.style.borderColor = "#ffb700"
+            arrow_stick.style.backgroundColor = "#ffb700"
         }
         else{
             arrow.style.borderColor = "white"
@@ -84,22 +81,28 @@ class Status {
     }
 
     Update_Direction(direction){
-        document.getElementById(this.Direction+"_Arrow").style.borderColor = "white"
-        document.getElementById(this.Direction+"_Arrow_Stick").style.backgroundColor = "white"
-        clearInterval(this.turn_signal_interval)
-        if (direction == "Forward"){
-            document.getElementById(direction+"_Arrow").style.borderColor = this.first_color
-            document.getElementById(direction+"_Arrow_Stick").style.backgroundColor = this.first_color
-        }
-        else{
-            this.turn_signal_interval = setInterval(this.turn_signal, 500, direction)
+        if (this.Direction != direction){
+            try{
+                document.getElementById(this.Direction+"_Arrow").style.borderColor = "white"
+                document.getElementById(this.Direction+"_Arrow_Stick").style.backgroundColor = "white"
+            }
+            catch{}
+            clearInterval(this.turn_signal_interval)
+            if (direction == "Forward"){
+                document.getElementById(direction+"_Arrow").style.borderColor = "#ffb700"
+                document.getElementById(direction+"_Arrow_Stick").style.backgroundColor = "#ffb700"
+            }
+            else{
+                this.turn_signal_interval = setInterval(this.turn_signal, 500, direction)
+            }
         }
         this.Direction = direction
-        // console.log("Direction:", this.direction)
+        // console.log("Direction:", this.Direction)
     }
 
     Update_Lane(lane){
-        document.getElementById(this.Lane+"_Lane").style.visibility = "hidden"
+        try{document.getElementById(this.Lane+"_Lane").style.visibility = "hidden"}
+        catch{}
         this.Lane = lane
         document.getElementById(this.Lane+"_Lane").style.visibility = "visible"
         // console.log("Lane:", this.lane)
@@ -299,27 +302,31 @@ class Status {
         fetch("inputs")
         .then(response => response.json())
         .then(inputs => {
-        Track.Update_Stop(inputs["Stop"])
-        Track.Update_Taxi(inputs["Taxi"])
-        Track.Update_Direction(inputs["Direction"])
-        Track.Update_Lane(inputs["Lane"])
+            Track.Update_Stop(inputs["Stop"])
+            Track.Update_Taxi(inputs["Taxi"])
+            Track.Update_Direction(inputs["Direction"])
+            Track.Update_Lane(inputs["Lane"])
 
-        Track.Update_Steering(inputs["Steering"])
-        Track.Update_Throttle(inputs["Throttle"])
-        Track.Update_Speed(inputs["Speed"])
+            Track.Update_Steering(inputs["Steering"])
+            Track.Update_Throttle(inputs["Throttle"])
+            Track.Update_Speed(inputs["Speed"])
 
-        Track.Update_FPS(inputs["Fps"])
+            Track.Update_FPS(inputs["Fps"])
 
-        Track.graph["Steering"].push(inputs["Steering"])
-        Track.graph["Throttle"].push(inputs["Throttle"])
-        Track.graph["Speed"].push(inputs["Speed"])
-        Track.graph["Timestamp"].push(inputs["Timestamp"] / 10**24)
-        Track.graph["IMU_Accel_X"].push(inputs["IMU_Accel_X"])
-        Track.graph["IMU_Accel_Y"].push(inputs["IMU_Accel_Y"])
-        Track.graph["IMU_Accel_Z"].push(inputs["IMU_Accel_Z"])
-        Track.graph["IMU_Gyro_X"].push(inputs["IMU_Gyro_X"])
-        Track.graph["IMU_Gyro_Y"].push(inputs["IMU_Gyro_Y"])
-        Track.graph["IMU_Gyro_Z"].push(inputs["IMU_Gyro_Z"])
+
+            for (const key in Track.graph) {
+                    Track.graph[key].push(inputs[key])
+            }
+            // Track.graph["Steering"].push(inputs["Steering"])
+            // Track.graph["Throttle"].push(inputs["Throttle"])
+            // Track.graph["Speed"].push(inputs["Speed"])
+            // Track.graph["Timestamp"].push(inputs["Timestamp"] / 10**24)
+            // Track.graph["IMU_Accel_X"].push(inputs["IMU_Accel_X"])
+            // Track.graph["IMU_Accel_Y"].push(inputs["IMU_Accel_Y"])
+            // Track.graph["IMU_Accel_Z"].push(inputs["IMU_Accel_Z"])
+            // Track.graph["IMU_Gyro_X"].push(inputs["IMU_Gyro_X"])
+            // Track.graph["IMU_Gyro_Y"].push(inputs["IMU_Gyro_Y"])
+            // Track.graph["IMU_Gyro_Z"].push(inputs["IMU_Gyro_Z"])
         })
     }
 }
