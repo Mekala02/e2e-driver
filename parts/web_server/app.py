@@ -1,4 +1,5 @@
 from flask import Flask, render_template, Response, request, jsonify
+import time
 import cv2
 
 app=Flask(__name__)
@@ -9,22 +10,25 @@ queue = set()
 outputs = {"Pilot_Mode": "Manuel", "Route_Mode": "Manuel", "Motor_Power": 0, "Record": 0,
         "Speed_Factor": 1}
 
+# Servers memory
 inputs = {}
 
 # It contains latest image like rgb, depth, yolo and new is for
 # tracking if there is new image on it
-camera = {"New": False}
+camera = {"Is_New": False}
 
 web_special = {"Camera_Mode": "RGB", "Graph1_Mode": ["Steering"], "Graph2_Mode": ["Throttle"]}
 
 def generate_frames():
     while True:
-        if camera["new"]:
+        if camera["Is_New"]:
             frame = camera[web_special["Camera_Mode"]]
             ret, buffer = cv2.imencode('.jpg', frame)
             frame=buffer.tobytes()
             yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-            camera["New"] = False
+            camera["Is_New"] = False
+        # While loop is too fast we need to slow down interval is 2ms (500fps)
+        time.sleep(0.002)
 
 @app.route('/')
 def index():
@@ -68,7 +72,7 @@ class Web_Server:
             inputs[key] = self.memory.memory[key]
         for key in self.memory.big_memory:
             camera[key] = self.memory.big_memory[key]
-        camera["new"] = True
+        camera["Is_New"] = True
 
     def start_thread(self):
         app.run(host="0.0.0.0")
