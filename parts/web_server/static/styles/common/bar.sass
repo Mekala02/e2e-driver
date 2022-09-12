@@ -1,0 +1,29 @@
+.Bar
+    display: relative
+    justify-content: middle
+    overflow: hidden
+    height: 24px
+    width: $Bar_Width
+    margin: 10px
+    border-style: solid
+    border-width: 3px
+    border-color: white
+    border-radius: $Fillet
+    @media (max-width: $max_width)
+        height: 17px
+
+    #Steering_Border
+        @extend %Bar_Border
+        margin-left: calc($Bar_Width * $Steering_Bar_Border)
+
+    #Throttle_Border
+        @extend %Bar_Border
+        margin-left: calc($Bar_Width * $Throttle_Bar_Border)
+
+    #Steering
+        @extend %Bar_Inside
+        background-color: #ff4e4e
+
+    #Throttle
+        @extend %Bar_Inside
+        background-color: #3666ff

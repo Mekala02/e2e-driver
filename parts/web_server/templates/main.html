@@ -10,19 +10,13 @@
     </head>
 
     <body>
-        <section id="Top">
-            {% include 'common/top.html' %}
-        </section>
+        {% include 'common/top.html' %}
 
         <section id="Middle">
             <div class="Left">
-                <div id="Camera_Brodcast">
-                    {% include 'common/camera.html' %}
-                </div>
+                {% include 'common/camera.html' %}
                 <div class="Info">
-                    <div class="Bar_Container">
-                        {% include 'common/bar.html' %}
-                    </div>
+                    {% include 'common/bar.html' %}
                     <div class="Action_Buttons">
                         <div id="Speed_Factor">
                                 <input title="1" id="Speed_Slider" type="range" min="1" max="100" value="50">
@@ -37,10 +31,8 @@
             </div>
 
             <div class="Right">                    
-                <div class="Graph_Container">
-                    <div id="Graph1">                          
-                        {% include 'common/graph1.html' %}
-                    </div>
+                <div class="Graph_Container">                       
+                    {% include 'common/graph1.html' %}
                     <div id="Graph2">
                         <div id="Graph2_Mode_Select">Mode
                             <div id="G2_Menu">

@@ -19,7 +19,7 @@
   }
 }
 
-#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select, #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select, #Middle .Left #Camera_Brodcast #Camera_Mode_Select {
+#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select, #Graph1 #Graph1_Mode_Select, #Camera_Brodcast #Camera_Mode_Select {
   display: flex;
   position: absolute;
   justify-content: center;
@@ -36,7 +36,7 @@
   z-index: 1000;
 }
 
-#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu, #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu, #Middle .Left #Camera_Brodcast #Camera_Mode_Select #C_Menu {
+#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu, #Graph1 #Graph1_Mode_Select #G1_Menu, #Camera_Brodcast #Camera_Mode_Select #C_Menu {
   display: none;
   flex-direction: column;
   position: absolute;
@@ -51,7 +51,7 @@
   margin-left: -40px;
 }
 
-#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select #G2_IMU_Menu .IMU_Select_Button, #Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu .Graph_Select_Button, #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu .IMU_Select_Button, #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu .Graph_Select_Button, #Middle .Left #Camera_Brodcast #Camera_Mode_Select #C_Menu .Camera_Select_Button {
+#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select #G2_IMU_Menu .IMU_Select_Button, #Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu .Graph_Select_Button, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu .IMU_Select_Button, #Graph1 #Graph1_Mode_Select #G1_Menu .Graph_Select_Button, #Camera_Brodcast #Camera_Mode_Select #C_Menu .Camera_Select_Button {
   height: 100%;
   width: 100%;
   color: white;
@@ -66,10 +66,76 @@
   margin-right: 0;
 }
 
-body, html {
+#Top #Indicators #Arrow_Container #Right_Arrow, #Top #Indicators #Arrow_Container #Forward_Arrow, #Top #Indicators #Arrow_Container #Left_Arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 40px;
+  background-color: transparent;
+  margin: 25px;
+  border-style: solid;
+  border-width: 14px;
+  border-radius: 5px;
+  border-color: white;
+  border-bottom: 0;
+  border-left: 0;
+}
+@media (max-width: 1920px) {
+  #Top #Indicators #Arrow_Container #Right_Arrow, #Top #Indicators #Arrow_Container #Forward_Arrow, #Top #Indicators #Arrow_Container #Left_Arrow {
+    margin: 20px;
+    border-width: 10px;
+  }
+}
+
+.Bar #Throttle_Border, .Bar #Steering_Border {
+  position: absolute;
+  height: 100%;
+  width: 5px;
+  margin-top: -1px;
+  background-color: white;
+}
+@media (max-width: 1920px) {
+  .Bar #Throttle_Border, .Bar #Steering_Border {
+    height: 19px;
+  }
+}
+
+.Bar #Throttle, .Bar #Steering {
+  height: 100%;
+  width: 0;
+}
+
+#Middle .Right .Graph_Container #Graph2, #Graph1 {
+  position: relative;
   width: 100%;
-  background-color: #272c2e;
+  height: 45%;
+  background-color: transparent;
+  border-radius: 10px;
+}
+
+#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select {
+  height: 25px;
+  width: calc(100% - 5px);
   margin: 0;
+  font-size: auto;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+}
+
+#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select #G2_IMU_Menu, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu {
+  display: none;
+  flex-direction: row;
+  position: absolute;
+  justify-content: center;
+  bottom: 0px;
+  right: 115px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0);
+  padding: 40px;
+  margin: -40px;
+  z-index: 1000;
 }
 
 #Top {
@@ -142,27 +208,6 @@ body, html {
   background-color: transparent;
   margin-left: 12px;
   margin-right: 12px;
-}
-#Top #Indicators #Arrow_Container #Right_Arrow, #Top #Indicators #Arrow_Container #Forward_Arrow, #Top #Indicators #Arrow_Container #Left_Arrow {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 40px;
-  width: 40px;
-  background-color: transparent;
-  margin: 25px;
-  border-style: solid;
-  border-width: 14px;
-  border-radius: 5px;
-  border-color: white;
-  border-bottom: 0;
-  border-left: 0;
-}
-@media (max-width: 1920px) {
-  #Top #Indicators #Arrow_Container #Right_Arrow, #Top #Indicators #Arrow_Container #Forward_Arrow, #Top #Indicators #Arrow_Container #Left_Arrow {
-    margin: 20px;
-    border-width: 10px;
-  }
 }
 #Top #Indicators #Arrow_Container #Left_Arrow {
   transform: rotate(-135deg);
@@ -243,6 +288,110 @@ body, html {
   }
 }
 
+#Camera_Brodcast {
+  width: 35vw;
+  height: 35vh;
+  position: relative;
+  background-color: bisque;
+  border-radius: 10px;
+  margin-bottom: 40px;
+}
+@media (max-width: 1920px) {
+  #Camera_Brodcast {
+    width: 43vw;
+    height: 48vh;
+    margin-bottom: 10px;
+  }
+}
+#Camera_Brodcast img {
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+}
+#Camera_Brodcast #Camera_Mode_Select {
+  top: 10px;
+  left: 10px;
+}
+#Camera_Brodcast #Camera_Mode_Select:hover > #C_Menu {
+  display: flex;
+}
+#Camera_Brodcast #Camera_Mode_Select #C_Menu {
+  left: -5px;
+}
+#Camera_Brodcast #Fps {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-weight: bold;
+  font-size: 25px;
+  color: green;
+}
+#Camera_Brodcast #Speed {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  bottom: 10px;
+  left: calc(50% - 40px);
+  font-weight: bold;
+  font-size: 25px;
+  color: white;
+}
+
+.Bar {
+  display: relative;
+  justify-content: middle;
+  overflow: hidden;
+  height: 24px;
+  width: 18vw;
+  margin: 10px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: white;
+  border-radius: 10px;
+}
+@media (max-width: 1920px) {
+  .Bar {
+    height: 17px;
+  }
+}
+.Bar #Steering_Border {
+  margin-left: 9vw;
+}
+.Bar #Throttle_Border {
+  margin-left: 6vw;
+}
+.Bar #Steering {
+  background-color: #ff4e4e;
+}
+.Bar #Throttle {
+  background-color: #3666ff;
+}
+
+#Graph1 #Graph1_Mode_Select {
+  top: 10px;
+  right: 10px;
+}
+#Graph1 #Graph1_Mode_Select:hover > #G1_Menu {
+  display: flex;
+}
+#Graph1 #Graph1_Mode_Select #G1_Menu {
+  right: -5px;
+}
+#Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select:hover > #G1_IMU_Menu {
+  display: flex;
+}
+#Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu .IMU_Select_Button {
+  width: 69px;
+}
+
+body, html {
+  width: 100%;
+  background-color: #272c2e;
+  margin: 0;
+}
+
 #Middle {
   display: flex;
   flex-direction: row;
@@ -262,56 +411,6 @@ body, html {
   display: flex;
   flex-direction: column;
 }
-#Middle .Left #Camera_Brodcast {
-  width: 35vw;
-  height: 35vh;
-  position: relative;
-  background-color: bisque;
-  border-radius: 10px;
-  margin-bottom: 40px;
-}
-@media (max-width: 1920px) {
-  #Middle .Left #Camera_Brodcast {
-    width: 43vw;
-    height: 48vh;
-    margin-bottom: 10px;
-  }
-}
-#Middle .Left #Camera_Brodcast img {
-  height: 100%;
-  width: 100%;
-  border-radius: 10px;
-}
-#Middle .Left #Camera_Brodcast #Camera_Mode_Select {
-  top: 10px;
-  left: 10px;
-}
-#Middle .Left #Camera_Brodcast #Camera_Mode_Select:hover > #C_Menu {
-  display: flex;
-}
-#Middle .Left #Camera_Brodcast #Camera_Mode_Select #C_Menu {
-  left: -5px;
-}
-#Middle .Left #Camera_Brodcast #Fps {
-  display: flex;
-  align-items: center;
-  position: absolute;
-  top: 15px;
-  right: 25px;
-  font-weight: bold;
-  font-size: 25px;
-  color: green;
-}
-#Middle .Left #Camera_Brodcast #Speed {
-  display: flex;
-  align-items: center;
-  position: absolute;
-  bottom: 10px;
-  left: calc(50% - 40px);
-  font-weight: bold;
-  font-size: 25px;
-  color: white;
-}
 #Middle .Left .Info {
   display: flex;
   justify-content: space-around;
@@ -325,51 +424,6 @@ body, html {
   font-size: 25px;
   color: white;
   margin-top: 0px;
-}
-#Middle .Left .Info .Bar_Container .Bar {
-  display: relative;
-  justify-content: middle;
-  overflow: hidden;
-  height: 24px;
-  width: 18vw;
-  margin: 10px;
-  border-style: solid;
-  border-width: 3px;
-  border-color: white;
-  border-radius: 10px;
-}
-@media (max-width: 1920px) {
-  #Middle .Left .Info .Bar_Container .Bar {
-    height: 17px;
-  }
-}
-#Middle .Left .Info .Bar_Container .Bar #Throttle_Border, #Middle .Left .Info .Bar_Container .Bar #Steering_Border {
-  position: absolute;
-  height: 100%;
-  width: 5px;
-  margin-top: -1px;
-  background-color: white;
-}
-@media (max-width: 1920px) {
-  #Middle .Left .Info .Bar_Container .Bar #Throttle_Border, #Middle .Left .Info .Bar_Container .Bar #Steering_Border {
-    height: 19px;
-  }
-}
-#Middle .Left .Info .Bar_Container .Bar #Steering_Border {
-  margin-left: 9vw;
-}
-#Middle .Left .Info .Bar_Container .Bar #Throttle_Border {
-  margin-left: 6vw;
-}
-#Middle .Left .Info .Bar_Container .Bar #Throttle, #Middle .Left .Info .Bar_Container .Bar #Steering {
-  height: 100%;
-  width: 0;
-}
-#Middle .Left .Info .Bar_Container .Bar #Steering {
-  background-color: #ff4e4e;
-}
-#Middle .Left .Info .Bar_Container .Bar #Throttle {
-  background-color: #3666ff;
 }
 #Middle .Left .Info .Action_Buttons {
   display: flex;
@@ -505,51 +559,6 @@ body, html {
     height: 48vh;
     margin-bottom: 10px;
   }
-}
-#Middle .Right .Graph_Container #Graph2, #Middle .Right .Graph_Container #Graph1 {
-  position: relative;
-  width: 100%;
-  height: 45%;
-  background-color: transparent;
-  border-radius: 10px;
-}
-#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select, #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select {
-  height: 25px;
-  width: calc(100% - 5px);
-  margin: 0;
-  font-size: auto;
-  justify-content: center;
-  align-items: center;
-  background-color: black;
-}
-#Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select #G2_IMU_Menu, #Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu {
-  display: none;
-  flex-direction: row;
-  position: absolute;
-  justify-content: center;
-  bottom: 0px;
-  right: 115px;
-  color: white;
-  background-color: rgba(0, 0, 0, 0);
-  padding: 40px;
-  margin: -40px;
-  z-index: 1000;
-}
-#Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select {
-  top: 10px;
-  right: 10px;
-}
-#Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select:hover > #G1_Menu {
-  display: flex;
-}
-#Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu {
-  right: -5px;
-}
-#Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select:hover > #G1_IMU_Menu {
-  display: flex;
-}
-#Middle .Right .Graph_Container #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu .IMU_Select_Button {
-  width: 69px;
 }
 #Middle .Right .Graph_Container #Graph2 #Graph2_Mode_Select {
   top: 15px;

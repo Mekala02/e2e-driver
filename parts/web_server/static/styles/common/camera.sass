@@ -1,0 +1,46 @@
+#Camera_Brodcast
+    width: 35vw
+    height: 35vh
+    position: relative
+    background-color: bisque
+    border-radius: $Fillet
+    margin-bottom: 40px 
+    @media (max-width: $max_width)
+        width: 43vw
+        height: 48vh
+        margin-bottom: 10px
+    img
+        height: 100%
+        width: 100%
+        border-radius: $Fillet
+    #Camera_Mode_Select
+        @extend %Mode_Select
+        top: 10px
+        left: 10px
+        &:hover > #C_Menu
+            display: flex
+        #C_Menu
+            @extend %Mode_Select_Menu
+            left: -5px
+            .Camera_Select_Button
+                @extend %Mode_Select_Button
+                // font-size: 20px
+    #Fps
+        display: flex
+        align-items: center
+        position: absolute
+        top: 15px
+        right: 25px
+        font-weight: bold
+        font-size: 25px
+        color: green
+    
+    #Speed
+        display: flex
+        align-items: center
+        position: absolute
+        bottom: 10px
+        left: calc(50% - 40px)
+        font-weight: bold
+        font-size: 25px
+        color: white

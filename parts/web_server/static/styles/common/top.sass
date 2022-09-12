@@ -1,0 +1,136 @@
+#Top
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    align-items: center
+    height: 120px
+    padding: 50px
+    padding-top: 25px
+    padding-bottom: 0px
+    @media (max-width: $max-width)
+        height: 70px
+
+    #Logo
+        width: 300px
+        font-size: 50px
+        color: white
+        font-family: "Cursive"
+        margin: 0
+        padding: 0
+        @media (max-width: $max-width)
+            width: 200px
+            font-size: 40px
+
+    #Indicators
+        display: flex
+        justify-content: space-between
+        height: 100%
+        color: white
+        margin: 0
+        padding: 0
+
+        .Sign_Container
+            display: flex
+            flex-direction: column
+            justify-content: space-around
+            align-items: center
+            height: 100%
+            width: 80px
+
+            #Stop, #Taxi
+                display: flex
+                justify-content: center
+                align-items: center
+                height: 35px
+                width: 65px
+                font-size: 25px
+                border-style: solid
+                border-color: white
+                // margin: 10px
+                @media (max-width: $max-width)
+                    height: 25px
+                    width: 50px
+                    font-size: 18px
+
+        #Arrow_Container
+            display: flex
+            justify-content: center
+            align-items: center
+            height: 100%
+            background-color: transparent
+            margin-left: 12px
+            margin-right: 12px 
+
+            #Left_Arrow
+                @extend %Arrow
+                transform: rotate(-135deg)
+
+            #Forward_Arrow
+                @extend %Arrow
+                transform: rotate(-45deg)
+                margin-top: 0
+
+            #Right_Arrow
+                @extend %Arrow
+                transform: rotate(45deg)
+
+            #Right_Arrow_Stick, #Forward_Arrow_Stick, #Left_Arrow_Stick
+                height: 60px
+                width: 10px
+                background-color: white
+                border-radius: 5px
+                transform: rotate(45deg)
+
+        #Stop_Timer
+            display: none
+            justify-content: center
+            align-items: center
+            width: 100px
+            height: 100px
+            position: absolute
+            right: calc(50% - 50px)
+            font-size: 90px
+            color: white
+            -webkit-text-stroke: 1px $First_Color
+
+        .Lane_Container
+            display: flex
+            justify-content: space-between
+            align-items: center
+            height: 100%
+            width: 80px
+            @media (max-width: $max-width)
+                width: 65px
+
+            .Lane
+                height: 100%
+                width: 4px
+                background-color: white
+
+            .Lane_Indicator
+                height: 100%
+                width: 25px
+                background-color: $Lane_Indicator_Color
+                margin-left: 7px
+                margin-right: 5px
+
+            #Left_Lane
+                visibility: hidden
+
+            #Right_Lane
+                visibility: hidden
+
+    #Emergency_Button
+        text-align: center
+        width: 300px
+        background-color: red
+        font-size: 30px
+        color: white
+        border: 0
+        border-radius: $Fillet
+        padding: 15px 32px
+        &:hover
+            background-color: #ff0000c0
+        @media (max-width: $max-width)
+            width: 200px
+            font-size: 20px
