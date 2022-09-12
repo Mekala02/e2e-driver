@@ -10,125 +10,78 @@
     </head>
 
     <body>
-            <section id="Top">
-                <dir id="Logo">E2E Driver</dir>
-                <dir id="Indicators">
-                    <div class="Sign_Container">
-                        <div id="Stop">Stop</div>
-                        <div id="Taxi">Taxi</div>
-                    </div>
-                    <div id="Arrow_Container">
-                        <div id="Left_Arrow"><div id="Left_Arrow_Stick"></div></div>
-                        <div id="Forward_Arrow"><div id="Forward_Arrow_Stick"></div></div>
-                        <div id="Right_Arrow"><div id="Right_Arrow_Stick"></div></div>
-                    </div>
-                    <div id="Stop_Timer">60</div>
-                    <div class="Lane_Container">
-                        <div class="Lane"></div>
-                        <div id="Left_Lane" class="Lane_Indicator"></div>
-                        <div class="Lane"></div>
-                        <div id="Right_Lane" class="Lane_Indicator"></div>
-                        <div class="Lane"></div>
-                    </div>
-                </dir>
+        <section id="Top">
+            {% include 'common/top.html' %}
+        </section>
 
-                <button id="Emergency_Button">Emergency Stop</button>
-            </section>
-
-            <section id="Middle">
-                <div class="Left">
-                    <div id="Camera_Brodcast">
-                        <div id="Camera_Mode_Select">Mode
-                            <div id="C_Menu">
-                                <button id="C_RGB" class="Camera_Select_Button">RGB</button>
-                                <button id="C_Depth" class="Camera_Select_Button">Depth</button>
-                                <button id="C_Object_Detection" class="Camera_Select_Button">YOLO</button>
-                            </div>
-                        </div>
-                        <div id="Fps">0</div>
-                        <div id="Speed">0 m/s</div>
-                        <img src="{{ url_for('video') }}"/>
+        <section id="Middle">
+            <div class="Left">
+                <div id="Camera_Brodcast">
+                    {% include 'common/camera.html' %}
+                </div>
+                <div class="Info">
+                    <div class="Bar_Container">
+                        {% include 'common/bar.html' %}
                     </div>
-                    <div class="Info">
-                        <div class="Bar_Container">
-                            <div class="Bar"><div id="Steering_Border"></div><div id="Steering"></div></div>
-                            <div class="Bar"><div id="Throttle_Border"></div><div id="Throttle"></div></div>
+                    <div class="Action_Buttons">
+                        <div id="Speed_Factor">
+                                <input title="1" id="Speed_Slider" type="range" min="1" max="100" value="50">
                         </div>
-                        <div class="Action_Buttons">
-                            <div id="Speed_Factor">
-                                    <input title="1" id="Speed_Slider" type="range" min="1" max="100" value="50">
-                            </div>
-                            <div class="Go_Record_Container">
-                                <button id="Go">GO</button>
-                                <div id="Record_Timer"></div>
-                                <div class="Record_Border"> <button id="Record"></button> </div>
-                            </div>
+                        <div class="Go_Record_Container">
+                            <button id="Go">GO</button>
+                            <div id="Record_Timer"></div>
+                            <div class="Record_Border"> <button id="Record"></button> </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="Right">                    
-                    <div class="Graph_Container">
-                        <div id="Graph1">                          
-                            <div id="Graph1_Mode_Select">Mode
-                                <div id="G1_Menu">
-                                    <button id="G1_Steering" class="Graph_Select_Button">Steering</button>
-                                    <button id="G1_Throttle" class="Graph_Select_Button">Throttle</button>
-                                    <button id="G1_Speed" class="Graph_Select_Button">Speed</button>
-                                    <div id="G1_IMU_Mode_Select" class="Graph_Select_Button">IMU
-                                        <div id="G1_IMU_Menu">
-                                            <button id="G1_IMU_Accel_X" class="IMU_Select_Button">Accel X</button>
-                                            <button id="G1_IMU_Accel_Y" class="IMU_Select_Button">Accel Y</button>
-                                            <button id="G1_IMU_Accel_Z" class="IMU_Select_Button">Accel Z</button>
-                                            <button id="G1_IMU_Gyro_X" class="IMU_Select_Button">Gyro X</button>
-                                            <button id="G1_IMU_Gyro_Y" class="IMU_Select_Button">Gyro Y</button>
-                                            <button id="G1_IMU_Gyro_Z" class="IMU_Select_Button">Gyro Z</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="Graph2">
-                            <div id="Graph2_Mode_Select">Mode
-                                <div id="G2_Menu">
-                                    <button id="G2_Steering" class="Graph_Select_Button">Steering</button>
-                                    <button id="G2_Throttle" class="Graph_Select_Button">Throttle</button>
-                                    <button id="G2_Speed" class="Graph_Select_Button">Speed</button>
-                                    <div id="G2_IMU_Mode_Select" class="Graph_Select_Button">IMU
-                                        <div id="G2_IMU_Menu">
-                                            <button id="G2_IMU_Accel_X" class="IMU_Select_Button">Accel X</button>
-                                            <button id="G2_IMU_Accel_Y" class="IMU_Select_Button">Accel Y</button>
-                                            <button id="G2_IMU_Accel_Z" class="IMU_Select_Button">Accel Z</button>
-                                            <button id="G2_IMU_Gyro_X" class="IMU_Select_Button">Gyro X</button>
-                                            <button id="G2_IMU_Gyro_Y" class="IMU_Select_Button">Gyro Y</button>
-                                            <button id="G2_IMU_Gyro_Z" class="IMU_Select_Button">Gyro Z</button>
-                                        </div>
+            <div class="Right">                    
+                <div class="Graph_Container">
+                    <div id="Graph1">                          
+                        {% include 'common/graph1.html' %}
+                    </div>
+                    <div id="Graph2">
+                        <div id="Graph2_Mode_Select">Mode
+                            <div id="G2_Menu">
+                                <button id="G2_Steering" class="Graph_Select_Button">Steering</button>
+                                <button id="G2_Throttle" class="Graph_Select_Button">Throttle</button>
+                                <button id="G2_Speed" class="Graph_Select_Button">Speed</button>
+                                <div id="G2_IMU_Mode_Select" class="Graph_Select_Button">IMU
+                                    <div id="G2_IMU_Menu">
+                                        <button id="G2_IMU_Accel_X" class="IMU_Select_Button">Accel X</button>
+                                        <button id="G2_IMU_Accel_Y" class="IMU_Select_Button">Accel Y</button>
+                                        <button id="G2_IMU_Accel_Z" class="IMU_Select_Button">Accel Z</button>
+                                        <button id="G2_IMU_Gyro_X" class="IMU_Select_Button">Gyro X</button>
+                                        <button id="G2_IMU_Gyro_Y" class="IMU_Select_Button">Gyro Y</button>
+                                        <button id="G2_IMU_Gyro_Z" class="IMU_Select_Button">Gyro Z</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="Drive_Mode_Change">
-                        <div class="Pilot">
-                            <button id="Pilot_Full_Auto">Full Auto</button>
-                            <button id="Pilot_Angle">Angle</button>
-                            <button id="Pilot_Manuel">Manuel</button>
-                        </div>
-                        <div class="Route">
-                            <button id="Route_Route" class="Route_Button">Route</button>
-                            <button id="Route_Random" class="Route_Button">Random</button>
-                            <button id="Route_Manuel" class="Route_Button">Manuel</button>
-                        </div>
+                </div>
+                <div class="Drive_Mode_Change">
+                    <div class="Pilot">
+                        <button id="Pilot_Full_Auto">Full Auto</button>
+                        <button id="Pilot_Angle">Angle</button>
+                        <button id="Pilot_Manuel">Manuel</button>
+                    </div>
+                    <div class="Route">
+                        <button id="Route_Route" class="Route_Button">Route</button>
+                        <button id="Route_Random" class="Route_Button">Random</button>
+                        <button id="Route_Manuel" class="Route_Button">Manuel</button>
                     </div>
                 </div>
+            </div>
 
-            </section>
+        </section>
 
-            <div id="Seperator_Line_Container"><div id=Seperator_Line></div></div>                
+        <div id="Seperator_Line_Container"><div id=Seperator_Line></div></div>                
 
-            <section id="Bottom">
+        <section id="Bottom">
 
-            </section>
+        </section>
         <script src="/static/script/track.js"></script>
         <script src="/static/script/plotly.min.js"></script>
         <script src="/static/script/main.js"></script>
