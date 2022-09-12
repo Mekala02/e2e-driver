@@ -1,7 +1,7 @@
 var record_timer = 0
 var stop_timer = 0
 
-class Status {
+class Track {
     constructor(){
         this.xhr = new XMLHttpRequest()
         this.button_clicked_color = "#912020"
@@ -302,31 +302,31 @@ class Status {
         fetch("inputs")
         .then(response => response.json())
         .then(inputs => {
-            Track.Update_Stop(inputs["Stop"])
-            Track.Update_Taxi(inputs["Taxi"])
-            Track.Update_Direction(inputs["Direction"])
-            Track.Update_Lane(inputs["Lane"])
+            this.Update_Stop(inputs["Stop"])
+            this.Update_Taxi(inputs["Taxi"])
+            this.Update_Direction(inputs["Direction"])
+            this.Update_Lane(inputs["Lane"])
 
-            Track.Update_Steering(inputs["Steering"])
-            Track.Update_Throttle(inputs["Throttle"])
-            Track.Update_Speed(inputs["Speed"])
+            this.Update_Steering(inputs["Steering"])
+            this.Update_Throttle(inputs["Throttle"])
+            this.Update_Speed(inputs["Speed"])
 
-            Track.Update_FPS(inputs["Fps"])
+            this.Update_FPS(inputs["Fps"])
 
 
-            for (const key in Track.graph) {
-                    Track.graph[key].push(inputs[key])
+            for (const key in this.graph) {
+                    this.graph[key].push(inputs[key])
             }
-            // Track.graph["Steering"].push(inputs["Steering"])
-            // Track.graph["Throttle"].push(inputs["Throttle"])
-            // Track.graph["Speed"].push(inputs["Speed"])
-            // Track.graph["Timestamp"].push(inputs["Timestamp"] / 10**24)
-            // Track.graph["IMU_Accel_X"].push(inputs["IMU_Accel_X"])
-            // Track.graph["IMU_Accel_Y"].push(inputs["IMU_Accel_Y"])
-            // Track.graph["IMU_Accel_Z"].push(inputs["IMU_Accel_Z"])
-            // Track.graph["IMU_Gyro_X"].push(inputs["IMU_Gyro_X"])
-            // Track.graph["IMU_Gyro_Y"].push(inputs["IMU_Gyro_Y"])
-            // Track.graph["IMU_Gyro_Z"].push(inputs["IMU_Gyro_Z"])
+            // this.graph["Steering"].push(inputs["Steering"])
+            // this.graph["Throttle"].push(inputs["Throttle"])
+            // this.graph["Speed"].push(inputs["Speed"])
+            // this.graph["Timestamp"].push(inputs["Timestamp"] / 10**24)
+            // this.graph["IMU_Accel_X"].push(inputs["IMU_Accel_X"])
+            // this.graph["IMU_Accel_Y"].push(inputs["IMU_Accel_Y"])
+            // this.graph["IMU_Accel_Z"].push(inputs["IMU_Accel_Z"])
+            // this.graph["IMU_Gyro_X"].push(inputs["IMU_Gyro_X"])
+            // this.graph["IMU_Gyro_Y"].push(inputs["IMU_Gyro_Y"])
+            // this.graph["IMU_Gyro_Z"].push(inputs["IMU_Gyro_Z"])
         })
     }
 }
