@@ -1,4 +1,4 @@
-let track = new Track()
+let track = new Main_Track()
 update_interval = 30 //ms
 
 function update_client_side(){

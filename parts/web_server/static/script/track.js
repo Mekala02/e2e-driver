@@ -1,7 +1,7 @@
 var record_timer = 0
 var stop_timer = 0
 
-class Track {
+class Main_Track {
     constructor(){
         this.xhr = new XMLHttpRequest()
         this.button_clicked_color = "#912020"
@@ -187,8 +187,6 @@ class Track {
         this.graph_layout["xaxis"]["range"] = [this.graph_trace["x"][0], this.graph_trace["x"][500]]
         Plotly.react(`Graph${graph_no}`, traces, this.graph_layout, {displayModeBar: false})
       }
-
-
 
     bar_lengthen(ID, value, center){
         var bar = document.getElementById(ID)
