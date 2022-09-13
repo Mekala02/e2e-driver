@@ -1,14 +1,44 @@
 let track = new Track()
 update_interval = 30 //ms
 
+function update_client_side(){
+  for (const key in track.outputs){
+      eval(`track.Update_${key}(undefined, 1)`)
+  }
+}
+
+function update_indicators(){
+  fetch("inputs")
+  .then(response => response.json())
+  .then(inputs => {
+      track.Update_Stop(inputs["Stop"])
+      track.Update_Taxi(inputs["Taxi"])
+      track.Update_Direction(inputs["Direction"])
+      track.Update_Lane(inputs["Lane"])
+
+      track.Update_Steering(inputs["Steering"])
+      track.Update_Throttle(inputs["Throttle"])
+      track.Update_Speed(inputs["Speed"])
+
+      track.Update_FPS(inputs["Fps"])
+
+      for (const key in track.graph) {
+        track.graph[key].push(inputs[key])
+      }
+  })
+}
+
 function load_parameters(outputs){
     for (const [key, value] of Object.entries(outputs)) {
         track.outputs[key] = value
         console.log(key, value);
       }
-      track.update_client_side()
-      setInterval(function() {track.update_indicators()}, update_interval)
+      update_client_side()
+      setInterval(function() {update_indicators()}, update_interval)
 }
+
+setInterval(function(){track.update_graph(1)}, update_interval)
+setInterval(function(){track.update_graph(2)}, update_interval)
 
 document.getElementById("Emergency_Button").addEventListener("click", function() {track.Emergency_Stop()})
 
@@ -52,66 +82,3 @@ document.getElementById("Pilot_Manuel").addEventListener("click", function() {tr
 document.getElementById("Route_Route").addEventListener("click", function() {track.Update_Route_Mode("Route")})
 document.getElementById("Route_Random").addEventListener("click", function() {track.Update_Route_Mode("Random")})
 document.getElementById("Route_Manuel").addEventListener("click", function() {track.Update_Route_Mode("Manuel")})
-
-var layout = {
-  autosize: true,
-  margin: {
-      l: 25,
-      r: 25,
-      b: 25,
-      t: 25,
-      pad: 0
-  },
-  paper_bgcolor: '#222222',
-  plot_bgcolor: '#222222',
-  xaxis: {showticklabels: false},
-  yaxis: {showticklabels: false},
-  showlegend: true,
-  legend:{
-    font:{
-      family: "Courier",
-      size: 12,
-      color: "white",
-    },
-    bgcolor: "transparent",
-    orientation: "h",
-    yanchor: "bottom",
-    y: 0,
-    xanchor: "right",
-    x: 1
-  }
-};
-
-var trace1 = {
-  x: [],
-  y: [],
-  type:'line',
-  line: {
-  color: 'red',
-  width: 4
-}}
-
-var length1 = 0
-function graph(graph){
-  length1 = track.graph["Timestamp"].length
-
-  var traces = []
-  for (let mode of track.outputs[`Graph${graph}_Mode`]){
-    traces.push({
-      x: track.graph["Timestamp"].slice(Math.max(0, length1 - 500), length1 - 1),
-      y: track.graph[mode].slice(Math.max(0, length1 - 500), length1 - 1),
-      name: mode,
-      type:'line',
-      line: {
-      // color: 'red',
-      width: 4
-    }})
-  }
-
-  layout["xaxis"]["range"] = [trace1["x"][0], trace1["x"][500]]
-
-  Plotly.react(`Graph${graph}`, traces, layout, {displayModeBar: false})
-}
-
-setInterval(function(){graph(1)}, update_interval)
-setInterval(function(){graph(2)}, update_interval)

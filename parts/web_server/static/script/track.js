@@ -6,14 +6,21 @@ class Track {
         this.xhr = new XMLHttpRequest()
         this.button_clicked_color = "#912020"
         this.indicator_color = "red"
-        // this.outputs = {pilot: "Manuel", route: "Manuel", motor_power: 0, record: 0,
-        // speed_factor: 1, camera_mode: "RGB", graph1_mode: [], graph2_mode: []}
         this.outputs = {}
-
         this.not_record_style = document.getElementById("Record").style
-
         this.graph = {Steering: [], Throttle: [], Speed: [], Timestamp: [],
             IMU_Accel_X: [], IMU_Accel_Y: [], IMU_Accel_Z: [], IMU_Gyro_X: [], IMU_Gyro_Y: [], IMU_Gyro_Z: []}
+
+        this.graph_layout = {
+            autosize: true, margin: {l: 25, r: 25, b: 25, t: 25, pad: 0},
+            paper_bgcolor: '#222222', plot_bgcolor: '#222222', xaxis: {showticklabels: false}, yaxis: {showticklabels: false},
+            showlegend: true,
+            legend:{
+                font:{family: "Courier", size: 12, color: "white",}, bgcolor: "transparent",
+                orientation: "h", yanchor: "bottom", y: 0, xanchor: "right", x: 1
+            }
+        }
+        this.graph_trace = {x: [], y: [], type:'line', line: {color: 'red', width: 4}}
     }
 
     send_data(data){
@@ -163,6 +170,25 @@ class Track {
     Update_Graph2_Mode(mode, synchronize=0){
         this.Update_Graph_Mode(mode, 2, synchronize)
     }
+      
+    update_graph(graph_no){
+        this.axis_length = track.graph["Timestamp"].length
+        var traces = []
+        for (let mode of track.outputs[`Graph${graph_no}_Mode`]){
+          traces.push({
+            x: this.graph["Timestamp"].slice(Math.max(0, this.axis_length - 500), this.axis_length - 1),
+            y: this.graph[mode].slice(Math.max(0, this.axis_length - 500), this.axis_length - 1),
+            name: mode,
+            type:'line',
+            line: {
+            width: 4
+          }})
+        }
+        this.graph_layout["xaxis"]["range"] = [this.graph_trace["x"][0], this.graph_trace["x"][500]]
+        Plotly.react(`Graph${graph_no}`, traces, this.graph_layout, {displayModeBar: false})
+      }
+
+
 
     bar_lengthen(ID, value, center){
         var bar = document.getElementById(ID)
@@ -280,53 +306,5 @@ class Track {
         }
         this.activated_color(`Route_${this.outputs["Route_Mode"]}`, this.button_clicked_color)
         // console.log("Route:", this.outputs["Route"])
-    }
-    
-    update_client_side(){
-        for (const key in outputs){
-            eval(`this.Update_${key}(undefined, 1)`)
-        }
-
-        // eval("this.Update_Pilot_Mode(undefined, 1)")
-        // this.Update_Route_Mode(undefined, 1)
-        // this.Update_Camera_Mode(undefined, 1)
-        // this.Update_Speed_Factor(undefined, 1)
-        // this.Update_Motor_Power(undefined, 1)
-        // this.Update_Record(undefined, 1)
-
-        // this.Update_Graph_Mode(undefined, 1, 1) // First 1 is graph no second 1 is syncronize mode on
-        // this.Update_Graph_Mode(this.outputs["Graph2_Mode"], 2, 1)
-    }
-
-    update_indicators(){
-        fetch("inputs")
-        .then(response => response.json())
-        .then(inputs => {
-            this.Update_Stop(inputs["Stop"])
-            this.Update_Taxi(inputs["Taxi"])
-            this.Update_Direction(inputs["Direction"])
-            this.Update_Lane(inputs["Lane"])
-
-            this.Update_Steering(inputs["Steering"])
-            this.Update_Throttle(inputs["Throttle"])
-            this.Update_Speed(inputs["Speed"])
-
-            this.Update_FPS(inputs["Fps"])
-
-
-            for (const key in this.graph) {
-                    this.graph[key].push(inputs[key])
-            }
-            // this.graph["Steering"].push(inputs["Steering"])
-            // this.graph["Throttle"].push(inputs["Throttle"])
-            // this.graph["Speed"].push(inputs["Speed"])
-            // this.graph["Timestamp"].push(inputs["Timestamp"] / 10**24)
-            // this.graph["IMU_Accel_X"].push(inputs["IMU_Accel_X"])
-            // this.graph["IMU_Accel_Y"].push(inputs["IMU_Accel_Y"])
-            // this.graph["IMU_Accel_Z"].push(inputs["IMU_Accel_Z"])
-            // this.graph["IMU_Gyro_X"].push(inputs["IMU_Gyro_X"])
-            // this.graph["IMU_Gyro_Y"].push(inputs["IMU_Gyro_Y"])
-            // this.graph["IMU_Gyro_Z"].push(inputs["IMU_Gyro_Z"])
-        })
     }
 }
