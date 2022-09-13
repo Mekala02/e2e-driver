@@ -22,11 +22,16 @@ function update_indicators(){
 
       data_clear_track.Update_FPS(inputs["Fps"])
 
-      for (const key in data_clear_track.graph) {
-        data_clear_track.graph[key].push(inputs[key])
-      }
-  })
-}
+    })
+  }
+  
+  function get_graph_data(){
+    fetch("graph")
+    .then(response => response.json())
+    .then(receive => {
+      data_clear_track.Update_Graph_Data(receive)
+    })
+  }
 
 function load_parameters(outputs){
     for (const [key, value] of Object.entries(outputs)) {
@@ -34,10 +39,14 @@ function load_parameters(outputs){
         console.log(key, value);
       }
       update_client_side()
+
       setInterval(function() {update_indicators()}, update_interval)
 }
 
-setInterval(function(){data_clear_track.update_graph(1)}, update_interval)
+get_graph_data()
+// data_clear_track.Update_Graph_Display()
+
+// setInterval(function(){data_clear_track.update_graph(1)}, update_interval)
 
 document.getElementById("Emergency_Button").addEventListener("click", function() {data_clear_track.Emergency_Stop()})
 
