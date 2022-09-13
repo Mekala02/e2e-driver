@@ -24,7 +24,6 @@ class Data_Clear_Track extends Main_Track {
         // this.axis_length = this.graph["Timestamp"].length
         var traces = []
         for (let mode of this.outputs["Graph1_Mode"]){
-            console.log(mode)
             traces.push({
             x: this.graph["Timestamp"],
             y: this.graph[mode],

@@ -5,6 +5,7 @@ function update_client_side(){
   for (const key in data_clear_track.outputs){
       eval(`data_clear_track.Update_${key}(undefined, 1)`)
   }
+  get_graph_data()
 }
 
 function update_indicators(){
@@ -31,6 +32,7 @@ function update_indicators(){
     .then(receive => {
       data_clear_track.Update_Graph_Data(receive)
     })
+    .then(function(){data_clear_track.Update_Graph_Display()})
   }
 
 function load_parameters(outputs){
@@ -39,14 +41,13 @@ function load_parameters(outputs){
         console.log(key, value);
       }
       update_client_side()
-
       setInterval(function() {update_indicators()}, update_interval)
 }
 
-get_graph_data()
-// data_clear_track.Update_Graph_Display()
-
-// setInterval(function(){data_clear_track.update_graph(1)}, update_interval)
+function update_graph(name){
+  data_clear_track.Update_Graph_Mode(name, 1)
+  get_graph_data()
+}
 
 document.getElementById("Emergency_Button").addEventListener("click", function() {data_clear_track.Emergency_Stop()})
 
@@ -54,14 +55,14 @@ document.getElementById('C_RGB').addEventListener("click", function() {data_clea
 document.getElementById('C_Depth').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("Depth")});
 document.getElementById('C_Object_Detection').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("Object_Detection")});
 
-document.getElementById('G1_Steering').addEventListener("click", function() {data_clear_track.Update_Graph_Mode("Steering", 1)});
-document.getElementById('G1_Throttle').addEventListener("click", function() {data_clear_track.Update_Graph_Mode("Throttle", 1)});
-document.getElementById('G1_Speed').addEventListener("click", function() {data_clear_track.Update_Graph_Mode("Speed", 1)});
+document.getElementById('G1_Steering').addEventListener("click", function() {update_graph("Steering")});
+document.getElementById('G1_Throttle').addEventListener("click", function() {update_graph("Throttle")});
+document.getElementById('G1_Speed').addEventListener("click", function() {update_graph("Speed")});
 
-document.getElementById('G1_IMU_Accel_X').addEventListener("click", function() {data_clear_track.Update_Graph_Mode("IMU_Accel_X", 1)});
-document.getElementById('G1_IMU_Accel_Y').addEventListener("click", function() {data_clear_track.Update_Graph_Mode("IMU_Accel_Y", 1)});
-document.getElementById('G1_IMU_Accel_Z').addEventListener("click", function() {data_clear_track.Update_Graph_Mode("IMU_Accel_Z", 1)});
-document.getElementById('G1_IMU_Gyro_X').addEventListener("click", function() {data_clear_track.Update_Graph_Mode("IMU_Gyro_X", 1)});
-document.getElementById('G1_IMU_Gyro_Y').addEventListener("click", function() {data_clear_track.Update_Graph_Mode("IMU_Gyro_Y", 1)});
-document.getElementById('G1_IMU_Gyro_Z').addEventListener("click", function() {data_clear_track.Update_Graph_Mode("IMU_Gyro_Z", 1)});
+document.getElementById('G1_IMU_Accel_X').addEventListener("click", function() {update_graph("IMU_Accel_X")});
+document.getElementById('G1_IMU_Accel_Y').addEventListener("click", function() {update_graph("IMU_Accel_Y")});
+document.getElementById('G1_IMU_Accel_Z').addEventListener("click", function() {update_graph("IMU_Accel_Z")});
+document.getElementById('G1_IMU_Gyro_X').addEventListener("click", function() {update_graph("IMU_Gyro_X")});
+document.getElementById('G1_IMU_Gyro_Y').addEventListener("click", function() {update_graph("IMU_Gyro_Y")});
+document.getElementById('G1_IMU_Gyro_Z').addEventListener("click", function() {update_graph("IMU_Gyro_Z")});
 
