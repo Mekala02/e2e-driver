@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href= "/static/styles/data_cleaner.css" rel="stylesheet"></link>
+        <meta name="description" content="Autonomous Car Data Cleaner">
+        <title>E2E Driver Cleaner</title>
+    </head>
+
+    <body>
+        {% include 'common/top.html' %}
+        <section id="Middle">
+            <div class="Left">
+                {% include 'common/camera.html' %}
+            </div>
+            <div class="Right">                    
+                <div class="Graph_Container">                       
+                    {% include 'common/graph1.html' %}
+                <div class="Info">
+                    {% include 'common/bar.html' %}
+                </div>
+            </div>
+        </section>
+
+        <section id="Bottom">
+
+        </section>
+
+        <script src="/static/script/plotly.min.js"></script>
+        <script src="/static/script/track.js"></script>
+        <script src="/static/script/data_clear_track.js"></script>
+        <script src="/static/script/data_clear_main.js"></script>
+        <script>
+            load_parameters(JSON.parse('{{outputs|tojson}}'))
+        </script>
+    </body>
+</html>

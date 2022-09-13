@@ -1,0 +1,448 @@
+#Graph2 #Graph2_Mode_Select, #Graph1 #Graph1_Mode_Select, #Camera_Brodcast #Camera_Mode_Select {
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  height: 25px;
+  width: 60px;
+  color: white;
+  font-size: 20px;
+  background-color: rgba(0, 0, 0, 0);
+  border-style: solid;
+  border-width: 3px;
+  border-color: white;
+  border-radius: 10px;
+  margin: 0;
+  z-index: 1000;
+}
+
+#Graph2 #Graph2_Mode_Select #G2_Menu, #Graph1 #Graph1_Mode_Select #G1_Menu, #Camera_Brodcast #Camera_Mode_Select #C_Menu {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  height: 120px;
+  width: 70px;
+  z-index: 1000;
+  top: 0;
+  padding-top: 30px;
+  padding-right: 40px;
+  padding-left: 40px;
+  margin-right: -40px;
+  margin-left: -40px;
+}
+
+#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select #G2_IMU_Menu .IMU_Select_Button, #Graph2 #Graph2_Mode_Select #G2_Menu .Graph_Select_Button, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu .IMU_Select_Button, #Graph1 #Graph1_Mode_Select #G1_Menu .Graph_Select_Button, #Camera_Brodcast #Camera_Mode_Select #C_Menu .Camera_Select_Button {
+  height: 100%;
+  width: 100%;
+  color: white;
+  font-size: auto;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0);
+  border-style: solid;
+  border-width: 3px;
+  border-color: white;
+  border-radius: 10px;
+  margin: 2px;
+  margin-right: 0;
+}
+
+#Top #Indicators #Arrow_Container #Right_Arrow, #Top #Indicators #Arrow_Container #Forward_Arrow, #Top #Indicators #Arrow_Container #Left_Arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 40px;
+  background-color: transparent;
+  margin: 25px;
+  border-style: solid;
+  border-width: 14px;
+  border-radius: 5px;
+  border-color: white;
+  border-bottom: 0;
+  border-left: 0;
+}
+@media (max-width: 1920px) {
+  #Top #Indicators #Arrow_Container #Right_Arrow, #Top #Indicators #Arrow_Container #Forward_Arrow, #Top #Indicators #Arrow_Container #Left_Arrow {
+    margin: 20px;
+    border-width: 10px;
+  }
+}
+
+.Bar #Throttle_Border, .Bar #Steering_Border {
+  position: absolute;
+  height: 100%;
+  width: 5px;
+  margin-top: -1px;
+  background-color: white;
+}
+@media (max-width: 1920px) {
+  .Bar #Throttle_Border, .Bar #Steering_Border {
+    height: 19px;
+  }
+}
+
+.Bar #Throttle, .Bar #Steering {
+  height: 100%;
+  width: 0;
+}
+
+#Graph2, #Graph1 {
+  position: relative;
+  width: 100%;
+  height: 45%;
+  background-color: transparent;
+  border-radius: 10px;
+}
+
+#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select {
+  height: 25px;
+  width: calc(100% - 5px);
+  margin: 0;
+  font-size: auto;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+}
+
+#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select #G2_IMU_Menu, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu {
+  display: none;
+  flex-direction: row;
+  position: absolute;
+  justify-content: center;
+  bottom: 0px;
+  right: 115px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0);
+  padding: 40px;
+  margin: -40px;
+  z-index: 1000;
+}
+
+#Top {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  height: 120px;
+  padding: 50px;
+  padding-top: 25px;
+  padding-bottom: 0px;
+}
+@media (max-width: 1920px) {
+  #Top {
+    height: 70px;
+  }
+}
+#Top #Logo {
+  width: 300px;
+  font-size: 50px;
+  color: white;
+  font-family: "Cursive";
+  margin: 0;
+  padding: 0;
+}
+@media (max-width: 1920px) {
+  #Top #Logo {
+    width: 200px;
+    font-size: 40px;
+  }
+}
+#Top #Indicators {
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+#Top #Indicators .Sign_Container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  width: 80px;
+}
+#Top #Indicators .Sign_Container #Stop, #Top #Indicators .Sign_Container #Taxi {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 35px;
+  width: 65px;
+  font-size: 25px;
+  border-style: solid;
+  border-color: white;
+}
+@media (max-width: 1920px) {
+  #Top #Indicators .Sign_Container #Stop, #Top #Indicators .Sign_Container #Taxi {
+    height: 25px;
+    width: 50px;
+    font-size: 18px;
+  }
+}
+#Top #Indicators #Arrow_Container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: transparent;
+  margin-left: 12px;
+  margin-right: 12px;
+}
+#Top #Indicators #Arrow_Container #Left_Arrow {
+  transform: rotate(-135deg);
+}
+#Top #Indicators #Arrow_Container #Forward_Arrow {
+  transform: rotate(-45deg);
+  margin-top: 0;
+}
+#Top #Indicators #Arrow_Container #Right_Arrow {
+  transform: rotate(45deg);
+}
+#Top #Indicators #Arrow_Container #Right_Arrow_Stick, #Top #Indicators #Arrow_Container #Forward_Arrow_Stick, #Top #Indicators #Arrow_Container #Left_Arrow_Stick {
+  height: 60px;
+  width: 10px;
+  background-color: white;
+  border-radius: 5px;
+  transform: rotate(45deg);
+}
+#Top #Indicators #Stop_Timer {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  right: calc(50% - 50px);
+  font-size: 90px;
+  color: white;
+  -webkit-text-stroke: 1px #ffb700;
+}
+#Top #Indicators .Lane_Container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  width: 80px;
+}
+@media (max-width: 1920px) {
+  #Top #Indicators .Lane_Container {
+    width: 65px;
+  }
+}
+#Top #Indicators .Lane_Container .Lane {
+  height: 100%;
+  width: 4px;
+  background-color: white;
+}
+#Top #Indicators .Lane_Container .Lane_Indicator {
+  height: 100%;
+  width: 25px;
+  background-color: #3c73ff;
+  margin-left: 7px;
+  margin-right: 5px;
+}
+#Top #Indicators .Lane_Container #Left_Lane {
+  visibility: hidden;
+}
+#Top #Indicators .Lane_Container #Right_Lane {
+  visibility: hidden;
+}
+#Top #Emergency_Button {
+  text-align: center;
+  width: 300px;
+  background-color: red;
+  font-size: 30px;
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  padding: 15px 32px;
+}
+#Top #Emergency_Button:hover {
+  background-color: rgba(255, 0, 0, 0.7529411765);
+}
+@media (max-width: 1920px) {
+  #Top #Emergency_Button {
+    width: 200px;
+    font-size: 20px;
+  }
+}
+
+#Camera_Brodcast {
+  width: 35vw;
+  height: 35vh;
+  position: relative;
+  background-color: bisque;
+  border-radius: 10px;
+  margin-bottom: 40px;
+}
+@media (max-width: 1920px) {
+  #Camera_Brodcast {
+    width: 43vw;
+    height: 48vh;
+    margin-bottom: 10px;
+  }
+}
+#Camera_Brodcast img {
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+}
+#Camera_Brodcast #Camera_Mode_Select {
+  top: 10px;
+  left: 10px;
+}
+#Camera_Brodcast #Camera_Mode_Select:hover > #C_Menu {
+  display: flex;
+}
+#Camera_Brodcast #Camera_Mode_Select #C_Menu {
+  left: -5px;
+}
+#Camera_Brodcast #Fps {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-weight: bold;
+  font-size: 25px;
+  color: green;
+}
+#Camera_Brodcast #Speed {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  bottom: 10px;
+  left: calc(50% - 40px);
+  font-weight: bold;
+  font-size: 25px;
+  color: white;
+}
+
+.Bar {
+  display: relative;
+  justify-content: middle;
+  overflow: hidden;
+  height: 24px;
+  width: 18vw;
+  margin: 10px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: white;
+  border-radius: 10px;
+}
+@media (max-width: 1920px) {
+  .Bar {
+    height: 17px;
+  }
+}
+.Bar #Steering_Border {
+  margin-left: 9vw;
+}
+.Bar #Throttle_Border {
+  margin-left: 6vw;
+}
+.Bar #Steering {
+  background-color: #ff4e4e;
+}
+.Bar #Throttle {
+  background-color: #3666ff;
+}
+
+#Graph1 #Graph1_Mode_Select {
+  top: 10px;
+  right: 10px;
+}
+#Graph1 #Graph1_Mode_Select:hover > #G1_Menu {
+  display: flex;
+}
+#Graph1 #Graph1_Mode_Select #G1_Menu {
+  right: -5px;
+}
+#Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select:hover > #G1_IMU_Menu {
+  display: flex;
+}
+#Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu .IMU_Select_Button {
+  width: 69px;
+}
+
+#Graph2 #Graph2_Mode_Select {
+  top: 15px;
+  right: 10px;
+}
+@media (max-width: 1920px) {
+  #Graph2 #Graph2_Mode_Select {
+    top: 6px;
+  }
+}
+#Graph2 #Graph2_Mode_Select:hover > #G2_Menu {
+  display: flex;
+}
+#Graph2 #Graph2_Mode_Select #G2_Menu {
+  right: -5px;
+}
+#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select:hover > #G2_IMU_Menu {
+  display: flex;
+}
+#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select #G2_IMU_Menu .IMU_Select_Button {
+  width: 70px;
+}
+
+body, html {
+  width: 100%;
+  background-color: #272c2e;
+  margin: 0;
+}
+
+#Middle {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-top: 150px;
+  padding-left: 7vw;
+  padding-right: 7vw;
+}
+@media (max-width: 1920px) {
+  #Middle {
+    padding-left: 4vw;
+    padding-right: 4vw;
+    padding-top: 80px;
+  }
+}
+#Middle .Left {
+  display: flex;
+  flex-direction: column;
+}
+#Middle .Right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+#Middle .Right .Graph_Container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  justify-content: space-between;
+  width: 35vw;
+  height: 17vh;
+}
+@media (max-width: 1920px) {
+  #Middle .Right .Graph_Container {
+    width: 43vw;
+    height: 48vh;
+    margin-bottom: 10px;
+  }
+}
+#Middle .Right .Info {
+  display: flex;
+  justify-content: space-around;
+  height: 150px;
+  padding-top: 0px;
+}
+#Middle .Right .Info .Bar_Container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 25px;
+  color: white;
+  margin-top: 0px;
+}/*# sourceMappingURL=data_cleaner.css.map */

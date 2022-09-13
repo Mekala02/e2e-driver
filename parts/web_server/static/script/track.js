@@ -7,7 +7,6 @@ class Main_Track {
         this.button_clicked_color = "#912020"
         this.indicator_color = "red"
         this.outputs = {}
-        this.not_record_style = document.getElementById("Record").style
         this.graph = {Steering: [], Throttle: [], Speed: [], Timestamp: [],
             IMU_Accel_X: [], IMU_Accel_Y: [], IMU_Accel_Z: [], IMU_Gyro_X: [], IMU_Gyro_Y: [], IMU_Gyro_Z: []}
 
@@ -21,6 +20,11 @@ class Main_Track {
             }
         }
         this.graph_trace = {x: [], y: [], type:'line', line: {color: 'red', width: 4}}
+        
+        try{this.not_record_style = document.getElementById("Record").style}
+        catch{}
+        
+
     }
 
     send_data(data){
@@ -172,9 +176,9 @@ class Main_Track {
     }
       
     update_graph(graph_no){
-        this.axis_length = track.graph["Timestamp"].length
+        this.axis_length = this.graph["Timestamp"].length
         var traces = []
-        for (let mode of track.outputs[`Graph${graph_no}_Mode`]){
+        for (let mode of this.outputs[`Graph${graph_no}_Mode`]){
           traces.push({
             x: this.graph["Timestamp"].slice(Math.max(0, this.axis_length - 500), this.axis_length - 1),
             y: this.graph[mode].slice(Math.max(0, this.axis_length - 500), this.axis_length - 1),

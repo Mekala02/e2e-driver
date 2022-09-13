@@ -1,0 +1,60 @@
+@use "sass:math"
+@import "common/variables.sass"
+@import "common/extends.sass"
+@import "common/top.sass"
+@import "common/camera.sass"
+@import "common/bar.sass"
+@import "common/graph1.sass"
+@import "common/graph2.sass"
+
+body, html
+    width: 100%
+    background-color: $Background_Color
+    margin: 0
+
+#Middle
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    padding-top: 150px
+    padding-left: 7vw
+    padding-right: 7vw 
+    @media (max-width: $max-width)
+        padding-left: 4vw
+        padding-right: 4vw 
+        padding-top: 80px
+
+    .Left
+        display: flex
+        flex-direction: column
+    
+    .Right
+        display: flex
+        flex-direction: column
+        align-items: flex-end
+
+        .Graph_Container
+            display: flex
+            flex-direction: column
+            position: relative
+            justify-content: space-between
+            width: 35vw
+            height: 17vh
+            @media (max-width: $max_width)
+                width: 43vw
+                height: 48vh
+                margin-bottom: 10px
+
+        .Info
+            display: flex
+            justify-content: space-around
+            height: 150px
+            padding-top: 0px
+
+            .Bar_Container
+                display: flex
+                flex-direction: column
+                justify-content: center
+                font-size: 25px
+                color: white
+                margin-top: 0px

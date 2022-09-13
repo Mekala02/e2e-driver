@@ -24,6 +24,7 @@ class Data_Logger:
                 if key in self.save_list:
                     self.save_list[key] = self.memory.memory[key]
             json.dump(self.save_list, self.file)
+            self.file.write(',')
             self.file.write('\n')
             for key, value in self.memory.big_memory.items():
                 threading.Thread(target=self.save_image, args=([f"data/images/{key}/{self.index}.npy", value]), daemon=True).start()
