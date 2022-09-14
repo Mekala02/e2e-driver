@@ -67,24 +67,31 @@ class Data_Clear_Track extends Main_Track {
             }
         }
 
-        Update_Left_Marker(index, synchronize=0){
+        Update_Marker(index, marker, synchronize=0){
             if (synchronize == 0){
-                this.outputs["Left_Marker"] = index
-                this.send_data({Left_Marker: this.outputs["Left_Marker"]})
+                this.outputs[`${marker}_Marker`] = index
+                if (marker == "Right")
+                    this.send_data({Right_Marker: this.outputs[`${marker}_Marker`]})
+                if (marker == "Left")
+                    this.send_data({Left_Marker: this.outputs[`${marker}_Marker`]})
             }
-            var left = `${this.outputs["Left_Marker"]/this.outputs["Data_Lenght"]*100}`
-            var right = `${this.outputs["Right_Marker"]/this.outputs["Data_Lenght"]*100}`
-            document.getElementById("Left_Marker").style.left = `calc(${left}% - 8px)`
+            var Left = `${this.outputs[`Left_Marker`]/this.outputs["Data_Lenght"]*100}`
+            var Right = `${this.outputs["Right_Marker"]/this.outputs["Data_Lenght"]*100}`
+            if (marker == "Left")
+                document.getElementById(`${marker}_Marker`).style.left = `calc(${Left}%)`
+            if (marker == "Right")
+                document.getElementById(`${marker}_Marker`).style.left = `calc(${Right}%)`
+            try{this.between_divs["Marker_Between_Div"].remove()} catch{}
             this.between_divs["Marker_Between_Div"] = document.createElement("div")
             document.getElementById("Progress_Bar").appendChild(this.between_divs["Marker_Between_Div"]);
-            this.add_between_mark(this.between_divs["Marker_Between_Div"], left, right, "rgb(0 255 0 / 70%)")
+            this.add_between_mark(this.between_divs["Marker_Between_Div"], Left, Right, "rgb(0 255 0 / 70%)")
+        }
+
+        Update_Left_Marker(index, synchronize=0){
+            this.Update_Marker(index, "Left", synchronize)
         }
 
         Update_Right_Marker(index, synchronize=0){
-            if (synchronize == 0){
-                this.outputs["Right_Marker"] = index
-                this.send_data({Left_Marker: this.outputs["Right_Marker"]})
-            }
-            document.getElementById("Right_Marker").style.left = `${this.outputs["Right_Marker"]/this.outputs["Data_Lenght"]*100}%`
+            this.Update_Marker(index, "Right", synchronize)
         }
 }

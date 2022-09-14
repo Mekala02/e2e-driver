@@ -48,6 +48,11 @@ function update_graph(name){
   get_graph_data()
 }
 
+function bar_move(e){
+  index = e.offsetX * data_clear_track.outputs["Data_Lenght"] / data_clear_track.Progress_Bar_Width
+  data_clear_track.Update_Data_Index(Math.round(index))
+}
+
 document.getElementById("Emergency_Button").addEventListener("click", function() {data_clear_track.Emergency_Stop()})
 
 document.getElementById('C_RGB').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("RGB")});
@@ -65,17 +70,15 @@ document.getElementById('G1_IMU_Gyro_X').addEventListener("click", function() {u
 document.getElementById('G1_IMU_Gyro_Y').addEventListener("click", function() {update_graph("IMU_Gyro_Y")});
 document.getElementById('G1_IMU_Gyro_Z').addEventListener("click", function() {update_graph("IMU_Gyro_Z")});
 
-function bar_move(e){
-  index = e.offsetX * data_clear_track.outputs["Data_Lenght"] / data_clear_track.Progress_Bar_Width
-  data_clear_track.Update_Data_Index(Math.round(index))
-}
-
 document.getElementById('Progress_Bar').addEventListener("mousedown", function(e){
   bar_move(e)
   document.getElementById('Progress_Bar').addEventListener("mousemove", bar_move)
   }
 )
-
 document.getElementById('Progress_Bar').addEventListener("mouseup", function(){
   document.getElementById('Progress_Bar').removeEventListener("mousemove", bar_move);
 })
+
+document.getElementById('Mark_Left_Button').addEventListener("click", function() {data_clear_track.Update_Left_Marker(data_clear_track.outputs["Data_Index"])});
+document.getElementById('Mark_Right_Button').addEventListener("click", function() {data_clear_track.Update_Right_Marker(data_clear_track.outputs["Data_Index"])});
+

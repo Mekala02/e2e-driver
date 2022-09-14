@@ -1,3 +1,24 @@
+#Bottom #Edit #Delete_Button, #Bottom #Edit #Mark_Right_Button, #Bottom #Edit #Mark_Left_Button {
+  text-align: center;
+  height: 40px;
+  width: 120px;
+  background-color: rgba(0, 0, 0, 0);
+  color: white;
+  font-size: 25px;
+  margin: 4px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: white;
+  border-radius: 10px;
+}
+@media (max-width: 1920px) {
+  #Bottom #Edit #Delete_Button, #Bottom #Edit #Mark_Right_Button, #Bottom #Edit #Mark_Left_Button {
+    height: 35px;
+    width: auto;
+    font-size: 20px;
+  }
+}
+
 #Graph2 #Graph2_Mode_Select, #Graph1 #Graph1_Mode_Select, #Camera_Brodcast #Camera_Mode_Select {
   display: flex;
   position: absolute;
@@ -532,4 +553,16 @@ body, html {
   background-color: white;
   pointer-events: none;
   z-index: 1000;
+}
+#Bottom #Edit {
+  display: flex;
+  padding-top: 30px;
+  justify-content: center;
+  width: 100%;
+}
+#Bottom #Edit #Mark_Left_Button {
+  width: 70px;
+}
+#Bottom #Edit #Mark_Right_Button {
+  width: 70px;
 }/*# sourceMappingURL=data_cleaner.css.map */
