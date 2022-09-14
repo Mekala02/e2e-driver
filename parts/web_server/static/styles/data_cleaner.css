@@ -434,7 +434,7 @@ body, html {
 }
 #Middle .Right .Info {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   height: 150px;
   padding-top: 0px;
@@ -451,6 +451,22 @@ body, html {
   display: flex;
   height: 25px;
   width: 75px;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0);
+  font-size: 25px;
+  border-radius: 10px;
+  margin: 4px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: white;
+}
+#Middle .Right .Info #Data_Folder {
+  display: flex;
+  width: 75px;
+  height: auto;
+  word-break: break-all;
   color: white;
   justify-content: center;
   align-items: center;

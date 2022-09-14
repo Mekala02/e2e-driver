@@ -37,7 +37,11 @@ class Data_Clear_Track extends Main_Track {
         document.getElementById("Data_Index").innerHTML = this.outputs["Data_Index"]
       }
 
-      Update_Data_Folder(){
-
+      Update_Data_Folder(folder, synchronize=0){
+        if (synchronize == 0){
+            this.outputs["Data_Folder"] = index
+            this.send_data({Data_Index: this.outputs["Data_Folder"]})
+        }
+        document.getElementById("Data_Folder").innerHTML = this.outputs["Data_Folder"]
     }
 }

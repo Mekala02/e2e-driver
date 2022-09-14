@@ -6,9 +6,10 @@ import cv2
 
 app=Flask(__name__)
 data_folder = "c:\\Users\\Mekala\\Documents\\GitHub\\e2e-driver\\data"
+folder_name = "Data"
 datas = json.loads(open(f"{data_folder}\\memory.json", "r").read())
 
-client_outputs = {"Data_Index": 0, "Data_Folder": 0, "Camera_Mode": "RGB", "Graph1_Mode": ["Steering"]}
+client_outputs = {"Data_Index": 0, "Data_Folder": folder_name, "Camera_Mode": "RGB", "Graph1_Mode": ["Steering"]}
 
 # Servers memory
 data = {}
