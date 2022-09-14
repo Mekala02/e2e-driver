@@ -477,4 +477,37 @@ body, html {
   border-style: solid;
   border-width: 3px;
   border-color: white;
+}
+
+#Bottom {
+  display: flex;
+  flex-direction: column;
+  padding-top: 40px;
+  padding-left: 7vw;
+  padding-right: 7vw;
+}
+@media (max-width: 1920px) {
+  #Bottom {
+    padding-left: 4vw;
+    padding-right: 4vw;
+    padding-top: 20px;
+  }
+}
+#Bottom #Progress_Bar {
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  height: 30px;
+  width: 100%;
+  border-radius: 10px;
+  margin: 4px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: white;
+}
+#Bottom #Progress_Bar #Bar_Data_Index {
+  position: absolute;
+  height: 100%;
+  width: 5px;
+  background-color: white;
 }/*# sourceMappingURL=data_cleaner.css.map */

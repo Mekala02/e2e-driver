@@ -65,3 +65,38 @@ document.getElementById('G1_IMU_Gyro_X').addEventListener("click", function() {u
 document.getElementById('G1_IMU_Gyro_Y').addEventListener("click", function() {update_graph("IMU_Gyro_Y")});
 document.getElementById('G1_IMU_Gyro_Z').addEventListener("click", function() {update_graph("IMU_Gyro_Z")});
 
+function bar_move(e){
+  index = e.offsetX * data_clear_track.outputs["Data_Lenght"] / document.getElementById('Progress_Bar').clientWidth
+  data_clear_track.Update_Data_Index(Math.round(index))
+  console.log(e.offsetX)
+}
+
+document.getElementById('Progress_Bar').addEventListener("mousemove", bar_move)
+// document.getElementById('Progress_Bar').addEventListener("mousemove", function(e){console.log(e.offsetX)})
+
+
+// document.getElementById('Progress_Bar').addEventListener("mousedown", function(){
+//   document.getElementById('Progress_Bar').addEventListener("mouseover", bar_move)
+//   console.log("down")
+//   }
+// )
+
+// document.getElementById('Progress_Bar').addEventListener("mouseup", function(){
+//   document.getElementById('Progress_Bar').removeEventListener("mouseover", bar_move);
+//   console.log("up")
+// })
+
+// document.getElementById('Progress_Bar').addEventListener("mousedown", bar_move);
+// var outside = document.getElementById('outside');
+// var inside = document.getElementById('inside');
+
+// index = e.offsetX * data_clear_track.outputs["Data_Lenght"] / document.getElementById('Progress_Bar').style.width
+
+
+// outside.addEventListener('click', function(e) {
+//   inside.style.width = e.offsetX + "px";
+
+//   // calculate the %
+//   var pct = Math.floor((e.offsetX / outside.offsetWidth) * 100);
+//   inside.innerHTML = pct + " %";
+// }, false);

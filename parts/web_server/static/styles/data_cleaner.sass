@@ -78,6 +78,7 @@ body, html
                 //     height: 35px
                 //     width: auto
                 //     font-size: 20px
+
             #Data_Folder
                 display: flex
                 width: 75px
@@ -97,3 +98,33 @@ body, html
                 //     height: 35px
                 //     width: auto
                 //     font-size: 20px
+
+#Bottom
+    display: flex
+    flex-direction: column
+    // justify-content: space-between
+    padding-top: 40px
+    padding-left: 7vw
+    padding-right: 7vw
+    @media (max-width: $max-width)
+        padding-left: 4vw
+        padding-right: 4vw 
+        padding-top: 20px
+
+    #Progress_Bar
+        display: flex
+        position: relative
+        overflow: hidden
+        height: 30px
+        width: 100%
+        border-radius: $Fillet
+        margin: 4px
+        border-style: solid
+        border-width: 3px
+        border-color: white
+
+        #Bar_Data_Index
+            position: absolute
+            height: calc(100%)
+            width: 5px
+            background-color: white

@@ -29,12 +29,20 @@ class Data_Clear_Track extends Main_Track {
         Plotly.react("Graph1", traces, this.graph_layout, {displayModeBar: false})
       }
 
+      Update_Data_Lenght(lenght, synchronize=0){
+        if (synchronize == 0){
+            this.outputs["Data_Lenght"] = lenght
+            this.send_data({Data_Index: this.outputs["Data_Lenght"]})
+        }
+      }
+
       Update_Data_Index(index, synchronize=0){
         if (synchronize == 0){
             this.outputs["Data_Index"] = index
             this.send_data({Data_Index: this.outputs["Data_Index"]})
         }
         document.getElementById("Data_Index").innerHTML = this.outputs["Data_Index"]
+        document.getElementById("Bar_Data_Index").style.left = `${this.outputs["Data_Index"]/this.outputs["Data_Lenght"]*100}%`
       }
 
       Update_Data_Folder(folder, synchronize=0){
