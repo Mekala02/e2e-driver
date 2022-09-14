@@ -73,11 +73,9 @@ function bar_move(e){
 document.getElementById('Progress_Bar').addEventListener("mousedown", function(e){
   bar_move(e)
   document.getElementById('Progress_Bar').addEventListener("mousemove", bar_move)
-  console.log("down")
   }
 )
 
 document.getElementById('Progress_Bar').addEventListener("mouseup", function(){
   document.getElementById('Progress_Bar').removeEventListener("mousemove", bar_move);
-  console.log("up")
 })

@@ -505,10 +505,31 @@ body, html {
   border-width: 3px;
   border-color: white;
 }
+#Bottom #Progress_Bar #Left_Marker {
+  position: absolute;
+  height: 100%;
+  width: 5px;
+  background-color: blue;
+  pointer-events: none;
+  border-style: solid;
+  border: 0;
+  border-right: 3px solid #ffb700;
+  z-index: 999;
+}
+#Bottom #Progress_Bar #Right_Marker {
+  position: absolute;
+  height: 100%;
+  width: 5px;
+  background-color: blue;
+  pointer-events: none;
+  border-left: 3px solid #ffb700;
+  z-index: 999;
+}
 #Bottom #Progress_Bar #Bar_Data_Index {
   position: absolute;
   height: 100%;
   width: 5px;
   background-color: white;
   pointer-events: none;
+  z-index: 1000;
 }/*# sourceMappingURL=data_cleaner.css.map */
