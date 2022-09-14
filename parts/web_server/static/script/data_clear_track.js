@@ -4,14 +4,7 @@ var stop_timer = 0
 class Data_Clear_Track extends Main_Track {
     constructor(){
         super()
-    }
-    
-    Update_Data_Folder(){
-
-    }
-
-    Update_Data_Position(){
-        
+        self.Data_Index
     }
 
     Update_Graph_Data(receive){
@@ -36,4 +29,15 @@ class Data_Clear_Track extends Main_Track {
         Plotly.react("Graph1", traces, this.graph_layout, {displayModeBar: false})
       }
 
+      Update_Data_Index(index, synchronize=0){
+        if (synchronize == 0){
+            this.outputs["Data_Index"] = index
+            this.send_data({Data_Index: this.outputs["Data_Index"]})
+        }
+        document.getElementById("Data_Index").innerHTML = this.outputs["Data_Index"]
+      }
+
+      Update_Data_Folder(){
+
+    }
 }

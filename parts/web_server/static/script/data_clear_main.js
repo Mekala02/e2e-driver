@@ -22,7 +22,6 @@ function update_indicators(){
       data_clear_track.Update_Speed(inputs["Speed"])
 
       data_clear_track.Update_FPS(inputs["Fps"])
-
     })
   }
   

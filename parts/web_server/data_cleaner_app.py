@@ -8,14 +8,14 @@ app=Flask(__name__)
 data_folder = "c:\\Users\\Mekala\\Documents\\GitHub\\e2e-driver\\data"
 datas = json.loads(open(f"{data_folder}\\memory.json", "r").read())
 
-client_outputs = {"Data_Position": 0, "Data_Folder": 0, "Camera_Mode": "RGB", "Graph1_Mode": ["Steering"]}
+client_outputs = {"Data_Index": 0, "Data_Folder": 0, "Camera_Mode": "RGB", "Graph1_Mode": ["Steering"]}
 
 # Servers memory
 data = {}
 
 def generate_frames():
     while True:
-        img_id = datas[client_outputs["Data_Position"]]["Img_Id"]
+        img_id = datas[client_outputs["Data_Index"]]["Img_Id"]
         camera_mode = client_outputs["Camera_Mode"]
         frame = np.load(f"{data_folder}\\images\\{camera_mode}\\{img_id}.npy")
         ret, buffer = cv2.imencode('.jpg', frame)
@@ -41,7 +41,7 @@ def receive_outputs():
 
 @app.route('/inputs')
 def send_inputs():
-    data = datas[client_outputs["Data_Position"]]
+    data = datas[client_outputs["Data_Index"]]
     return jsonify(data)
 
 @app.route('/graph')
