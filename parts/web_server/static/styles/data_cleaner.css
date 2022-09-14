@@ -510,4 +510,5 @@ body, html {
   height: 100%;
   width: 5px;
   background-color: white;
+  pointer-events: none;
 }/*# sourceMappingURL=data_cleaner.css.map */

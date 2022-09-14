@@ -4,7 +4,7 @@ var stop_timer = 0
 class Data_Clear_Track extends Main_Track {
     constructor(){
         super()
-        self.Data_Index
+        this.Progress_Bar_Width = document.getElementById('Progress_Bar').clientWidth
     }
 
     Update_Graph_Data(receive){
