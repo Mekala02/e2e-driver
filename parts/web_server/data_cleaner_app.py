@@ -10,7 +10,7 @@ folder_name = "Data"
 datas = json.loads(open(f"{data_folder}\\memory.json", "r").read())
 
 client_outputs = {"Data_Lenght": len(datas), "Data_Index": 0, "Data_Folder": folder_name,
-    "Left_Marker": 500, "Right_Marker": 1000, "Camera_Mode": "RGB", "Graph1_Mode": ["Steering"]}
+    "Left_Marker": 500, "Right_Marker": 1000, "Delete_List": [], "Camera_Mode": "RGB", "Graph1_Mode": ["Steering"]}
 
 # Servers memory
 data = {}

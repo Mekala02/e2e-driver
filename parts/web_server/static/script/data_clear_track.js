@@ -67,6 +67,10 @@ class Data_Clear_Track extends Main_Track {
             }
         }
 
+        delete_between_mark(div){
+            try{div.remove()} catch{}
+        }
+
         Update_Marker(index, marker, synchronize=0){
             if (synchronize == 0){
                 this.outputs[`${marker}_Marker`] = index
@@ -75,15 +79,18 @@ class Data_Clear_Track extends Main_Track {
                 if (marker == "Left")
                     this.send_data({Left_Marker: this.outputs[`${marker}_Marker`]})
             }
+            else{
+                
+            }
             var Left = `${this.outputs[`Left_Marker`]/this.outputs["Data_Lenght"]*100}`
             var Right = `${this.outputs["Right_Marker"]/this.outputs["Data_Lenght"]*100}`
             if (marker == "Left")
                 document.getElementById(`${marker}_Marker`).style.left = `calc(${Left}%)`
             if (marker == "Right")
                 document.getElementById(`${marker}_Marker`).style.left = `calc(${Right}%)`
-            try{this.between_divs["Marker_Between_Div"].remove()} catch{}
+            this.delete_between_mark(this.between_divs["Marker_Between_Div"])
             this.between_divs["Marker_Between_Div"] = document.createElement("div")
-            document.getElementById("Progress_Bar").appendChild(this.between_divs["Marker_Between_Div"]);
+            document.getElementById("Progress_Bar").appendChild(this.between_divs["Marker_Between_Div"])
             this.add_between_mark(this.between_divs["Marker_Between_Div"], Left, Right, "rgb(0 255 0 / 70%)")
         }
 
@@ -93,5 +100,9 @@ class Data_Clear_Track extends Main_Track {
 
         Update_Right_Marker(index, synchronize=0){
             this.Update_Marker(index, "Right", synchronize)
+        }
+
+        Update_Delete_List(right_left_list, synchronize=0){
+
         }
 }

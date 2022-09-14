@@ -565,4 +565,7 @@ body, html {
 }
 #Bottom #Edit #Mark_Right_Button {
   width: 70px;
+}
+#Bottom #Edit #Delete_Button {
+  color: #ff4e4e;
 }/*# sourceMappingURL=data_cleaner.css.map */
