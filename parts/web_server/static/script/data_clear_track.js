@@ -116,10 +116,10 @@ class Data_Clear_Track extends Main_Track {
                 var tmp_dict = {}
                 tmp_dict["Indexes"] = [this.outputs["Left_Marker"], this.outputs["Right_Marker"]]
                 tmp_dict["Changes"] = []
+                tmp_dict["Div"] = this.selected_between_div
                 for (const element of changes)
                     if (tmp_dict["Changes"].includes(element) == 0)
                         tmp_dict["Changes"].push(element)
-                console.log(tmp_dict["Changes"])
                 this.selected_between_div.style.backgroundColor = "#ff4e4e"
                 this.selected_between_div = 0
                 this.outputs["Select_List"].push(tmp_dict)
@@ -136,6 +136,20 @@ class Data_Clear_Track extends Main_Track {
                     document.getElementById("Progress_Bar").appendChild(this.div)
                     this.add_between_mark(this.div, start, finish, color)
                 }
+            }
+        }
+
+        unselect(){
+            var left_marker = this.outputs["Left_Marker"]
+            var right_marker = this.outputs["Right_Marker"]
+            for (const dict of this.outputs["Select_List"]){
+              if(dict["Indexes"][0] == left_marker && dict["Indexes"][1] == right_marker){
+                const index = this.outputs["Select_List"].indexOf(this.outputs["Select_List"])
+                this.outputs["Select_List"].splice(index, 1)
+                this.delete_between_mark(dict["Div"])
+                this.send_data({Select_List: this.outputs["Select_List"]})
+                return
+              }
             }
         }
 }
