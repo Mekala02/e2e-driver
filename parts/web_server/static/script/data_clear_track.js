@@ -5,7 +5,7 @@ class Data_Clear_Track extends Main_Track {
     constructor(){
         super()
         this.Progress_Bar_Width = document.getElementById('Progress_Bar').clientWidth
-        this.between_divs = {}
+        this.selected_between_div = 0
     }
 
     Update_Graph_Data(receive){
@@ -79,19 +79,17 @@ class Data_Clear_Track extends Main_Track {
                 if (marker == "Left")
                     this.send_data({Left_Marker: this.outputs[`${marker}_Marker`]})
             }
-            else{
-                
-            }
-            var Left = `${this.outputs[`Left_Marker`]/this.outputs["Data_Lenght"]*100}`
-            var Right = `${this.outputs["Right_Marker"]/this.outputs["Data_Lenght"]*100}`
+            // Converting indexes to parent divs %
+            var Left = `${this.outputs[`Left_Marker`] / this.outputs["Data_Lenght"] * 100}`
+            var Right = `${this.outputs["Right_Marker"] / this.outputs["Data_Lenght"] * 100}`
             if (marker == "Left")
                 document.getElementById(`${marker}_Marker`).style.left = `calc(${Left}%)`
             if (marker == "Right")
-                document.getElementById(`${marker}_Marker`).style.left = `calc(${Right}%)`
-            this.delete_between_mark(this.between_divs["Marker_Between_Div"])
-            this.between_divs["Marker_Between_Div"] = document.createElement("div")
-            document.getElementById("Progress_Bar").appendChild(this.between_divs["Marker_Between_Div"])
-            this.add_between_mark(this.between_divs["Marker_Between_Div"], Left, Right, "rgb(0 255 0 / 70%)")
+                document.getElementById(`${marker}_Marker`).style.left = `calc(${Right}% - 3px)`
+            this.delete_between_mark(this.selected_between_div)
+            this.selected_between_div = document.createElement("div")
+            document.getElementById("Progress_Bar").appendChild(this.selected_between_div)
+            this.add_between_mark(this.selected_between_div, Left, Right, "rgb(0 255 0 / 70%)")
         }
 
         Update_Left_Marker(index, synchronize=0){
@@ -102,7 +100,38 @@ class Data_Clear_Track extends Main_Track {
             this.Update_Marker(index, "Right", synchronize)
         }
 
-        Update_Delete_List(right_left_list, synchronize=0){
-
+        // Changes set
+        Update_Select_List(changes, synchronize=0){
+            if (synchronize == 0){
+                for (const dict of this.outputs["Select_List"]){
+                    if (dict["Indexes"][0] == this.outputs["Left_Marker"] && dict["Indexes"][1] == this.outputs["Right_Marker"]){
+                        for (const element of changes)
+                            dict["Changes"].add(element)
+                        this.send_data({Select_List: this.outputs["Select_List"]})
+                        return
+                    }
+                }
+                var tmp_dict = {}
+                tmp_dict["Indexes"] = [this.outputs["Left_Marker"], this.outputs["Right_Marker"]]
+                tmp_dict["Changes"] = new Set()
+                for (const element of changes)
+                    tmp_dict["Changes"].add(element)
+                this.selected_between_div.style.backgroundColor = "#ff4e4e"
+                this.selected_between_div = 0
+                this.outputs["Select_List"].push(tmp_dict)
+                this.send_data({Select_List: this.outputs["Select_List"]})
+            }
+            else{
+                for (const dict of this.outputs["Select_List"]){
+                    console.log(dict)
+                    // Converting indexes to % of parent div
+                    var start = dict["Indexes"][0] / this.outputs["Data_Lenght"] * 100
+                    var finish = dict["Indexes"][1] / this.outputs["Data_Lenght"] * 100
+                    var color = "#ff4e4e"
+                    this.div = document.createElement("div")
+                    document.getElementById("Progress_Bar").appendChild(this.div)
+                    this.add_between_mark(this.div, start, finish, color)
+                }
+            }
         }
 }

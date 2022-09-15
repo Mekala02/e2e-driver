@@ -81,4 +81,4 @@ document.getElementById('Progress_Bar').addEventListener("mouseup", function(){
 
 document.getElementById('Mark_Left_Button').addEventListener("click", function() {data_clear_track.Update_Left_Marker(data_clear_track.outputs["Data_Index"])});
 document.getElementById('Mark_Right_Button').addEventListener("click", function() {data_clear_track.Update_Right_Marker(data_clear_track.outputs["Data_Index"])});
-
+document.getElementById('Delete_Button').addEventListener("click", function() {data_clear_track.Update_Select_List(["Delete"])});
