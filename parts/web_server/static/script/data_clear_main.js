@@ -82,3 +82,13 @@ document.getElementById('Progress_Bar').addEventListener("mouseup", function(){
 document.getElementById('Mark_Left_Button').addEventListener("click", function() {data_clear_track.Update_Left_Marker(data_clear_track.outputs["Data_Index"])})
 document.getElementById('Mark_Right_Button').addEventListener("click", function() {data_clear_track.Update_Right_Marker(data_clear_track.outputs["Data_Index"])})
 document.getElementById('Delete_Button').addEventListener("click", function() {data_clear_track.Update_Select_List(["Delete"])})
+
+document.getElementById('Progress_Bar').addEventListener("dblclick", function(e){
+  index = Math.round(e.offsetX * data_clear_track.outputs["Data_Lenght"] / data_clear_track.Progress_Bar_Width)
+  for (const dict of data_clear_track.outputs["Select_List"]){
+    if(dict["Indexes"][0] < index && index < dict["Indexes"][1]){
+      data_clear_track.Update_Left_Marker(dict["Indexes"][0])
+      data_clear_track.Update_Right_Marker(dict["Indexes"][1])
+    }
+  }
+})
