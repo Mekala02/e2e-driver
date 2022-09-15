@@ -48,8 +48,9 @@ function update_graph(name){
   get_graph_data()
 }
 
-function bar_move(e){
-  index = e.offsetX * data_clear_track.outputs["Data_Lenght"] / data_clear_track.Progress_Bar_Width
+function bar_move(px=0, index=0){
+  if (px)
+    index = px.offsetX * data_clear_track.outputs["Data_Lenght"] / data_clear_track.Progress_Bar_Width
   data_clear_track.Update_Data_Index(Math.round(index))
 }
 
@@ -94,3 +95,29 @@ document.getElementById('Progress_Bar').addEventListener("dblclick", function(e)
   }
 })
 
+var endTime = 0
+var startTime = 0
+var counter = 0
+
+addEventListener('keydown', function(e){
+  if (counter > 5){
+    endTime = performance.now()
+    increment = Math.round((endTime - startTime) * data_clear_track.Fps / 1000)
+  }
+  else
+    increment = 1
+  if (e.code == "ArrowRight"){
+    bar_move(0, data_clear_track.outputs["Data_Index"] + increment)
+  }
+  else if (e.code == "ArrowLeft"){
+    bar_move(0, data_clear_track.outputs["Data_Index"] - increment)
+  }
+  startTime = performance.now()
+  counter ++
+})
+
+addEventListener('keyup', function(e){
+  if (e.code == "ArrowRight"  || e.code == "ArrowLeft"){
+    counter = 0
+  }
+})

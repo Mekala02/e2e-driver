@@ -134,6 +134,7 @@ class Main_Track {
 
     Update_FPS(fps){
         document.getElementById("Fps").innerHTML = fps
+        this.Fps = fps
     }
 
     Update_Graph_Mode(mode, graph=0, synchronize=0){
