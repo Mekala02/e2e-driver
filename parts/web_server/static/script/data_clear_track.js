@@ -100,22 +100,26 @@ class Data_Clear_Track extends Main_Track {
             this.Update_Marker(index, "Right", synchronize)
         }
 
-        // Changes set
+        // Changes is list
         Update_Select_List(changes, synchronize=0){
             if (synchronize == 0){
                 for (const dict of this.outputs["Select_List"]){
                     if (dict["Indexes"][0] == this.outputs["Left_Marker"] && dict["Indexes"][1] == this.outputs["Right_Marker"]){
-                        for (const element of changes)
-                            dict["Changes"].add(element)
+                        for (const element of changes){
+                            if (dict["Changes"].includes(element) == 0)
+                                dict["Changes"].push(element)
+                        }
                         this.send_data({Select_List: this.outputs["Select_List"]})
                         return
                     }
                 }
                 var tmp_dict = {}
                 tmp_dict["Indexes"] = [this.outputs["Left_Marker"], this.outputs["Right_Marker"]]
-                tmp_dict["Changes"] = new Set()
+                tmp_dict["Changes"] = []
                 for (const element of changes)
-                    tmp_dict["Changes"].add(element)
+                    if (tmp_dict["Changes"].includes(element) == 0)
+                        tmp_dict["Changes"].push(element)
+                console.log(tmp_dict["Changes"])
                 this.selected_between_div.style.backgroundColor = "#ff4e4e"
                 this.selected_between_div = 0
                 this.outputs["Select_List"].push(tmp_dict)
@@ -123,7 +127,7 @@ class Data_Clear_Track extends Main_Track {
             }
             else{
                 for (const dict of this.outputs["Select_List"]){
-                    console.log(dict)
+                    console.log(dict["Changes"])
                     // Converting indexes to % of parent div
                     var start = dict["Indexes"][0] / this.outputs["Data_Lenght"] * 100
                     var finish = dict["Indexes"][1] / this.outputs["Data_Lenght"] * 100
