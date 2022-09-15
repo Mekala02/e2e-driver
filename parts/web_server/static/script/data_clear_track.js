@@ -89,7 +89,7 @@ class Data_Clear_Track extends Main_Track {
             this.delete_between_mark(this.selected_between_div)
             this.selected_between_div = document.createElement("div")
             document.getElementById("Progress_Bar").appendChild(this.selected_between_div)
-            this.add_between_mark(this.selected_between_div, Left, Right, "rgb(0 255 0 / 70%)")
+            this.add_between_mark(this.selected_between_div, Left, Right, "rgb(63 81 181 / 70%)")
         }
 
         Update_Left_Marker(index, synchronize=0){
@@ -148,6 +148,7 @@ class Data_Clear_Track extends Main_Track {
                 this.outputs["Select_List"].splice(index, 1)
                 this.delete_between_mark(dict["Div"])
                 this.send_data({Select_List: this.outputs["Select_List"]})
+                this.Update_Right_Marker(undefined, 1)
                 return
               }
             }
