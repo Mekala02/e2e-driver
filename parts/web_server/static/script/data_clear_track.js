@@ -27,6 +27,19 @@ class Data_Clear_Track extends Main_Track {
             width: 4
             }})
         }
+        // this.graph_layout["shapes"] = [
+        //     //line vertical
+        //     {
+        //       type: 'line',
+        //       x0: 1663084384230,
+        //       y0: -1,
+        //       x1: 1663084384232,
+        //       y1: 1,
+        //       line: {
+        //         color: 'white',
+        //         width: 3
+        //       }
+        //     }]
         Plotly.react("Graph1", traces, this.graph_layout, {displayModeBar: false})
       }
 
