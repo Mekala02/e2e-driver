@@ -92,3 +92,17 @@ document.getElementById('Progress_Bar').addEventListener("dblclick", function(e)
     }
   }
 })
+
+document.getElementById('Unselect_Button').addEventListener("click", function() {
+  left_marker = data_clear_track.outputs["Left_Marker"]
+  right_marker = data_clear_track.outputs["Right_Marker"]
+  for (const dict of data_clear_track.outputs["Select_List"]){
+    if(dict["Indexes"][0] == left_marker && dict["Indexes"][1] == right_marker){
+      const index = data_clear_track.outputs["Select_List"].indexOf(data_clear_track.outputs["Select_List"])
+      data_clear_track.outputs["Select_List"].splice(index, 1)
+      data_clear_track.send_data({Select_List: data_clear_track.outputs["Select_List"]})
+      data_clear_track.Update_Select_List(undefined, 1)
+      return
+    }
+  }
+})
