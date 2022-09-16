@@ -155,20 +155,41 @@ body, html
         display: flex
         padding-top: 30px
         justify-content: center
+        align-items: center
         width: 100%
 
-        #Mark_Left_Button
+        #Search_Box
             @extend %Buttons
-            width: 70px
+            height: 30px
+            width: 150px
+        #Search_Box::-webkit-search-cancel-button
+            display: none
 
-        #Mark_Right_Button
-            @extend %Buttons
-            width: 70px
+        input[type="search" i]
+            outline: none
 
-        #Unselect_Button
-            @extend %Buttons
-            color: #4caf50
+        #edit_bottom_left
+            margin-left: 150px 
+            margin-right: 50px 
+            #Mark_Left_Button
+                @extend %Buttons
+                width: 70px
 
-        #Delete_Button
+            #Mark_Right_Button
+                @extend %Buttons
+                width: 70px
+
+        #edit_bottom_right
+            margin-right: 150px
+            margin-left: 50px 
+            #Unselect_Button
+                @extend %Buttons
+                color: #4caf50
+
+            #Delete_Button
+                @extend %Buttons
+                color: #ff4e4e
+
+        #Apply_Button
             @extend %Buttons
             color: #ff4e4e

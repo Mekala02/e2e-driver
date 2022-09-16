@@ -1,4 +1,4 @@
-#Bottom #Edit #Delete_Button, #Bottom #Edit #Unselect_Button, #Bottom #Edit #Mark_Right_Button, #Bottom #Edit #Mark_Left_Button {
+#Bottom #Edit #Apply_Button, #Bottom #Edit #edit_bottom_right #Delete_Button, #Bottom #Edit #edit_bottom_right #Unselect_Button, #Bottom #Edit #edit_bottom_left #Mark_Right_Button, #Bottom #Edit #edit_bottom_left #Mark_Left_Button, #Bottom #Edit #Search_Box {
   text-align: center;
   height: 40px;
   width: 120px;
@@ -12,7 +12,7 @@
   border-radius: 10px;
 }
 @media (max-width: 1920px) {
-  #Bottom #Edit #Delete_Button, #Bottom #Edit #Unselect_Button, #Bottom #Edit #Mark_Right_Button, #Bottom #Edit #Mark_Left_Button {
+  #Bottom #Edit #Apply_Button, #Bottom #Edit #edit_bottom_right #Delete_Button, #Bottom #Edit #edit_bottom_right #Unselect_Button, #Bottom #Edit #edit_bottom_left #Mark_Right_Button, #Bottom #Edit #edit_bottom_left #Mark_Left_Button, #Bottom #Edit #Search_Box {
     height: 35px;
     width: auto;
     font-size: 20px;
@@ -558,17 +558,39 @@ body, html {
   display: flex;
   padding-top: 30px;
   justify-content: center;
+  align-items: center;
   width: 100%;
 }
-#Bottom #Edit #Mark_Left_Button {
+#Bottom #Edit #Search_Box {
+  height: 30px;
+  width: 150px;
+}
+#Bottom #Edit #Search_Box::-webkit-search-cancel-button {
+  display: none;
+}
+#Bottom #Edit input[type=search i] {
+  outline: none;
+}
+#Bottom #Edit #edit_bottom_left {
+  margin-left: 150px;
+  margin-right: 50px;
+}
+#Bottom #Edit #edit_bottom_left #Mark_Left_Button {
   width: 70px;
 }
-#Bottom #Edit #Mark_Right_Button {
+#Bottom #Edit #edit_bottom_left #Mark_Right_Button {
   width: 70px;
 }
-#Bottom #Edit #Unselect_Button {
+#Bottom #Edit #edit_bottom_right {
+  margin-right: 150px;
+  margin-left: 50px;
+}
+#Bottom #Edit #edit_bottom_right #Unselect_Button {
   color: #4caf50;
 }
-#Bottom #Edit #Delete_Button {
+#Bottom #Edit #edit_bottom_right #Delete_Button {
+  color: #ff4e4e;
+}
+#Bottom #Edit #Apply_Button {
   color: #ff4e4e;
 }/*# sourceMappingURL=data_cleaner.css.map */

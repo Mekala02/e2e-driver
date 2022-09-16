@@ -34,6 +34,7 @@ class Data_Clear_Track extends Main_Track {
 
     Update_Graph_Display(){
         // this.axis_length = this.graph["Timestamp"].length
+        this.traces = []
         for (let mode of this.outputs["Graph1_Mode"]){
             this.traces.push({
             x: this.graph["Img_Id"],
@@ -44,8 +45,8 @@ class Data_Clear_Track extends Main_Track {
             width: 4
             }})
         }
-        // Plotly.react("Graph1", this.traces, this.graph_layout, {displayModeBar: false})
         this.Update_Graph_Index()
+        // Plotly.react("Graph1", this.traces, this.graph_layout, {displayModeBar: false})
       }
 
       Update_Data_Folder(folder, synchronize=0){
