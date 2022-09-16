@@ -87,7 +87,7 @@ searchBar.addEventListener("keydown", (e) => {
   if (e.key == "Enter" && searchBar.value != "") {
       searchQuery = Search_Box.value
       console.log(searchQuery)
-      data_clear_track.request_search_results(searchQuery)
+      data_clear_track.mark_search_results(searchQuery)
   }
 })
 

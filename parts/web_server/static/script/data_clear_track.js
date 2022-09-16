@@ -174,35 +174,35 @@ class Data_Clear_Track extends Main_Track {
             }
         }
 
-        request_search_results(search_phrase){
+        mark_search_results(search_phrase){
             this.xhr.open("POST", "/search", true)
             this.xhr.setRequestHeader('Content-Type', 'application/json');
             this.xhr.send(JSON.stringify(search_phrase))
             fetch("search_results")
             .then(response => response.json())
             .then(inputs => {
-                for (const div of this.search_divs){
+                // Cleaning previous searched divs (if there is any)
+                for (const div of this.search_divs)
                     this.delete_between_mark(div)
-                }
                 this.search_divs = []
                 var mark_list = []
-                var start = inputs[0]
+                var start_index = inputs[0]
+                // Squeezing values into [start, stop] continious list
                 for (var i = 0; i < inputs.length; i++){
                     if(inputs[i] + 1 != inputs[i+1]){
-                        mark_list.push([start, inputs[i]])
-                        start = inputs[i+1]
+                        mark_list.push([start_index, inputs[i]])
+                        start_index = inputs[i+1]
                     }
                 }
-                for (const s_f of mark_list){
-                    console.log(mark_list[1])
-                    console.log(s_f)
+                // Marking search results
+                for (const between of mark_list){
                     var div = document.createElement("div")
                     document.getElementById("Progress_Bar").appendChild(div)
                     this.search_divs.push(div)
                     // Converting indexes to % of parent div
-                    var start = s_f[0] / this.outputs["Data_Lenght"] * 100
-                    var finish = s_f[1] / this.outputs["Data_Lenght"] * 100
-                    this.add_between_mark(div, start, finish, "yellow")
+                    var start = between[0] / this.outputs["Data_Lenght"] * 100
+                    var finish = between[1] / this.outputs["Data_Lenght"] * 100
+                    this.add_between_mark(div, start, finish, "#ffbf00")
                 }
               })
         }
