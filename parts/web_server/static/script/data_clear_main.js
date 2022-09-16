@@ -25,6 +25,16 @@ function update_indicators(){
     })
   }
   
+  
+  function load_parameters(outputs){
+    for (const [key, value] of Object.entries(outputs)) {
+      data_clear_track.outputs[key] = value
+      console.log(key, value);
+    }
+    update_client_side()
+    setInterval(function() {update_indicators()}, update_interval)
+  }
+
   function get_graph_data(){
     fetch("graph")
     .then(response => response.json())
@@ -33,15 +43,6 @@ function update_indicators(){
     })
     .then(function(){data_clear_track.Update_Graph_Display()})
   }
-
-function load_parameters(outputs){
-    for (const [key, value] of Object.entries(outputs)) {
-        data_clear_track.outputs[key] = value
-        console.log(key, value);
-      }
-      update_client_side()
-      setInterval(function() {update_indicators()}, update_interval)
-}
 
 function update_graph(name){
   data_clear_track.Update_Graph_Mode(name, 1)

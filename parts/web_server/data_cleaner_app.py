@@ -53,9 +53,9 @@ def send_graph():
         send[mode] = []
     send["Img_Id"] = []
     for row in datas:
+        send["Img_Id"].append(row["Img_Id"])
         for mode in client_outputs["Graph1_Mode"]:
             send[mode].append(row[mode])
-            send["Img_Id"].append(row["Img_Id"])
     return jsonify(send)
 
 if __name__=="__main__":
