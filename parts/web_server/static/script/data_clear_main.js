@@ -104,6 +104,12 @@ document.getElementById('Progress_Bar').addEventListener("dblclick", function(e)
       data_clear_track.Update_Right_Marker(dict["Indexes"][1])
     }
   }
+  for (const between of data_clear_track.search_results_list){
+    if(between[0] < index && index < between[1]){
+      data_clear_track.Update_Left_Marker(between[0])
+      data_clear_track.Update_Right_Marker(between[1])
+    }
+  }
 })
 
 var endTime = 0

@@ -7,7 +7,8 @@ class Data_Clear_Track extends Main_Track {
         this.Progress_Bar_Width = document.getElementById('Progress_Bar').clientWidth
         this.selected_between_div = 0
         this.traces = []
-        this.search_divs = []
+        this.search_results_list = []
+        this.search_results_divs = []
     }
 
     Update_Graph_Data(receive){
@@ -182,23 +183,23 @@ class Data_Clear_Track extends Main_Track {
             .then(response => response.json())
             .then(inputs => {
                 // Cleaning previous searched divs (if there is any)
-                for (const div of this.search_divs)
+                for (const div of this.search_results_divs)
                     this.delete_between_mark(div)
-                this.search_divs = []
-                var mark_list = []
+                this.search_results_divs = []
+                this.search_results_list = []
                 var start_index = inputs[0]
                 // Squeezing values into [start, stop] continious list
                 for (var i = 0; i < inputs.length; i++){
                     if(inputs[i] + 1 != inputs[i+1]){
-                        mark_list.push([start_index, inputs[i]])
+                        this.search_results_list.push([start_index, inputs[i]])
                         start_index = inputs[i+1]
                     }
                 }
                 // Marking search results
-                for (const between of mark_list){
+                for (const between of this.search_results_list){
                     var div = document.createElement("div")
                     document.getElementById("Progress_Bar").appendChild(div)
-                    this.search_divs.push(div)
+                    this.search_results_divs.push(div)
                     // Converting indexes to % of parent div
                     var start = between[0] / this.outputs["Data_Lenght"] * 100
                     var finish = between[1] / this.outputs["Data_Lenght"] * 100
@@ -206,12 +207,4 @@ class Data_Clear_Track extends Main_Track {
                 }
               })
         }
-
-        // get_search_results(){
-        //     fetch("search_results")
-        //     .then(response => response.json())
-        //     .then(inputs => {
-        //         console.log(inputs)
-        //       })
-        //     }
 }
