@@ -6,6 +6,7 @@ class Data_Clear_Track extends Main_Track {
         super()
         this.Progress_Bar_Width = document.getElementById('Progress_Bar').clientWidth
         this.selected_between_div = 0
+        this.traces = []
     }
 
     Update_Graph_Data(receive){
@@ -14,12 +15,28 @@ class Data_Clear_Track extends Main_Track {
           }
     }
 
+    Update_Graph_Index(){
+        this.graph_layout["shapes"] = [
+            //line vertical
+            {
+                type: 'line',
+                x0: this.outputs["Data_Index"],
+                y0: -1,
+                x1: this.outputs["Data_Index"],
+                y1: 1,
+                line: {
+                color: 'white',
+                width: 3
+                }
+            }]
+        Plotly.react("Graph1", this.traces, this.graph_layout, {displayModeBar: false})
+      }
+
     Update_Graph_Display(){
         // this.axis_length = this.graph["Timestamp"].length
-        var traces = []
         for (let mode of this.outputs["Graph1_Mode"]){
-            traces.push({
-            x: this.graph["Timestamp"],
+            this.traces.push({
+            x: this.graph["Img_Id"],
             y: this.graph[mode],
             name: mode,
             type:'line',
@@ -27,20 +44,8 @@ class Data_Clear_Track extends Main_Track {
             width: 4
             }})
         }
-        // this.graph_layout["shapes"] = [
-        //     //line vertical
-        //     {
-        //       type: 'line',
-        //       x0: 1663084384230,
-        //       y0: -1,
-        //       x1: 1663084384232,
-        //       y1: 1,
-        //       line: {
-        //         color: 'white',
-        //         width: 3
-        //       }
-        //     }]
-        Plotly.react("Graph1", traces, this.graph_layout, {displayModeBar: false})
+        // Plotly.react("Graph1", this.traces, this.graph_layout, {displayModeBar: false})
+        this.Update_Graph_Index()
       }
 
       Update_Data_Folder(folder, synchronize=0){

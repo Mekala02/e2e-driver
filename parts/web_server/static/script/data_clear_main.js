@@ -52,6 +52,7 @@ function bar_move(px=0, index=0){
   if (px)
     index = px.offsetX * data_clear_track.outputs["Data_Lenght"] / data_clear_track.Progress_Bar_Width
   data_clear_track.Update_Data_Index(Math.round(index))
+  data_clear_track.Update_Graph_Index()
 }
 
 document.getElementById("Emergency_Button").addEventListener("click", function() {data_clear_track.Emergency_Stop()})
