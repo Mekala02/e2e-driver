@@ -41,6 +41,51 @@ def receive_outputs():
         client_outputs[key] = information[key]
     return information
 
+search_results = []
+@app.route('/search', methods=['GET', 'POST'])
+def receive_search():
+    search_phrase = request.get_json()
+    search_phrase = search_phrase.replace(" ", "")
+    search_results.clear()
+    delimiters = ["==", ">=", "<=", ">", "<"]
+    for delimiter in delimiters:
+        try:
+            name, value = search_phrase.split(delimiter)
+            name = name.capitalize()
+            value = value.capitalize()
+            print(name, value)
+            if value.isnumeric():
+                value = int(value)
+            symbol = delimiter
+            break
+        except:
+            pass
+    if symbol == "==":
+        for row in datas:
+            if row[name] == value:
+                search_results.append(row["Img_Id"])
+    elif symbol == ">=":
+        for row in datas:
+            if row[name] >= value:
+                search_results.append(row["Img_Id"])
+    elif symbol == "<=":
+        for row in datas:
+            if row[name] <= value:
+                search_results.append(row["Img_Id"])
+    elif symbol == ">":
+        for row in datas:
+            if row[name] > value:
+                search_results.append(row["Img_Id"])
+    elif symbol == "<":
+        for row in datas:
+            if row[name] < value:
+                search_results.append(row["Img_Id"])
+    return "a"
+
+@app.route('/search_results')
+def send_search_results():
+    return jsonify(search_results)
+
 @app.route('/inputs')
 def send_inputs():
     data = datas[client_outputs["Data_Index"]]

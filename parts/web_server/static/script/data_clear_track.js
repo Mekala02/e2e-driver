@@ -172,4 +172,19 @@ class Data_Clear_Track extends Main_Track {
               }
             }
         }
+
+        request_search_results(search_phrase){
+            this.xhr.open("POST", "/search", true)
+            this.xhr.setRequestHeader('Content-Type', 'application/json');
+            this.xhr.send(JSON.stringify(search_phrase))
+            this.get_search_results()
+        }
+
+        get_search_results(){
+            fetch("search_results")
+            .then(response => response.json())
+            .then(inputs => {
+                console.log(inputs)
+              })
+            }
 }
