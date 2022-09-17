@@ -81,7 +81,10 @@ class Data_Clear_Track extends Main_Track {
                 div.style.height = "100%"
                 div.style.width = "auto"
                 div.style.left = start + "%"
-                div.style.right = 100 - finish + "%"
+                if (start == finish)
+                    div.style.right = 99.99 - finish + "%"
+                else
+                    div.style.right = 100 - finish + "%"
                 div.style.backgroundColor = color
                 div.style.pointerEvents = "none"
 
@@ -130,6 +133,10 @@ class Data_Clear_Track extends Main_Track {
                             if (dict["Changes"].includes(element) == 0)
                                 dict["Changes"].push(element)
                         }
+                        if (dict["Changes"].includes("Delete"))
+                            dict["Div"].style.backgroundColor = "#ff4e4e"
+                        else
+                            dict["Div"].style.backgroundColor = "yellow"
                         this.send_data({Select_List: this.outputs["Select_List"]})
                         return
                     }
@@ -141,7 +148,10 @@ class Data_Clear_Track extends Main_Track {
                 for (const element of changes)
                     if (tmp_dict["Changes"].includes(element) == 0)
                         tmp_dict["Changes"].push(element)
-                this.selected_between_div.style.backgroundColor = "#ff4e4e"
+                if (changes.includes("Delete"))
+                    this.selected_between_div.style.backgroundColor = "#ff4e4e"
+                else
+                    this.selected_between_div.style.backgroundColor = "yellow"
                 this.selected_between_div = 0
                 this.outputs["Select_List"].push(tmp_dict)
                 this.send_data({Select_List: this.outputs["Select_List"]})
@@ -152,7 +162,10 @@ class Data_Clear_Track extends Main_Track {
                     // Converting indexes to % of parent div
                     var start = dict["Indexes"][0] / this.outputs["Data_Lenght"] * 100
                     var finish = dict["Indexes"][1] / this.outputs["Data_Lenght"] * 100
-                    var color = "#ff4e4e"
+                    if (dict["Changes"].includes("Delete"))
+                        var color = "#ff4e4e"
+                    else
+                        var color = "yellow"
                     this.div = document.createElement("div")
                     document.getElementById("Progress_Bar").appendChild(this.div)
                     this.add_between_mark(this.div, start, finish, color)

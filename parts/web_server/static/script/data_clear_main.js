@@ -25,7 +25,6 @@ function update_indicators(){
     })
   }
   
-  
   function load_parameters(outputs){
     for (const [key, value] of Object.entries(outputs)) {
       data_clear_track.outputs[key] = value
@@ -55,6 +54,16 @@ function bar_move(px=0, index=0){
   data_clear_track.Update_Data_Index(Math.round(index))
   data_clear_track.Update_Graph_Index()
 }
+
+document.getElementById("Stop").addEventListener("click", function() {data_clear_track.Update_Select_List(["Stop"])})
+document.getElementById("Taxi").addEventListener("click", function() {data_clear_track.Update_Select_List(["Taxi"])})
+document.getElementById("Left_Arrow").addEventListener("click", function() {data_clear_track.Update_Select_List(["Left_Direction"])})
+document.getElementById("Forward_Arrow").addEventListener("click", function() {data_clear_track.Update_Select_List(["Forward_Direction"])})
+document.getElementById("Right_Arrow").addEventListener("click", function() {data_clear_track.Update_Select_List(["Right_Direction"])})
+
+document.getElementById("Left_Lane").addEventListener("click", function() {data_clear_track.Update_Select_List(["Left_Lane"])})
+document.getElementById("Right_Lane").addEventListener("click", function() {data_clear_track.Update_Select_List(["Right_Lane"])})
+
 
 document.getElementById("Emergency_Button").addEventListener("click", function() {data_clear_track.Emergency_Stop()})
 
