@@ -23,7 +23,8 @@ def generate_frames():
     while True:
         img_id = datas[client_outputs["Data_Index"]]["Img_Id"]
         camera_mode = client_outputs["Camera_Mode"]
-        frame = np.load(f"{data_folder}\\images\\{camera_mode}\\{img_id}.npy")
+        frame_path = os.path.join(data_folder, "images", camera_mode, f"{img_id}.npy")
+        frame = np.load(frame_path)
         ret, buffer = cv2.imencode('.jpg', frame)
         frame=buffer.tobytes()
         yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -110,9 +111,9 @@ def send_graph():
 if __name__=="__main__":
     args = docopt(__doc__)
     data_folder = args["<data_dir>"]
-    path = os.path.join(data_folder, "memory.json")
-    datas = json.loads(open(path, "r").read())
     folder_name = os.path.basename(data_folder)
+    json_path = os.path.join(data_folder, "memory.json")
+    datas = json.loads(open(json_path, "r").read())
     client_outputs = {"Data_Lenght": len(datas), "Data_Index": 0, "Data_Folder": folder_name,
     "Left_Marker": 500, "Right_Marker": 1000, "Select_List": [], "Camera_Mode": "RGB", "Graph1_Mode": ["Steering"]}
     app.run(host='0.0.0.0', debug=True)
