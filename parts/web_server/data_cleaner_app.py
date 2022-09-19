@@ -1,3 +1,13 @@
+"""
+Usage:
+    data_cleaner_app.py  [(--d=data_dir|--dir=data_dir)]
+    data_cleaner_app.py  [(--c==False|--copy==False)] <copy_to>
+
+Options:
+  -h --help     Show this screen.
+"""
+
+from docopt import docopt
 from flask import Flask, render_template, Response, request, jsonify
 import numpy as np
 import json
@@ -5,12 +15,8 @@ import time
 import cv2
 
 app=Flask(__name__)
-data_folder = "c:\\Users\\Mekala\\Documents\\GitHub\\e2e-driver\\data"
+# data_folder = "c:\\Users\\Mekala\\Documents\\GitHub\\e2e-driver\\data"
 folder_name = "Data"
-datas = json.loads(open(f"{data_folder}\\memory.json", "r").read())
-
-client_outputs = {"Data_Lenght": len(datas), "Data_Index": 0, "Data_Folder": folder_name,
-    "Left_Marker": 500, "Right_Marker": 1000, "Select_List": [], "Camera_Mode": "RGB", "Graph1_Mode": ["Steering"]}
 
 # Servers memory
 data = {}
@@ -104,4 +110,9 @@ def send_graph():
     return jsonify(send)
 
 if __name__=="__main__":
+    args = docopt(__doc__)
+    data_folder = args["--d"]
+    datas = json.loads(open(f"{data_folder}\\memory.json", "r").read())
+    client_outputs = {"Data_Lenght": len(datas), "Data_Index": 0, "Data_Folder": folder_name,
+    "Left_Marker": 500, "Right_Marker": 1000, "Select_List": [], "Camera_Mode": "RGB", "Graph1_Mode": ["Steering"]}
     app.run(host='0.0.0.0', debug=True)

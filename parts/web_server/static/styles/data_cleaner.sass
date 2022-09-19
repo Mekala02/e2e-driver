@@ -5,7 +5,6 @@
 @import "common/camera.sass"
 @import "common/bar.sass"
 @import "common/graph1.sass"
-@import "common/graph2.sass"
 
 body, html
     width: 100%
@@ -17,8 +16,8 @@ body, html
     flex-direction: row
     justify-content: space-between
     padding-top: 150px
-    padding-left: 7vw
-    padding-right: 7vw 
+    padding-left: 9vw
+    padding-right: 9vw 
     @media (max-width: $max-width)
         padding-left: 4vw
         padding-right: 4vw 
@@ -39,7 +38,7 @@ body, html
             position: relative
             justify-content: space-between
             width: 35vw
-            height: 17vh
+            height: 35vh
             @media (max-width: $max_width)
                 width: 43vw
                 height: 48vh
@@ -80,7 +79,7 @@ body, html
                 //     font-size: 20px
 
             #Data_Folder
-                display: flex
+                display: none
                 width: 75px
                 height: auto
                 word-break: break-all
@@ -99,13 +98,30 @@ body, html
                 //     width: auto
                 //     font-size: 20px
 
+            #Display_Changes
+                display: flex
+                justify-content: center
+                width: 140px
+                height: 80px
+                color: white
+                overflow: scroll
+                padding: 5px
+                border-radius: $Fillet
+                margin: 4px
+                border-style: solid
+                border-width: 3px
+                border-color: white
+            #Display_Changes::-webkit-scrollbar 
+                display: none
+
+
 #Bottom
     display: flex
     flex-direction: column
     // justify-content: space-between
-    padding-top: 40px
-    padding-left: 7vw
-    padding-right: 7vw
+    padding-top: 60px
+    padding-left: 9vw
+    padding-right: 9vw
     @media (max-width: $max-width)
         padding-left: 4vw
         padding-right: 4vw 
@@ -153,15 +169,20 @@ body, html
     
     #Edit
         display: flex
-        padding-top: 30px
+        padding-top: 70px
         justify-content: center
         align-items: center
         width: 100%
+        @media (max-width: $max-width)
+            padding-top: 30px
 
         #Search_Box
             @extend %Buttons
-            height: 30px
-            width: 150px
+            height: 40px
+            width: 200px
+            @media (max-width: $max-width)
+                height: 35px
+                width: 150px
         #Search_Box::-webkit-search-cancel-button
             display: none
 
@@ -173,11 +194,11 @@ body, html
             margin-right: 50px 
             #Mark_Left_Button
                 @extend %Buttons
-                width: 70px
+                width: 80px
 
             #Mark_Right_Button
                 @extend %Buttons
-                width: 70px
+                width: 80px
 
         #edit_bottom_right
             margin-right: 150px

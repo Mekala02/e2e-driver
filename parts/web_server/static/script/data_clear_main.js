@@ -100,10 +100,13 @@ searchBar.addEventListener("keydown", (e) => {
   }
 })
 
-document.getElementById('Mark_Left_Button').addEventListener("click", function() {data_clear_track.Update_Left_Marker(data_clear_track.outputs["Data_Index"])})
-document.getElementById('Mark_Right_Button').addEventListener("click", function() {data_clear_track.Update_Right_Marker(data_clear_track.outputs["Data_Index"])})
+document.getElementById('Mark_Left_Button').addEventListener("click", function() {data_clear_track.Update_Left_Marker(data_clear_track.outputs["Data_Index"])
+  data_clear_track.update_display_changes(undefined, 1)})
+document.getElementById('Mark_Right_Button').addEventListener("click", function() {data_clear_track.Update_Right_Marker(data_clear_track.outputs["Data_Index"])
+  data_clear_track.update_display_changes(undefined, 1)})
 document.getElementById('Unselect_Button').addEventListener("click", function() {data_clear_track.unselect()})
 document.getElementById('Delete_Button').addEventListener("click", function() {data_clear_track.Update_Select_List(["Delete"])})
+document.getElementById('Apply_Button').addEventListener("click", function() {data_clear_track.Apply_Changes()})
 
 document.getElementById('Progress_Bar').addEventListener("dblclick", function(e){
   index = Math.round(e.offsetX * data_clear_track.outputs["Data_Lenght"] / data_clear_track.Progress_Bar_Width)
@@ -111,6 +114,7 @@ document.getElementById('Progress_Bar').addEventListener("dblclick", function(e)
     if(dict["Indexes"][0] < index && index < dict["Indexes"][1]){
       data_clear_track.Update_Left_Marker(dict["Indexes"][0])
       data_clear_track.Update_Right_Marker(dict["Indexes"][1])
+      data_clear_track.update_display_changes(dict["Changes"])
     }
   }
   for (const between of data_clear_track.search_results_list){

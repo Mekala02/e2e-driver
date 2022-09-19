@@ -19,7 +19,7 @@
   }
 }
 
-#Graph2 #Graph2_Mode_Select, #Graph1 #Graph1_Mode_Select, #Camera_Brodcast #Camera_Mode_Select {
+#Graph1 #Graph1_Mode_Select, #Camera_Brodcast #Camera_Mode_Select {
   display: flex;
   position: absolute;
   justify-content: center;
@@ -36,7 +36,7 @@
   z-index: 1000;
 }
 
-#Graph2 #Graph2_Mode_Select #G2_Menu, #Graph1 #Graph1_Mode_Select #G1_Menu, #Camera_Brodcast #Camera_Mode_Select #C_Menu {
+#Graph1 #Graph1_Mode_Select #G1_Menu, #Camera_Brodcast #Camera_Mode_Select #C_Menu {
   display: none;
   flex-direction: column;
   position: absolute;
@@ -51,7 +51,7 @@
   margin-left: -40px;
 }
 
-#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select #G2_IMU_Menu .IMU_Select_Button, #Graph2 #Graph2_Mode_Select #G2_Menu .Graph_Select_Button, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu .IMU_Select_Button, #Graph1 #Graph1_Mode_Select #G1_Menu .Graph_Select_Button, #Camera_Brodcast #Camera_Mode_Select #C_Menu .Camera_Select_Button {
+#Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu .IMU_Select_Button, #Graph1 #Graph1_Mode_Select #G1_Menu .Graph_Select_Button, #Camera_Brodcast #Camera_Mode_Select #C_Menu .Camera_Select_Button {
   height: 100%;
   width: 100%;
   color: white;
@@ -90,7 +90,7 @@
 
 .Bar #Throttle_Border, .Bar #Steering_Border {
   position: absolute;
-  height: 100%;
+  height: 25px;
   width: 5px;
   margin-top: -1px;
   background-color: white;
@@ -106,7 +106,7 @@
   width: 0;
 }
 
-#Graph2, #Graph1 {
+#Graph1 {
   position: relative;
   width: 100%;
   height: 45%;
@@ -114,7 +114,7 @@
   border-radius: 10px;
 }
 
-#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select {
+#Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select {
   height: 25px;
   width: calc(100% - 5px);
   margin: 0;
@@ -124,7 +124,7 @@
   background-color: black;
 }
 
-#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select #G2_IMU_Menu, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu {
+#Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu {
   display: none;
   flex-direction: row;
   position: absolute;
@@ -386,28 +386,6 @@
   width: 69px;
 }
 
-#Graph2 #Graph2_Mode_Select {
-  top: 15px;
-  right: 10px;
-}
-@media (max-width: 1920px) {
-  #Graph2 #Graph2_Mode_Select {
-    top: 6px;
-  }
-}
-#Graph2 #Graph2_Mode_Select:hover > #G2_Menu {
-  display: flex;
-}
-#Graph2 #Graph2_Mode_Select #G2_Menu {
-  right: -5px;
-}
-#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select:hover > #G2_IMU_Menu {
-  display: flex;
-}
-#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select #G2_IMU_Menu .IMU_Select_Button {
-  width: 70px;
-}
-
 body, html {
   width: 100%;
   background-color: #272c2e;
@@ -419,8 +397,8 @@ body, html {
   flex-direction: row;
   justify-content: space-between;
   padding-top: 150px;
-  padding-left: 7vw;
-  padding-right: 7vw;
+  padding-left: 9vw;
+  padding-right: 9vw;
 }
 @media (max-width: 1920px) {
   #Middle {
@@ -444,7 +422,7 @@ body, html {
   position: relative;
   justify-content: space-between;
   width: 35vw;
-  height: 17vh;
+  height: 35vh;
 }
 @media (max-width: 1920px) {
   #Middle .Right .Graph_Container {
@@ -484,7 +462,7 @@ body, html {
   border-color: white;
 }
 #Middle .Right .Info #Data_Folder {
-  display: flex;
+  display: none;
   width: 75px;
   height: auto;
   word-break: break-all;
@@ -499,13 +477,30 @@ body, html {
   border-width: 3px;
   border-color: white;
 }
+#Middle .Right .Info #Display_Changes {
+  display: flex;
+  justify-content: center;
+  width: 140px;
+  height: 80px;
+  color: white;
+  overflow: scroll;
+  padding: 5px;
+  border-radius: 10px;
+  margin: 4px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: white;
+}
+#Middle .Right .Info #Display_Changes::-webkit-scrollbar {
+  display: none;
+}
 
 #Bottom {
   display: flex;
   flex-direction: column;
-  padding-top: 40px;
-  padding-left: 7vw;
-  padding-right: 7vw;
+  padding-top: 60px;
+  padding-left: 9vw;
+  padding-right: 9vw;
 }
 @media (max-width: 1920px) {
   #Bottom {
@@ -556,14 +551,25 @@ body, html {
 }
 #Bottom #Edit {
   display: flex;
-  padding-top: 30px;
+  padding-top: 70px;
   justify-content: center;
   align-items: center;
   width: 100%;
 }
+@media (max-width: 1920px) {
+  #Bottom #Edit {
+    padding-top: 30px;
+  }
+}
 #Bottom #Edit #Search_Box {
-  height: 30px;
-  width: 150px;
+  height: 40px;
+  width: 200px;
+}
+@media (max-width: 1920px) {
+  #Bottom #Edit #Search_Box {
+    height: 35px;
+    width: 150px;
+  }
 }
 #Bottom #Edit #Search_Box::-webkit-search-cancel-button {
   display: none;
@@ -576,10 +582,10 @@ body, html {
   margin-right: 50px;
 }
 #Bottom #Edit #edit_bottom_left #Mark_Left_Button {
-  width: 70px;
+  width: 80px;
 }
 #Bottom #Edit #edit_bottom_left #Mark_Right_Button {
-  width: 70px;
+  width: 80px;
 }
 #Bottom #Edit #edit_bottom_right {
   margin-right: 150px;

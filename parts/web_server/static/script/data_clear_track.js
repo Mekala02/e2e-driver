@@ -132,11 +132,16 @@ class Data_Clear_Track extends Main_Track {
                         for (const element of changes){
                             if (dict["Changes"].includes(element) == 0)
                                 dict["Changes"].push(element)
+                            else{
+                                const index = dict["Changes"].indexOf(element)
+                                dict["Changes"].splice(index, 1)
+                            }
                         }
                         if (dict["Changes"].includes("Delete"))
-                            dict["Div"].style.backgroundColor = "#ff4e4e"
+                            try{dict["Div"].style.backgroundColor = "#ff4e4e"} catch{}
                         else
-                            dict["Div"].style.backgroundColor = "yellow"
+                            try{dict["Div"].style.backgroundColor = "yellow"} catch{}
+                        this.update_display_changes(dict["Changes"])
                         this.send_data({Select_List: this.outputs["Select_List"]})
                         return
                     }
@@ -154,6 +159,7 @@ class Data_Clear_Track extends Main_Track {
                     this.selected_between_div.style.backgroundColor = "yellow"
                 this.selected_between_div = 0
                 this.outputs["Select_List"].push(tmp_dict)
+                this.update_display_changes(tmp_dict["Changes"])
                 this.send_data({Select_List: this.outputs["Select_List"]})
             }
             else{
@@ -219,5 +225,27 @@ class Data_Clear_Track extends Main_Track {
                     this.add_between_mark(div, start, finish, "#ffbf00")
                 }
               })
+        }
+
+        update_display_changes(changes, ifdelete=0){
+            if (ifdelete == 1){
+                document.getElementById("Display_Changes").innerHTML = ""
+                document.getElementById("Data_Folder").style.display = "flex"
+                document.getElementById("Display_Changes").style.display = "none"
+            }
+            else{
+                var inner = ""
+                for (const change of changes){
+                    inner = inner.concat(change)
+                    inner = inner.concat("<br>")
+                }
+                document.getElementById("Display_Changes").innerHTML = inner
+                document.getElementById("Data_Folder").style.display = "none"
+                document.getElementById("Display_Changes").style.display = "flex"
+            }
+        }
+
+        Apply_Changes(){
+            
         }
 }
