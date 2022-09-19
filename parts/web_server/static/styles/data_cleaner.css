@@ -462,7 +462,7 @@ body, html {
   border-color: white;
 }
 #Middle .Right .Info #Data_Folder {
-  display: none;
+  display: flex;
   width: 75px;
   height: auto;
   word-break: break-all;
@@ -478,7 +478,7 @@ body, html {
   border-color: white;
 }
 #Middle .Right .Info #Display_Changes {
-  display: flex;
+  display: none;
   justify-content: center;
   width: 140px;
   height: 80px;
