@@ -8,6 +8,7 @@ from parts.arduino import Arduino
 from parts.data_logger import Data_Logger
 from parts.web_server.app import Web_Server
 from parts.fps_counter import FPS_Counter
+import sys
 import time
 
 vehicle = Vehicle()
@@ -27,10 +28,15 @@ vehicle.start()
 
 
 rate_hz = 200
-while True:
-    start_time = time.time()
-    vehicle.update()
-    sleep_time = 1.0 / rate_hz - (time.time() - start_time)
-    if sleep_time > 0.0:
-        time.sleep(sleep_time)
-    # vehicle.memory.print_memory()
+try:
+    while True:
+        start_time = time.time()
+        vehicle.update()
+        sleep_time = 1.0 / rate_hz - (time.time() - start_time)
+        if sleep_time > 0.0:
+            time.sleep(sleep_time)
+        # vehicle.memory.print_memory()
+except KeyboardInterrupt:
+    vehicle.shut_down()
+    print("Stopped")
+    sys.exit()

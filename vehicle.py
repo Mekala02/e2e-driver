@@ -28,3 +28,8 @@ class Vehicle:
     def update(self):
         for part in self.parts:
             part.update()
+
+    def shut_down(self):
+        for part in self.parts:
+            if callable(getattr(part, "shut_down", None)):
+                part.shut_down()
