@@ -118,4 +118,4 @@ if __name__=="__main__":
     "Left_Marker": 500, "Right_Marker": 1000, "Select_List": [], "Camera_Mode": "RGB", "Graph1_Mode": ["Steering"]}
     app.run(host='0.0.0.0', debug=True)
 
-# python .\data_cleaner_app.py c:\Users\Mekala\Documents\GitHub\e2e-driver\data
+# python .\data_cleaner_app.py c:\Users\Mekala\Documents\GitHub\e2e-driver\data\test_data
