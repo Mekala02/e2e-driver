@@ -6,10 +6,10 @@ class Main_Track {
         this.xhr = new XMLHttpRequest()
         this.button_clicked_color = "#912020"
         this.indicator_color = "red"
+        // Memory for client side javasript. On startup server will send necessery data for that output dict
         this.outputs = {}
         this.graph = {Steering: [], Throttle: [], Speed: [], Timestamp: [],
             IMU_Accel_X: [], IMU_Accel_Y: [], IMU_Accel_Z: [], IMU_Gyro_X: [], IMU_Gyro_Y: [], IMU_Gyro_Z: []}
-
         this.graph_layout = {
             autosize: true, margin: {l: 25, r: 25, b: 25, t: 25, pad: 0},
             paper_bgcolor: '#222222', plot_bgcolor: '#222222', xaxis: {showticklabels: false}, yaxis: {showticklabels: false},
@@ -20,13 +20,10 @@ class Main_Track {
             }
         }
         this.graph_trace = {x: [], y: [], type:'line', line: {color: 'red', width: 4}}
-        
-        try{this.not_record_style = document.getElementById("Record").style}
-        catch{}
-        
-
+        try{this.not_record_style = document.getElementById("Record").style} catch{}
     }
 
+    // This send data to server (python)
     send_data(data){
         this.xhr.open("POST", "/outputs", true)
         this.xhr.setRequestHeader('Content-Type', 'application/json');
@@ -34,14 +31,17 @@ class Main_Track {
         // console.log(data)
     }
 
+    // Changes divs color
     activated_color(ID, color){
         document.getElementById(ID).style.backgroundColor = color;
     }
 
+    // Changes divs color
     unactivated_color(ID){
         document.getElementById(ID).style.backgroundColor = "#00000000"
     }
     
+    // If we activate stop with optional time argument this will count
     Print_Stop_Timer(){
         stop_timer -= 1
         document.getElementById("Stop_Timer").innerHTML = stop_timer
@@ -79,6 +79,7 @@ class Main_Track {
     }
 
     turn_signal(direction){
+        // Blinking turn signal
         var arrow = document.getElementById(direction+"_Arrow")
         var arrow_stick = document.getElementById(direction+"_Arrow_Stick")
         if (arrow.style.borderColor == "white"){
@@ -103,17 +104,15 @@ class Main_Track {
                 document.getElementById(direction+"_Arrow").style.borderColor = "#ffb700"
                 document.getElementById(direction+"_Arrow_Stick").style.backgroundColor = "#ffb700"
             }
-            else{
+            else
                 this.turn_signal_interval = setInterval(this.turn_signal, 500, direction)
-            }
         }
         this.Direction = direction
         // console.log("Direction:", this.Direction)
     }
 
     Update_Lane(lane){
-        try{document.getElementById(this.Lane+"_Lane").style.visibility = "hidden"}
-        catch{}
+        try{document.getElementById(this.Lane+"_Lane").style.visibility = "hidden"} catch{}
         this.Lane = lane
         document.getElementById(this.Lane+"_Lane").style.visibility = "visible"
         // console.log("Lane:", this.lane)
@@ -133,8 +132,8 @@ class Main_Track {
     }
 
     Update_FPS(fps){
-        document.getElementById("Fps").innerHTML = fps
         this.Fps = fps
+        document.getElementById("Fps").innerHTML = this.Fps
     }
 
     Update_Graph_Mode(mode, graph=0, synchronize=0){
@@ -193,6 +192,18 @@ class Main_Track {
         Plotly.react(`Graph${graph_no}`, traces, this.graph_layout, {displayModeBar: false})
       }
 
+    Update_Steering(steering){
+        this.steering = steering
+        this.bar_lengthen("Steering", this.steering, 50)
+        // console.log('Steering: ', this.steering)
+    }
+
+    Update_Throttle(throttle){
+        this.throttle = throttle
+        this.bar_lengthen("Throttle", this.throttle, 33.33)
+        // console.log('Throttle: ', this.throttle)
+    }
+
     bar_lengthen(ID, value, center){
         var bar = document.getElementById(ID)
         var calculated_value = 0
@@ -207,18 +218,6 @@ class Main_Track {
             calculated_value = -value * center
         }
         bar.style.width = calculated_value + "%"
-    }
-
-    Update_Steering(steering){
-        this.steering = steering
-        this.bar_lengthen("Steering", this.steering, 50)
-        // console.log('Steering: ', this.steering)
-    }
-
-    Update_Throttle(throttle){
-        this.throttle = throttle
-        this.bar_lengthen("Throttle", this.throttle, 33.33)
-        // console.log('Throttle: ', this.throttle)
     }
 
     Update_Speed(speed){
@@ -239,7 +238,8 @@ class Main_Track {
     }
 
     print_record_time(){
-        record_timer+= 0.1
+        // Incrementing according to seted interval in this case 0.1
+        record_timer += 0.1
         document.getElementById("Record_Timer").innerHTML = (Math.round(record_timer * 100) / 100).toFixed(1)
     }
 
@@ -263,6 +263,9 @@ class Main_Track {
         }
     }
 
+    // We not using mode but we defined becouse it's a standart
+    // we rnning thoose functions with for loop and eval on main
+    // so hey have to take same amount of arguments
     Update_Record(mode=undefined, synchronize=0){
         if (synchronize == 0){
             if (this.outputs["Record"] == 0)

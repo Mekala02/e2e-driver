@@ -1,6 +1,23 @@
 let track = new Main_Track()
 update_interval = 30 //ms
 
+/*
+When we run our server it will render html template then calls load parameters function.
+Load parameters function loads default values on first startup, if we refresh the page
+sam thing happens but load parameters function will load stored values.
+
+We setting interval for updating client side indicators according to data we received.
+*/
+
+function load_parameters(outputs){
+  for (const [key, value] of Object.entries(outputs)) {
+      track.outputs[key] = value
+      console.log(key, value);
+    }
+    update_client_side()
+    setInterval(function() {update_indicators()}, update_interval)
+}
+
 function update_client_side(){
   for (const key in track.outputs){
       eval(`track.Update_${key}(undefined, 1)`)
@@ -15,26 +32,14 @@ function update_indicators(){
       track.Update_Taxi(inputs["Taxi"])
       track.Update_Direction(inputs["Direction"])
       track.Update_Lane(inputs["Lane"])
-
       track.Update_Steering(inputs["Steering"])
       track.Update_Throttle(inputs["Throttle"])
       track.Update_Speed(inputs["Speed"])
-
       track.Update_FPS(inputs["Fps"])
-
       for (const key in track.graph) {
         track.graph[key].push(inputs[key])
       }
   })
-}
-
-function load_parameters(outputs){
-    for (const [key, value] of Object.entries(outputs)) {
-        track.outputs[key] = value
-        console.log(key, value);
-      }
-      update_client_side()
-      setInterval(function() {update_indicators()}, update_interval)
 }
 
 setInterval(function(){track.update_graph(1)}, update_interval)

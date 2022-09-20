@@ -34,11 +34,9 @@ function update_indicators(){
       data_clear_track.Update_Taxi(inputs["Taxi"])
       data_clear_track.Update_Direction(inputs["Direction"])
       data_clear_track.Update_Lane(inputs["Lane"])
-
       data_clear_track.Update_Steering(inputs["Steering"])
       data_clear_track.Update_Throttle(inputs["Throttle"])
       data_clear_track.Update_Speed(inputs["Speed"])
-
       data_clear_track.Update_FPS(inputs["Fps"])
     })
   }
