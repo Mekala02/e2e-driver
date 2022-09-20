@@ -21,7 +21,9 @@ data = {}
 
 def generate_frames():
     while True:
+        # Geeting img id according to our data index (cursor on the bar)
         img_id = datas[client_outputs["Data_Index"]]["Img_Id"]
+        # Getting camera mode (RGB, Depth, Object_Detection)
         camera_mode = client_outputs["Camera_Mode"]
         frame_path = os.path.join(data_folder, "images", camera_mode, f"{img_id}.npy")
         frame = np.load(frame_path)
@@ -33,6 +35,7 @@ def generate_frames():
 
 @app.route('/')
 def index():
+    # Rendering template, and sending necessary data to client side
     return render_template('data_cleaner.html',  outputs={**client_outputs})
 
 @app.route('/video')
@@ -41,24 +44,29 @@ def video():
 
 @app.route('/outputs', methods=['GET', 'POST'])
 def receive_outputs():
+    # Receiving servers outputs such as camera mode etc.
     information = request.get_json()
     for key in information.keys():
+        # Updating server side (Python)
         client_outputs[key] = information[key]
     return information
 
 search_results = []
 @app.route('/search', methods=['GET', 'POST'])
 def receive_search():
+    # Finding requested search results
     search_phrase = request.get_json()
+    # Deleting whitespaces
     search_phrase = search_phrase.replace(" ", "")
+    # Clearing the previous search results
     search_results.clear()
     delimiters = ["==", ">=", "<=", ">", "<"]
     for delimiter in delimiters:
         try:
             name, value = search_phrase.split(delimiter)
+            # Making first letter capital becaouse our datas starts with capital letter
             name = name.capitalize()
             value = value.capitalize()
-            print(name, value)
             if value.isnumeric():
                 value = int(value)
             symbol = delimiter
@@ -88,21 +96,27 @@ def receive_search():
     return "a"
 
 @app.route('/search_results')
+# Sends search results
 def send_search_results():
     return jsonify(search_results)
 
+# Sends data according to our data index (cursor on the bar)
 @app.route('/inputs')
 def send_inputs():
     data = datas[client_outputs["Data_Index"]]
     return jsonify(data)
 
+# Sends graphs data
 @app.route('/graph')
 def send_graph():
     send = {}
+    # Looping over graphs requests
     for mode in client_outputs["Graph1_Mode"]:
         send[mode] = []
+    # Img id is X coordinate of the graph
     send["Img_Id"] = []
     for row in datas:
+        # Looping over all dataset and adding neccesry inputs
         send["Img_Id"].append(row["Img_Id"])
         for mode in client_outputs["Graph1_Mode"]:
             send[mode].append(row[mode])
@@ -114,8 +128,10 @@ if __name__=="__main__":
     folder_name = os.path.basename(data_folder)
     json_path = os.path.join(data_folder, "memory.json")
     datas = json.loads(open(json_path, "r").read())
+    # Default values for server startup
     client_outputs = {"Data_Lenght": len(datas), "Data_Index": 0, "Data_Folder": folder_name,
-    "Left_Marker": 500, "Right_Marker": 1000, "Select_List": [], "Camera_Mode": "RGB", "Graph1_Mode": ["Steering"]}
+    "Left_Marker": 0, "Right_Marker": 0, "Select_List": [], "Camera_Mode": "RGB", "Graph1_Mode": ["Steering"]}
+
     app.run(host='0.0.0.0', debug=True)
 
 # python .\data_cleaner_app.py c:\Users\Mekala\Documents\GitHub\e2e-driver\data\test_data
