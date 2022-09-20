@@ -258,7 +258,6 @@ class Data_Clear_Track extends Main_Track {
     }
 
     mark_search_results(search_phrase){
-
         this.xhr.open("POST", "/search", true)
         this.xhr.setRequestHeader('Content-Type', 'application/json')
         // Sending search phrase to the server (python)
@@ -293,6 +292,13 @@ class Data_Clear_Track extends Main_Track {
                 this.add_between_mark(div, start, finish, "#ffbf00")
             }
             })
+    }
+    save_changes(){
+        this.xhr.open("POST", "/save", true)
+        this.xhr.setRequestHeader('Content-Type', 'application/json')
+        // Sending search phrase to the server (python)
+        this.xhr.send(JSON.stringify(1))
+        window.alert("Saved The Changes")
     }
 
     apply_changes(){

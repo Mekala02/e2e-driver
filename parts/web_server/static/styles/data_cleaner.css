@@ -1,4 +1,4 @@
-#Bottom #Edit #Apply_Button, #Bottom #Edit #edit_bottom_right #Delete_Button, #Bottom #Edit #edit_bottom_right #Unselect_Button, #Bottom #Edit #edit_bottom_left #Mark_Right_Button, #Bottom #Edit #edit_bottom_left #Mark_Left_Button, #Bottom #Edit #Search_Box {
+#Bottom #Edit #Apply_Button, #Bottom #Edit #Save_Button, #Bottom #Edit #edit_bottom_right #Delete_Button, #Bottom #Edit #edit_bottom_right #Unselect_Button, #Bottom #Edit #edit_bottom_left #Mark_Right_Button, #Bottom #Edit #edit_bottom_left #Mark_Left_Button, #Bottom #Edit #Search_Box {
   text-align: center;
   height: 40px;
   width: 120px;
@@ -12,7 +12,7 @@
   border-radius: 10px;
 }
 @media (max-width: 1920px) {
-  #Bottom #Edit #Apply_Button, #Bottom #Edit #edit_bottom_right #Delete_Button, #Bottom #Edit #edit_bottom_right #Unselect_Button, #Bottom #Edit #edit_bottom_left #Mark_Right_Button, #Bottom #Edit #edit_bottom_left #Mark_Left_Button, #Bottom #Edit #Search_Box {
+  #Bottom #Edit #Apply_Button, #Bottom #Edit #Save_Button, #Bottom #Edit #edit_bottom_right #Delete_Button, #Bottom #Edit #edit_bottom_right #Unselect_Button, #Bottom #Edit #edit_bottom_left #Mark_Right_Button, #Bottom #Edit #edit_bottom_left #Mark_Left_Button, #Bottom #Edit #Search_Box {
     height: 35px;
     width: auto;
     font-size: 20px;
@@ -597,6 +597,9 @@ body, html {
   color: #4caf50;
 }
 #Bottom #Edit #edit_bottom_right #Delete_Button {
+  color: #ff4e4e;
+}
+#Bottom #Edit #Save_Button {
   color: #ff4e4e;
 }
 #Bottom #Edit #Apply_Button {

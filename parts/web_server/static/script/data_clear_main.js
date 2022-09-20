@@ -115,8 +115,10 @@ document.getElementById('Mark_Left_Button').addEventListener("click", function()
   data_clear_track.update_display_changes(undefined, 1)})
 document.getElementById('Mark_Right_Button').addEventListener("click", function() {data_clear_track.Update_Right_Marker(data_clear_track.outputs["Data_Index"])
   data_clear_track.update_display_changes(undefined, 1)})
-document.getElementById('Unselect_Button').addEventListener("click", function() {data_clear_track.unselect()})
+document.getElementById('Unselect_Button').addEventListener("click", function() {data_clear_track.unselect()
+  data_clear_track.update_display_changes(undefined, 1)})
 document.getElementById('Delete_Button').addEventListener("click", function() {data_clear_track.Update_Select_List(["Delete"])})
+document.getElementById('Save_Button').addEventListener("click", function() {data_clear_track.save_changes()})
 document.getElementById('Apply_Button').addEventListener("click", function() {data_clear_track.apply_changes()})
 
 
