@@ -96,36 +96,44 @@ class Data_Clear_Track extends Main_Track {
             div.style.width = "auto"
             div.style.left = start + "%"
             if (start == finish)
+                // If they are in same position we making div little larger for better visualization
                 div.style.right = 99.99 - finish + "%"
             else
                 div.style.right = 100 - finish + "%"
             div.style.backgroundColor = color
+            // Makes div unselectable on hover
             div.style.pointerEvents = "none"
-
         }
     }
 
     delete_between_mark(div){
+        // We are trying becouse someimes div doesnt exist
         try{div.remove()} catch{}
     }
 
     Update_Marker(index, marker, synchronize=0){
+        // Updates left or right markers position and adds or modifies between div accordingly
         if (synchronize == 0){
             this.outputs[`${marker}_Marker`] = index
             if (marker == "Right")
-                this.send_data({Right_Marker: this.outputs[`${marker}_Marker`]})
+                this.send_data({Right_Marker: this.outputs["Right_Marker"]})
             if (marker == "Left")
-                this.send_data({Left_Marker: this.outputs[`${marker}_Marker`]})
+                this.send_data({Left_Marker: this.outputs["Left_Marker"]})
         }
-        // Converting indexes to parent divs %
+        // Converting indexes to progress bars lenght %
         var Left = `${this.outputs[`Left_Marker`] / this.outputs["Data_Lenght"] * 100}`
         var Right = `${this.outputs["Right_Marker"] / this.outputs["Data_Lenght"] * 100}`
         if (marker == "Left")
-            document.getElementById(`${marker}_Marker`).style.left = `calc(${Left}%)`
+            // Updating position of marker
+            document.getElementById("Left_Marker").style.left = `calc(${Left}%)`
         if (marker == "Right")
-            document.getElementById(`${marker}_Marker`).style.left = `calc(${Right}% - 3px)`
+            // -3px becouse there is thickness of marker indicator
+            document.getElementById("Right_Marker").style.left = `calc(${Right}% - 3px)`
+        // Deletes old between mark
         this.delete_between_mark(this.selected_between_div)
+        // Creates new div for making it new between mark
         this.selected_between_div = document.createElement("div")
+        // Appends div to the progress bar
         document.getElementById("Progress_Bar").appendChild(this.selected_between_div)
         this.add_between_mark(this.selected_between_div, Left, Right, "rgb(63 81 181 / 70%)")
     }
@@ -138,47 +146,80 @@ class Data_Clear_Track extends Main_Track {
         this.Update_Marker(index, "Right", synchronize)
     }
 
-    // Changes is list
+    update_display_changes(changes, ifdelete=0){
+        // Updates the changes div
+        if (ifdelete == 1){
+            // If we dont have selected changes we are making this div invisible and cleaning inside
+            document.getElementById("Display_Changes").innerHTML = ""
+            document.getElementById("Data_Folder").style.display = "flex"
+            document.getElementById("Display_Changes").style.display = "none"
+        }
+        else{
+            var inner = ""
+            // We are making string for adding to inner html
+            // Br is a new line on html
+            for (const change of changes){
+                inner = inner.concat(change)
+                inner = inner.concat("<br>")
+            }
+            document.getElementById("Display_Changes").innerHTML = inner
+            document.getElementById("Data_Folder").style.display = "none"
+            document.getElementById("Display_Changes").style.display = "flex"
+        }
+    }
+
     Update_Select_List(changes, synchronize=0){
+        // Changes is a list
         if (synchronize == 0){
+            // Slect List contins dicts, thoose dicts contain: Div, Indexes[Right, Left], Changes []
             for (const dict of this.outputs["Select_List"]){
+                // Searching for dict that indexes matches with selected indexes
                 if (dict["Indexes"][0] == this.outputs["Left_Marker"] && dict["Indexes"][1] == this.outputs["Right_Marker"]){
+                    // If we found that div (if it's exist)
                     for (const element of changes){
+                        // Looking to changes list if that element doesnt exist we adding it to the list
                         if (dict["Changes"].includes(element) == 0)
                             dict["Changes"].push(element)
-                        else{
-                            const index = dict["Changes"].indexOf(element)
-                            dict["Changes"].splice(index, 1)
-                        }
+                        // If that element already exist we removing it from list
+                        // Splice command takes index and how many element you want to remove
+                        else
+                            dict["Changes"].splice(dict["Changes"].indexOf(element), 1)
                     }
+                    // If that section going to b deleted we marking it with red
+                    // Trying becouse if we refresh the page we losing the div so we cant change it color
                     if (dict["Changes"].includes("Delete"))
                         try{dict["Div"].style.backgroundColor = "#ff4e4e"} catch{}
                     else
                         try{dict["Div"].style.backgroundColor = "yellow"} catch{}
+                    // Updating changes list for seing the changes we made
                     this.update_display_changes(dict["Changes"])
                     this.send_data({Select_List: this.outputs["Select_List"]})
                     return
                 }
             }
+            // If there is no selected mark here we make one
             var tmp_dict = {}
             tmp_dict["Indexes"] = [this.outputs["Left_Marker"], this.outputs["Right_Marker"]]
             tmp_dict["Changes"] = []
+            // We are that div for later use
             tmp_dict["Div"] = this.selected_between_div
             for (const element of changes)
+                // If there is duplicates we are not saving same thing twice
                 if (tmp_dict["Changes"].includes(element) == 0)
                     tmp_dict["Changes"].push(element)
             if (changes.includes("Delete"))
                 this.selected_between_div.style.backgroundColor = "#ff4e4e"
             else
                 this.selected_between_div.style.backgroundColor = "yellow"
+            // Tis div is n longer for selected between so we removing it from selected between div
             this.selected_between_div = 0
             this.outputs["Select_List"].push(tmp_dict)
             this.update_display_changes(tmp_dict["Changes"])
             this.send_data({Select_List: this.outputs["Select_List"]})
         }
         else{
+            // If we are syncronizing after refresh looping over select list
             for (const dict of this.outputs["Select_List"]){
-                console.log(dict["Changes"])
                 // Converting indexes to % of parent div
                 var start = dict["Indexes"][0] / this.outputs["Data_Lenght"] * 100
                 var finish = dict["Indexes"][1] / this.outputs["Data_Lenght"] * 100
@@ -186,32 +227,43 @@ class Data_Clear_Track extends Main_Track {
                     var color = "#ff4e4e"
                 else
                     var color = "yellow"
-                this.div = document.createElement("div")
-                document.getElementById("Progress_Bar").appendChild(this.div)
-                this.add_between_mark(this.div, start, finish, color)
+                // Creating div
+                const div = document.createElement("div")
+                document.getElementById("Progress_Bar").appendChild(div)
+                this.add_between_mark(div, start, finish, color)
             }
         }
     }
 
     unselect(){
+        // Unselect marked section
         var left_marker = this.outputs["Left_Marker"]
         var right_marker = this.outputs["Right_Marker"]
         for (const dict of this.outputs["Select_List"]){
+            // Searching for div
             if(dict["Indexes"][0] == left_marker && dict["Indexes"][1] == right_marker){
-            const index = this.outputs["Select_List"].indexOf(this.outputs["Select_List"])
-            this.outputs["Select_List"].splice(index, 1)
-            this.delete_between_mark(dict["Div"])
-            this.send_data({Select_List: this.outputs["Select_List"]})
-            this.Update_Right_Marker(undefined, 1)
-            return
+                const index = this.outputs["Select_List"].indexOf(this.outputs["Select_List"])
+                // Removing that dict from selected list
+                this.outputs["Select_List"].splice(index, 1)
+                // Deleting the div of that dict
+                this.delete_between_mark(dict["Div"])
+                this.send_data({Select_List: this.outputs["Select_List"]})
+                // We deleting selected list div but we still selecting that section with our
+                // Left and Right cursor so in order to add between marker we using update right marker funcition
+                // with Syncronize == 1
+                this.Update_Right_Marker(undefined, 1)
+                return
             }
         }
     }
 
     mark_search_results(search_phrase){
+
         this.xhr.open("POST", "/search", true)
-        this.xhr.setRequestHeader('Content-Type', 'application/json');
+        this.xhr.setRequestHeader('Content-Type', 'application/json')
+        // Sending search phrase to the server (python)
         this.xhr.send(JSON.stringify(search_phrase))
+        // Getting search results from server (python)
         fetch("search_results")
         .then(response => response.json())
         .then(inputs => {
@@ -221,6 +273,8 @@ class Data_Clear_Track extends Main_Track {
             this.search_results_divs = []
             this.search_results_list = []
             var start_index = inputs[0]
+            // Search results are a list that contains all indexes that matches with
+            // search phrase but our mark between function takes start, finish % so we
             // Squeezing values into [start, stop] continious list
             for (var i = 0; i < inputs.length; i++){
                 if(inputs[i] + 1 != inputs[i+1]){
@@ -233,7 +287,7 @@ class Data_Clear_Track extends Main_Track {
                 var div = document.createElement("div")
                 document.getElementById("Progress_Bar").appendChild(div)
                 this.search_results_divs.push(div)
-                // Converting indexes to % of parent div
+                // Converting indexes to %
                 var start = between[0] / this.outputs["Data_Lenght"] * 100
                 var finish = between[1] / this.outputs["Data_Lenght"] * 100
                 this.add_between_mark(div, start, finish, "#ffbf00")
@@ -241,25 +295,7 @@ class Data_Clear_Track extends Main_Track {
             })
     }
 
-    update_display_changes(changes, ifdelete=0){
-        if (ifdelete == 1){
-            document.getElementById("Display_Changes").innerHTML = ""
-            document.getElementById("Data_Folder").style.display = "flex"
-            document.getElementById("Display_Changes").style.display = "none"
-        }
-        else{
-            var inner = ""
-            for (const change of changes){
-                inner = inner.concat(change)
-                inner = inner.concat("<br>")
-            }
-            document.getElementById("Display_Changes").innerHTML = inner
-            document.getElementById("Data_Folder").style.display = "none"
-            document.getElementById("Display_Changes").style.display = "flex"
-        }
-    }
-
-    Apply_Changes(){
+    apply_changes(){
         
     }
 }
