@@ -1,4 +1,4 @@
-# e2e-driver
+# E2E Driver
 End To End Autonomous Driving Car
 
 This is a ongoing project !
