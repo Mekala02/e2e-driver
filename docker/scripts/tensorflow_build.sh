@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 L4T_VERSION="35.1.0"
 OPENCV_URL="https://nvidia.box.com/shared/static/2hssa5g3v28ozvo3tc3qwxmn78yerca9.gz"
 OPENCV_DEB="OpenCV-4.5.0-aarch64.tar.gz"

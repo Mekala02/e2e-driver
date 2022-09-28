@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# this script installs OpenCV from deb packages that it downloads
-# the opencv_version.sh script selects which packages to use
 
+# this script installs OpenCV from deb packages
 set -e -x
 
 OPENCV_URL=$1
