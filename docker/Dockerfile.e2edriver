@@ -139,7 +139,7 @@ ARG OPENCV_URL=https://nvidia.box.com/shared/static/5v89u6g5rb62fpz4lh0rz531ajo2
 ARG OPENCV_DEB=OpenCV-4.5.0-aarch64.tar.gz
 
 COPY scripts/opencv_install.sh /tmp/opencv_install.sh
-RUN cd /tmp && ./opencv_install.sh ${OPENCV_URL} ${OPENCV_DEB}
+RUN cd /tmp && bash opencv_install.sh ${OPENCV_URL} ${OPENCV_DEB}
 
 
 #

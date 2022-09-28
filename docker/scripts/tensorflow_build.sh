@@ -12,7 +12,7 @@ protobuf_version="3.20.1"
 
 CONTAINER=$tensorflow_tag
 
-#sudo cp cuda-devel.csv /etc/nvidia-container-runtime/host-files-for-container.d/
+cd ..
 echo "building TensorFlow $tensorflow_whl, $tensorflow_tag"
 echo "Building $CONTAINER container..."
 

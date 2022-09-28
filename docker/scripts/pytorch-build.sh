@@ -15,6 +15,7 @@ cuda_arch_list="7.2;8.7"
 
 CONTAINER=$pytorch_tag
 
+cd ..
 echo "building PyTorch $pytorch_whl, torchvision $vision_version, torchaudio $audio_version, cuda arch $cuda_arch_list"
 echo "Building $CONTAINER container..."
 
