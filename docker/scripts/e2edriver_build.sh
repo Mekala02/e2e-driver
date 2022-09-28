@@ -10,7 +10,7 @@ PYTHON3_VERSION="3.8"
 
 echo "Building $CONTAINER container..."
 
-sudo docker build --network=host -t e2e-Driver -f Dockerfile.e2edriver \
+sudo docker build --network=host -t e2e-driver -f Dockerfile.e2edriver \
 		--build-arg BASE_IMAGE=$BASE_IMAGE \
 		--build-arg PYTORCH_IMAGE=l4t-pytorch:r$L4T_VERSION-pth1.13-py3 \
 		--build-arg TENSORFLOW_IMAGE=l4t-tensorflow:r$L4T_VERSION-tf1.15-py3 \
