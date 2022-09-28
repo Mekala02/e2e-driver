@@ -5,6 +5,11 @@ This is a ongoing project!
 
 My objective is making autonomous driving car with end to end learning.
 
+Using Jetson Xavier JetPack 5.0.2 --- r35.1.0</br>
+For pulling docker image:
+```bash
+sudo docker pull mekala02/e2e-driver
+```
 
 Current Features:
 &nbsp;
