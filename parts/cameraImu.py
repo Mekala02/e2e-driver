@@ -72,4 +72,7 @@ class Camera_IMU:
         
         self.memory.big_memory["RGB"] = self.RGB_image
         self.memory.big_memory["Depth"] = self.depth_image
-        self.memory.big_memory["Object_Detection"] = self.RGB_image
+        self.memory.big_memory["Object_Detection"] = 0
+
+    def shut_down(self):
+        self.zed.close()

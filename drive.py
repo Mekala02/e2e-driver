@@ -27,7 +27,7 @@ vehicle.add(FPS_Counter())
 vehicle.start()
 
 
-rate_hz = 200
+rate_hz = 20000
 try:
     while True:
         start_time = time.time()
