@@ -20,10 +20,9 @@ class Vehicle:
                 for big_output, value in part.big_outputs.items():
                     self.memory.add_big(big_output, value)
             if part.threaded:
-                t = Thread(target=part.start_thread, args=(), name=part.__class__.__name__)
-                t.daemon = True
+                t = Thread(target=part.start_thread, args=(), daemon=True, name=part.__class__.__name__)
                 t.start()
-            time.sleep(0.01)
+            time.sleep(0.02)
 
     def update(self):
         for part in self.parts:

@@ -4,6 +4,7 @@ class Camera_IMU:
     def __init__(self):
         self.threaded = True
         self.memory = 0
+        self.run = True
         self.outputs = {"IMU_Accel_X": 0, "IMU_Accel_Y": 0, "IMU_Accel_Z": 0, "IMU_Gyro_X": 0, "IMU_Gyro_Y": 0, "IMU_Gyro_Z": 0}
         self.big_outputs = {"RGB": 0, "Depth": 0, "Object_Detection": 0}
         self.RGB_image = 0
@@ -61,7 +62,7 @@ class Camera_IMU:
             print(err)
 
     def start_thread(self):
-        while True:
+        while self.run:
             self.generate_frames()
 
     def update(self):
@@ -78,4 +79,5 @@ class Camera_IMU:
         self.memory.big_memory["Object_Detection"] = 0
 
     def shut_down(self):
+        self.run = False
         self.zed.close()
