@@ -1,8 +1,10 @@
 from flask import Flask, render_template, Response, request, jsonify
 from waitress import serve
+import logging
 import time
 import cv2
 
+logger = logging.getLogger(__name__)
 app=Flask(__name__)
 
 queue = set()
@@ -61,6 +63,7 @@ class Web_Server:
         self.memory = 0
         self.run = True
         self.outputs = outputs
+        logger.info("Successfully Added")
 
     def update_vehicle_memory(self):
         # Updates outputs(to vehicle) coming from web server client side
@@ -77,6 +80,7 @@ class Web_Server:
         camera["Is_New"] = True
 
     def start_thread(self):
+        logger.info("Starting Thread")
         serve(app, host="0.0.0.0", port=8080)
         
     def update(self):
@@ -85,6 +89,7 @@ class Web_Server:
 
     def shut_down(self):
         self.run = False
+        logger.info("Stopped")
 
 
 if __name__=="__main__":

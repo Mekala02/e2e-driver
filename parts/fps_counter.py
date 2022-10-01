@@ -1,3 +1,7 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
 class FPS_Counter:
     def __init__(self):
         self.threaded = False
@@ -8,6 +12,7 @@ class FPS_Counter:
         self.past_time = 0
         self.epsilon = 10 ** -6
         self.counter = 0
+        logger.info("Successfully Added")
 
     def update(self):
         timestamp = self.memory.memory["Timestamp"]
@@ -21,6 +26,7 @@ class FPS_Counter:
 
     def shut_down(self):
         self.run = False
+        logger.info("Stopped")
 
         # timestamp = self.memory.memory["timestamp"]
         # self.memory.memory["fps"] = round(1000 / ((timestamp - self.past_time) + self.epsilon))

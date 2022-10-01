@@ -1,5 +1,8 @@
 from threading import Thread
+import logging
 import time
+
+logger = logging.getLogger(__name__)
 
 class Vehicle:
     def __init__(self):
@@ -12,6 +15,7 @@ class Vehicle:
         part.memory = self.memory
 
     def start(self):
+        logger.info("Starting parts \n")
         for part in self.parts:
             # Adding parts output to the memory
             for output, value in part.outputs.items():
@@ -31,3 +35,4 @@ class Vehicle:
     def shut_down(self):
         for part in self.parts:
             part.shut_down()
+        logger.info("Stopped")

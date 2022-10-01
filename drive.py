@@ -1,3 +1,7 @@
+import logging
+import sys
+import time
+
 from vehicle import Vehicle
 from parts.memory import Memory
 from parts.cameraImu import Camera_IMU
@@ -8,13 +12,16 @@ from parts.arduino import Arduino
 from parts.data_logger import Data_Logger
 from parts.web_server.app import Web_Server
 from parts.fps_counter import FPS_Counter
-import sys
-import time
+
+logger = logging.getLogger("drive")
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: @ %(name)s %(message)s")
+
 
 vehicle = Vehicle()
 
 vehicle.memory = Memory()
 
+logger.info("Adding parts to vehicle ... \n")
 vehicle.add(Camera_IMU())
 vehicle.add(Yolo())
 vehicle.add(Copilot())
@@ -26,7 +33,7 @@ vehicle.add(FPS_Counter())
 
 vehicle.start()
 
-
+logger.info("Starting the drive loop \n")
 rate_hz = 20000
 try:
     while True:
@@ -38,5 +45,5 @@ try:
         # vehicle.memory.print_memory()
 except KeyboardInterrupt:
     vehicle.shut_down()
-    print("Stopped")
+    logger.info("Vehicle Shut Down \n")
     sys.exit()

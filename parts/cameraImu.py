@@ -1,4 +1,7 @@
 import pyzed.sl as sl
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Camera_IMU:
     def __init__(self):
@@ -25,8 +28,8 @@ class Camera_IMU:
             coordinate_system=sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP
         )
 
-        if self.zed.open(self.init_params) != sl.ERROR_CODE.SUCCESS:
-            print("Error")
+        if err:=self.zed.open(self.init_params) != sl.ERROR_CODE.SUCCESS:
+            logger.error(err)
 
         self.runtime_parameters = sl.RuntimeParameters()
         self.zed_RGB = sl.Mat(self.zed.get_camera_information().camera_resolution.width,
@@ -35,10 +38,10 @@ class Camera_IMU:
             sl.MEM.CPU)
         self.zed_depth = sl.Mat()
         self.sensors_data = sl.SensorsData()
+        logger.info("Successfully Added")
 
     def generate_frames(self):
-        err = self.zed.grab(self.runtime_parameters)
-        if err == sl.ERROR_CODE.SUCCESS:
+        if err:= self.zed.grab(self.runtime_parameters) == sl.ERROR_CODE.SUCCESS:
             # A new image is available if grab() returns SUCCESS
             self.zed.retrieve_image(self.zed_RGB, sl.VIEW.LEFT)
             self.RGB_image = self.zed_RGB.get_data()
@@ -59,9 +62,10 @@ class Camera_IMU:
             self.IMU_Gyro_Z = angular_velocity[2]
 
         else:
-            print(err)
+            logger.error(err)
 
     def start_thread(self):
+        logger.info("Starting Thread")
         while self.run:
             self.generate_frames()
 
@@ -81,3 +85,4 @@ class Camera_IMU:
     def shut_down(self):
         self.run = False
         self.zed.close()
+        logger.info("Stopped")

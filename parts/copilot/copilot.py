@@ -1,4 +1,7 @@
+import logging
 import random
+
+logger = logging.getLogger(__name__)
 
 class Copilot:
     def __init__(self):
@@ -10,6 +13,7 @@ class Copilot:
         self.directions = ["Left", "Forward", "Right"]
         self.lanes = ["Left", "Right"]
         self.counter = 0
+        logger.info("Successfully Added")
 
     def update(self):
         self.counter += 1
@@ -21,3 +25,4 @@ class Copilot:
 
     def shut_down(self):
         self.run = False
+        logger.info("Stopped")

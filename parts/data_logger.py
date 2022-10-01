@@ -4,6 +4,9 @@ import os
 import time
 import numpy as np
 import threading
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Data_Logger:
     def __init__(self):
@@ -25,6 +28,8 @@ class Data_Logger:
         self.file = open(os.path.join(data_folder, "memory.json"), "w+")
         self.file.write("[")
         self.index = 0
+        logger.info("Successfully Added")
+        logger.info(f"Data_Folder: {data_folder}")
 
     def save_to_file(self, path, data):
         np.save(path, data)
@@ -56,25 +61,21 @@ class Data_Logger:
         self.run = False
         # Move the pointer (similar to a cursor in a text editor) to the end of the file
         self.file.seek(0, os.SEEK_END)
-
         # This code means the following code skips the very last character in the file -
         # i.e. in the case the last line is null we delete the last line
         # and the penultimate one
         pos = self.file.tell() - 1
-
         # Read each character in the file one at a time from the penultimate
         # character going backwards, searching for a newline character
         # If we find a new line, exit the search
         while pos > 0 and self.file.read(1) != ",":
             pos -= 1
             self.file.seek(pos, os.SEEK_SET)
-
         # So long as we're not at the start of the file, delete all the characters ahead
         # of this position
         if pos > 0:
             self.file.seek(pos, os.SEEK_SET)
             self.file.truncate()
-
         self.file.write(']')
-
         self.file.close()
+        logger.info("Stopped")
