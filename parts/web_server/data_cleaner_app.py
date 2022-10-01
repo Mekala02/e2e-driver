@@ -158,7 +158,7 @@ if __name__=="__main__":
     datas = json.loads(open(json_path, "r").read())
     # Default values for server startup
     client_outputs = {"Data_Lenght": len(datas), "Data_Index": 0, "Data_Folder": folder_name,
-    "Left_Marker": 0, "Right_Marker": 0, "Select_List": [], "Camera_Mode": "RGB", "Graph1_Mode": ["Steering"]}
+    "Left_Marker": 0, "Right_Marker": 0, "Select_List": [], "Camera_Mode": "RGB_Image", "Graph1_Mode": ["Steering"]}
 
     app.run(host='0.0.0.0', debug=True)
 

@@ -13,8 +13,8 @@ from parts.data_logger import Data_Logger
 from parts.web_server.app import Web_Server
 from parts.fps_counter import FPS_Counter
 
-logger = logging.getLogger("drive")
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: @ %(name)s %(message)s")
+logger = logging.getLogger("drive")
 
 
 vehicle = Vehicle()

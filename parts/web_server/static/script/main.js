@@ -47,9 +47,9 @@ setInterval(function(){track.update_graph(2)}, update_interval)
 
 document.getElementById("Emergency_Button").addEventListener("click", function() {track.Emergency_Stop()})
 
-document.getElementById('C_RGB').addEventListener("click", function() {track.Update_Camera_Mode("RGB")});
-document.getElementById('C_Depth').addEventListener("click", function() {track.Update_Camera_Mode("Depth")});
-document.getElementById('C_Object_Detection').addEventListener("click", function() {track.Update_Camera_Mode("Object_Detection")});
+document.getElementById('C_RGB_Image').addEventListener("click", function() {track.Update_Camera_Mode("RGB_Image")});
+document.getElementById('C_Depth_Image').addEventListener("click", function() {track.Update_Camera_Mode("Depth_Image")});
+document.getElementById('C_Object_Detection_Image').addEventListener("click", function() {track.Update_Camera_Mode("Object_Detection_Image")});
 
 document.getElementById('G1_Steering').addEventListener("click", function() {track.Update_Graph_Mode("Steering", 1)});
 document.getElementById('G1_Throttle').addEventListener("click", function() {track.Update_Graph_Mode("Throttle", 1)});

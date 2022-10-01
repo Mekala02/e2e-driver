@@ -20,12 +20,12 @@ inputs = {}
 # tracking if there is new image on it
 camera = {"Is_New": False}
 
-web_special = {"Camera_Mode": "RGB", "Graph1_Mode": ["Steering"], "Graph2_Mode": ["Throttle"]}
+web_special = {"Camera_Mode": "RGB_Image", "Graph1_Mode": ["Steering"], "Graph2_Mode": ["Throttle"]}
 
 def generate_frames():
     while True:
         if camera["Is_New"]:
-            frame = camera[web_special["Camera_Mode"]]
+            frame = camera["frame"]
             ret, buffer = cv2.imencode('.jpg', frame)
             frame=buffer.tobytes()
             yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -75,8 +75,7 @@ class Web_Server:
         # Updates Inputs(to web server) coming from vehicle
         for key in self.memory.memory:
             inputs[key] = self.memory.memory[key]
-        for key in self.memory.big_memory:
-            camera[key] = self.memory.big_memory[key]
+        camera["frame"] = self.memory.big_memory[web_special["Camera_Mode"]]
         camera["Is_New"] = True
 
     def start_thread(self):

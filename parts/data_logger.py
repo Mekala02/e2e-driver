@@ -15,15 +15,14 @@ class Data_Logger:
         self.run = True
         self.outputs = {"Img_Id": 0, "Timestamp": 0}
 
-        # self.save_list = {"Img_Id": 0, "Timestamp": 0, "Steering": 0, "Throttle": 0, "Speed": 0, "IMU": 0, "Direction": 0, "Lane": 0, "Stop": 0, "Taxi": 0, "Pilot": 0, "Route": 0}
         new_folder_name = datetime.datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
         data_folder = os.path.join("data", new_folder_name)
         os.mkdir(data_folder)
-        self.images_folder = os.path.join(data_folder, "images")
-        os.mkdir(self.images_folder)
-        os.mkdir(os.path.join(self.images_folder, "Depth"))
-        os.mkdir(os.path.join(self.images_folder, "RGB"))
-        os.mkdir(os.path.join(self.images_folder, "Object_Detection"))
+        self.big_folder = os.path.join(data_folder, "big_data")
+        os.mkdir(self.big_folder)
+        os.mkdir(os.path.join(self.big_folder, "Depth"))
+        os.mkdir(os.path.join(self.big_folder, "RGB"))
+        os.mkdir(os.path.join(self.big_folder, "Object_Detection"))
 
         self.file = open(os.path.join(data_folder, "memory.json"), "w+")
         self.file.write("[")
@@ -43,18 +42,15 @@ class Data_Logger:
         self.memory.memory["Img_Id"] = self.index
         self.memory.memory["Timestamp"] = int(time.time_ns() * 1e-6)
         if self.memory.memory["Record"]:
-            # for key, value in self.memory.memory.items():
-            #     if key in self.save_list:
-            #         self.save_list[key] = self.memory.memory[key]
-            # json.dump(self.save_list, self.file)
             self.save_json(self.file, self.memory.memory)
-            for key, value in self.memory.big_memory.items():
-                t = threading.Thread(target=self.save_to_file,
-                    args=([os.path.join(self.images_folder, key, f"{self.index}.npy"), value]),
-                    daemon=True,
-                    name=key)
-                t.start()
-                break
+            threading.Thread(target=self.save_to_file,
+                args=([os.path.join(self.big_folder, "RGB", f"{self.index}.npy"),self.memory.big_memory["RGB_Image"]]),
+                daemon=True,
+                name="Rgb_Image").start()
+            threading.Thread(target=self.save_to_file,
+                args=([os.path.join(self.big_folder, "Depth", f"{self.index}.npy"),self.memory.big_memory["Depth_Array"]]),
+                daemon=True,
+                name="Depth_Array").start()
             self.index += 1
     
     def shut_down(self):

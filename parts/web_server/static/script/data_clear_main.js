@@ -64,9 +64,9 @@ document.getElementById("Left_Lane").addEventListener("click", function() {data_
 document.getElementById("Right_Lane").addEventListener("click", function() {data_clear_track.Update_Select_List(["Right_Lane"])})
 document.getElementById("Emergency_Button").addEventListener("click", function() {data_clear_track.Emergency_Stop()})
 
-document.getElementById('C_RGB').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("RGB")})
-document.getElementById('C_Depth').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("Depth")})
-document.getElementById('C_Object_Detection').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("Object_Detection")})
+document.getElementById('C_RGB_Image').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("RGB_Image")})
+document.getElementById('C_Depth_Image').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("Depth_Image")})
+document.getElementById('C_Object_Detection_Image').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("Object_Detection_Image")})
 
 document.getElementById('G1_Steering').addEventListener("click", function() {update_graph("Steering")})
 document.getElementById('G1_Throttle').addEventListener("click", function() {update_graph("Throttle")})
