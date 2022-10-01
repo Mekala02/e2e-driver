@@ -18,7 +18,7 @@ class Camera_IMU:
         self.zed = sl.Camera()
         self.init_params = sl.InitParameters(
             camera_resolution = sl.RESOLUTION.VGA,
-            camera_fps = 100,
+            camera_fps = 90,
             depth_mode=sl.DEPTH_MODE.ULTRA,
             coordinate_units=sl.UNIT.METER,
             coordinate_system=sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP
@@ -28,7 +28,10 @@ class Camera_IMU:
             print("Error")
 
         self.runtime_parameters = sl.RuntimeParameters()
-        self.zed_RGB = sl.Mat()
+        self.zed_RGB = sl.Mat(self.zed.get_camera_information().camera_resolution.width,
+            self.zed.get_camera_information().camera_resolution.height,
+            sl.MAT_TYPE.U8_C4,
+            sl.MEM.CPU)
         self.zed_depth = sl.Mat()
         self.sensors_data = sl.SensorsData()
 
