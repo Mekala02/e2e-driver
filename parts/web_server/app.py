@@ -1,4 +1,5 @@
 from flask import Flask, render_template, Response, request, jsonify
+from waitress import serve
 import time
 import cv2
 
@@ -76,7 +77,7 @@ class Web_Server:
         camera["Is_New"] = True
 
     def start_thread(self):
-        app.run(host="0.0.0.0")
+        serve(app, host="0.0.0.0", port=8080)
         
     def update(self):
         self.update_vehicle_memory()
