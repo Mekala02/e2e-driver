@@ -20,7 +20,7 @@ class Vehicle:
                 for big_output, value in part.big_outputs.items():
                     self.memory.add_big(big_output, value)
             if part.threaded:
-                t = Thread(target=part.start_thread, args=())
+                t = Thread(target=part.start_thread, args=(), name=part.__class__.__name__)
                 t.daemon = True
                 t.start()
             time.sleep(0.01)

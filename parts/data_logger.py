@@ -43,9 +43,15 @@ class Data_Logger:
             # json.dump(self.save_list, self.file)
             self.save_json(self.file, self.memory.memory)
             for key, value in self.memory.big_memory.items():
-                threading.Thread(target=self.save_to_file, args=([os.path.join(self.images_folder, key, f"{self.index}.npy"), value]), daemon=True).start()
+                t = threading.Thread(target=self.save_to_file,
+                    args=([os.path.join(self.images_folder, key, f"{self.index}.npy"), value]),
+                    daemon=True,
+                    name=key)
+                t.start()
                 break
             self.index += 1
+
+            t.join()
     
     def shut_down(self):
         # Move the pointer (similar to a cursor in a text editor) to the end of the file
