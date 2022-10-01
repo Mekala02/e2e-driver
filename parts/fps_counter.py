@@ -2,7 +2,9 @@ class FPS_Counter:
     def __init__(self):
         self.threaded = False
         self.memory = 0
+        self.run = True
         self.outputs = {"Fps": 0}
+        
         self.past_time = 0
         self.epsilon = 10 ** -6
         self.counter = 0
@@ -17,6 +19,8 @@ class FPS_Counter:
         else:
             self.counter += 1
 
+    def shut_down(self):
+        self.run = False
 
         # timestamp = self.memory.memory["timestamp"]
         # self.memory.memory["fps"] = round(1000 / ((timestamp - self.past_time) + self.epsilon))

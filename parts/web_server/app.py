@@ -58,6 +58,7 @@ class Web_Server:
     def __init__(self):
         self.threaded = True
         self.memory = 0
+        self.run = True
         self.outputs = outputs
 
     def update_vehicle_memory(self):
@@ -80,6 +81,9 @@ class Web_Server:
     def update(self):
         self.update_vehicle_memory()
         self.update_local_memory()
+
+    def shut_down(self):
+        self.run = False
 
 
 if __name__=="__main__":

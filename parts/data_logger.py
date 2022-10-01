@@ -9,6 +9,7 @@ class Data_Logger:
     def __init__(self):
         self.threaded = False
         self.memory = 0
+        self.run = True
         self.outputs = {"Img_Id": 0, "Timestamp": 0}
 
         # self.save_list = {"Img_Id": 0, "Timestamp": 0, "Steering": 0, "Throttle": 0, "Speed": 0, "IMU": 0, "Direction": 0, "Lane": 0, "Stop": 0, "Taxi": 0, "Pilot": 0, "Route": 0}
@@ -52,6 +53,7 @@ class Data_Logger:
             self.index += 1
     
     def shut_down(self):
+        self.run = False
         # Move the pointer (similar to a cursor in a text editor) to the end of the file
         self.file.seek(0, os.SEEK_END)
 

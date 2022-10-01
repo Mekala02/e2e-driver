@@ -1,6 +1,5 @@
 class Memory:
     def __init__(self):
-
         self.memory = {}
         self.big_memory = {}
 
