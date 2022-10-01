@@ -50,8 +50,6 @@ class Data_Logger:
                 t.start()
                 break
             self.index += 1
-
-            t.join()
     
     def shut_down(self):
         # Move the pointer (similar to a cursor in a text editor) to the end of the file
