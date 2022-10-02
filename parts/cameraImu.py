@@ -25,7 +25,7 @@ class Camera_IMU:
             camera_fps = 90,
             depth_mode=sl.DEPTH_MODE.ULTRA,
             coordinate_units=sl.UNIT.MILLIMETER,
-            coordinate_system=sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP
+            coordinate_system=sl.COORDINATE_SYSTEM.RIGHT_HANDED_Z_UP
         )
 
         if err:=self.zed.open(self.init_params) != sl.ERROR_CODE.SUCCESS:
