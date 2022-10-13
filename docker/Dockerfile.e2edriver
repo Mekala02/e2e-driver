@@ -155,10 +155,21 @@ RUN apt-get install --no-install-recommends lsb-release wget less udev sudo apt-
     rm -rf /usr/local/zed/resources/* \
     rm -rf ZED_SDK_Linux.run && \
     rm -rf /var/lib/apt/lists/*
-
-#This symbolic link is needed to use the streaming features on Jetson inside a container
+# This symbolic link is needed to use the streaming features on Jetson inside a container
 RUN ln -sf /usr/lib/aarch64-linux-gnu/tegra/libv4l2.so.0 /usr/lib/aarch64-linux-gnu/libv4l2.so
 
+#
+# In final version thoose will be in up
+# (opencv cd s /tmp when you edit change add it cd .. and Arduino cli cd into /tmp again)
 RUN pip3 install --no-cache-dir --verbose waitress
+RUN pip3 install --no-cache-dir --verbose docopt
+
+#
+# Arduino Cli
+#
+RUN wget https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARM64.tar.gz && \
+	tar -xvf arduino-cli_latest_Linux_ARM64.tar.gz && \
+	mv arduino-cli /usr/bin
+RUN arduino-cli core install arduino:avr
 
 WORKDIR /root
