@@ -8,7 +8,7 @@ from parts.cameraImu import Camera_IMU
 from parts.object_detection.yolo import Yolo
 from parts.copilot.copilot import Copilot
 from parts.pilot.pilot import Pilot
-from parts.arduino import Arduino
+from parts.arduino.arduino import Arduino
 from parts.data_logger import Data_Logger
 from parts.web_server.app import Web_Server
 from parts.fps_counter import FPS_Counter
