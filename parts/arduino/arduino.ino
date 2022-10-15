@@ -1,10 +1,14 @@
 #include <Servo.h>
 
+int readChannel(int channelInput, int defaultValue);
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max);
+
 #define CH1_PIN 3
 #define CH2_PIN 5
 #define CH3_PIN 6
 #define ESC_PIN 9
 #define Servo_PIN 10
+#define ENCODER_PIN 2
 
 #define THROTTLE_FORWARD_PWM 500
 #define THROTTLE_STOPPED_PWM 370
@@ -17,10 +21,10 @@
 String pyserial_data;
 float pyserial_throttle;
 float pyserial_steering;
-float speed = 0;
 
-int readChannel(int channelInput, int defaultValue);
-float mapfloat(float x, float in_min, float in_max, float out_min, float out_max);
+unsigned long encoder_last_time;
+unsigned int pulses = 0;
+float speed = 0;
 
 Servo throttle;
 Servo steering;
@@ -30,12 +34,34 @@ void setup() {
     pinMode(CH2_PIN, INPUT);
     throttle.attach(ESC_PIN);
     steering.attach(Servo_PIN);
+    pinMode(ENCODER_PIN, INPUT);
+    attachInterrupt(digitalPinToInterrupt(ENCODER_PIN), []{pulses++;}, FALLING );
     Serial.begin(115200);
 }
 
 float steering_value, throttle_value;
 
 void loop() {
+    // Reading serial input
+	if(Serial.available() > 0) {
+		pyserial_data =  Serial.readStringUntil('\r');
+		// Serial.print(pyserial_data);
+	}
+
+    int deliminator_index = 0;
+    if (pyserial_data[0] == 't'){
+        for (int i = 1; i < pyserial_data.length(); i++) {
+            if (pyserial_data[i] == 's'){
+                pyserial_throttle = pyserial_data.substring(1, i).toFloat();
+                // Serial.print(pyserial_throttle);
+                deliminator_index = i;
+            }
+            else if (pyserial_data[i] == 'e'){
+                pyserial_steering = pyserial_data.substring(deliminator_index+1, i).toFloat();
+                break;
+            }
+        }
+    }
     // If value equals to 10 that means we are in manuel mode
     // Received steering and throttle values are between -1 and 1
     // We have to convert them to pwm
@@ -56,27 +82,15 @@ void loop() {
     throttle.writeMicroseconds(throttle_value);
     steering.writeMicroseconds(steering_value);
 
-    Serial.println("t" + String(mapfloat(throttle_value, 900, 2000, -1, 1)) + "s" + String(mapfloat(steering_value, 900, 2000, -1, 1)) + "v" + String(speed) + "e");
-
-	if(Serial.available() > 0) {
-		pyserial_data =  Serial.readStringUntil('\r');
-		// Serial.print(pyserial_data);
-	}
-
-    int deliminator_index = 0;
-    if (pyserial_data[0] == 't'){
-        for (int i = 1; i < pyserial_data.length(); i++) {
-            if (pyserial_data[i] == 's'){
-                pyserial_throttle = pyserial_data.substring(1, i).toFloat();
-                // Serial.print(pyserial_throttle);
-                deliminator_index = i;
-            }
-            else if (pyserial_data[i] == 'e'){
-                pyserial_steering = pyserial_data.substring(deliminator_index+1, i).toFloat();
-                break;
-            }
-        }
+    // Calculating speed at certain rate
+    if (millis() - encoder_last_time > 100){
+        speed = (60 * 100 / 20) / (millis() - encoder_last_time) * pulses;
+        pulses = 0;
+        encoder_last_time = millis();
     }
+
+    Serial.println("t" + String(mapfloat(throttle_value, 900, 2000, -1, 1)) + "s" + String(mapfloat(steering_value, 900, 2000, -1, 1)) + "v" + String(pulses) + "e");
+
 }
 
 float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
