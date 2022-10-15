@@ -70,7 +70,8 @@ class Camera_IMU:
         else:
             logger.error(err)
         # Giving time for other threads
-        time.wait(0.001) # Limiting the max loop count to 1000 per second
+        # Limiting the max loop count to 500 per second
+        time.sleep(0.002)
 
     def start_thread(self):
         logger.info("Starting Thread")
