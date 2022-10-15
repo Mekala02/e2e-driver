@@ -1,4 +1,5 @@
 import pyzed.sl as sl
+import time
 import logging
 
 logger = logging.getLogger(__name__)
@@ -66,9 +67,10 @@ class Camera_IMU:
             self.IMU_Gyro_X = angular_velocity[0]
             self.IMU_Gyro_Y = angular_velocity[1]
             self.IMU_Gyro_Z = angular_velocity[2]
-
         else:
             logger.error(err)
+        # Giving time for other threads
+        time.wait(0.001) # Limiting the max loop count to 1000 per second
 
     def start_thread(self):
         logger.info("Starting Thread")
