@@ -26,29 +26,28 @@ class Arduino:
         while self.run:
             while (self.arduino.in_waiting > 0):
                 buffer = self.arduino.readline().decode('utf-8')
-            # print(data)
             # Looking if data is right format
             if buffer and buffer[0] == "t":
-                # re.search(r"t\d+.\d+s\d+.\d+v\d+.\d+e", data)
+                # re.search(r"t\d+.\d+s\d+.\d+v\d+.\d+e", data) // todo
                 data_array = re.split(r't|s|v|e', buffer)
                 self.Throttle = float(data_array[1])
                 self.Steering = float(data_array[2])
                 self.Speed = float(data_array[3])
-
             time.sleep(0.003)
 
     def update(self):
+        # self.Throttle, self.Steering and self.Speed values comes from arduino
+        # We writing or not writing those values to memory acording to driving mode
         self.memory.memory["Speed"] = self.Speed
         if self.memory.memory["Pilot_Mode"] == "Angle":
             self.memory.memory["Throttle"] = self.Throttle
         elif self.memory.memory["Pilot_Mode"] == "Manuel":
             self.memory.memory["Throttle"] = self.Throttle
             self.memory.memory["Steering"] = self.Steering
-
-        # We want to send the data as fast as we can so we are only sending 2 float, that
-        # floats encode motor power and drive mode parameters to throttle and steering values
-        # If that float is -1 < float < 1 arduino will use that value to drive motors
-        # If float is = 10 arduino won't use that values for controlling the motors 
+        # We want to send the data as fast as we can so we are only sending 2 char, those
+        # chars encode motor power and drive mode parameters to throttle and steering values
+        # If char is -1 < char < 1 arduino will use that value to drive motors
+        # If char is = 10 arduino won't use that values for controlling the motors
         pilot_mode_string = self.memory.memory["Pilot_Mode"]
         motor_power = self.memory.memory["Motor_Power"]
         if pilot_mode_string == "Manuel":
@@ -60,20 +59,21 @@ class Arduino:
         elif pilot_mode_string == "Full_Auto":
             throttle = self.memory.memory["Throttle"] * motor_power
             steering = self.memory.memory["Steering"]
-
         # t is for stating start of throttle value s is for steering and e is for end, \r for read ending
         formatted_data = "t" + str(throttle) + "s" + str(steering) + 'e' + '\r'
-
         try:
             self.arduino.write(formatted_data.encode())
         except Exception as e:
-            # print(e)
+            # logger.warning(e)
             pass
         else:
-            # print("succes!!!")
+            # logger.info("Succes !!!")
             pass
 
     def shut_down(self):
         self.run = False
+        # If we reading from arduino and close the port that
+        # will cause error so we waiting to finish reading then close
+        time.sleep(0.03)
         self.arduino.close()
         logger.info("Stopped")
