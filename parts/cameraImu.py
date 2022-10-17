@@ -24,6 +24,7 @@ class Camera_IMU:
         self.init_params = sl.InitParameters(
             camera_resolution = sl.RESOLUTION.VGA,
             camera_fps = 90,
+            camera_image_flip=sl.FLIP_MODE.ON,
             depth_mode=sl.DEPTH_MODE.ULTRA,
             coordinate_units=sl.UNIT.MILLIMETER,
             coordinate_system=sl.COORDINATE_SYSTEM.RIGHT_HANDED_Z_UP
