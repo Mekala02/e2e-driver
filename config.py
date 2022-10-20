@@ -3,7 +3,7 @@ config = dict(
     USE_COPILOT = True,
 
     RGB_IMAGE_FORMAT = "jpg",
-    DEPTH_IMAGE_FORMAT = "npy",
+    DEPTH_IMAGE_FORMAT = "npz",
     OBJECT_DETECTION_FORMAT = "npy",
 
     CAMERA_RESOLUTION = "VGA",

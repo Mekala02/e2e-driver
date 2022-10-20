@@ -6,15 +6,17 @@ Options:
   -h --help     Show this screen.
 """
 
-from docopt import docopt
 from flask import Flask, render_template, Response, request, jsonify
 from waitress import serve
+from docopt import docopt
 import numpy as np
+import threading
 import logging
-import os
 import json
 import time
 import cv2
+import sys
+import os
 
 app=Flask(__name__)
 # Servers memory
@@ -29,7 +31,9 @@ def generate_frames():
         frame_path = os.path.join(data_folder, "big_data", camera_mode)
         image_format = cfg[camera_mode.upper() + "_FORMAT"]
         if image_format == "npy":
-            frame = np.load(os.path.join(frame_path, str(img_id) + ".npy"))
+            frame = np.load(os.path.join(frame_path, str(img_id) + "." + image_format))
+        elif image_format == "npz":
+            frame = np.load(os.path.join(frame_path, str(img_id) + "." + image_format))["arr_0"]
         elif image_format == "jpg" or image_format == "jpeg" or image_format == "png":
             frame = cv2.imread(os.path.join(frame_path, str(img_id) + "." + image_format))
         else:
@@ -143,12 +147,13 @@ def save_changes():
         opened_file.close()
     return "a"
 
+def server_thread():
+    serve(app, host="0.0.0.0", port=8080)
 
 if __name__=="__main__":
     args = docopt(__doc__)
     data_folder = args["<data_dir>"]
     folder_name = os.path.basename(data_folder)
-
     # Make it os based this is too slow
     # if args["--c"] or args["--copy"]:
     #     from distutils.dir_util import copy_tree
@@ -170,6 +175,12 @@ if __name__=="__main__":
     client_outputs = {"Data_Lenght": len(datas), "Data_Index": 0, "Data_Folder": folder_name,
     "Left_Marker": 0, "Right_Marker": 0, "Select_List": [], "Camera_Mode": "RGB_Image", "Graph1_Mode": ["Steering"]}
 
-    serve(app, host="0.0.0.0", port=8080)
+    threading.Thread(target=server_thread, daemon=True, name="Server_Thread").start()
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        sys.exit()
 
 # python .\data_cleaner_app.py c:\Users\Mekala\Documents\GitHub\e2e-driver\data\test_data

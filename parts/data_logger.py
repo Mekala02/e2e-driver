@@ -37,10 +37,10 @@ class Data_Logger:
     def save_to_file(self, img_format, path, name, data):
         if img_format == "npy":
             np.save(os.path.join(path, name+".npy"), data)
-        elif img_format == "jpg" or img_format == "jpeg":
-            cv2.imwrite(os.path.join(path, name+".jpg"), data)
-        elif img_format == "png":
-            cv2.imwrite(os.path.join(path, name+".png"), data)
+        elif img_format == "npz":
+            np.savez_compressed(os.path.join(path, name+".npz"), data)
+        elif img_format == "jpg" or img_format == "jpeg" or img_format == "png":
+            cv2.imwrite(os.path.join(path, name+"." + img_format), data)
         else:
             logger.warning("Unknown Image Format For Saving")
     
