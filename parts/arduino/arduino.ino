@@ -89,7 +89,7 @@ void loop() {
         encoder_last_time = millis();
     }
 
-    Serial.println("t" + String(mapfloat(throttle_value, 900, 2000, -1, 1)) + "s" + String(mapfloat(steering_value, 900, 2000, -1, 1)) + "v" + String(pulses) + "e");
+    Serial.println("t" + String(mapfloat(throttle_value, 900, 2000, -1, 1)) + "s" + String(mapfloat(steering_value, 900, 2000, -1, 1)) + "v" + String(speed) + "e");
 
 }
 
