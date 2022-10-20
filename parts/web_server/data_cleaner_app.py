@@ -8,14 +8,15 @@ Options:
 
 from docopt import docopt
 from flask import Flask, render_template, Response, request, jsonify
+from waitress import serve
 import numpy as np
+import logging
 import os
 import json
 import time
 import cv2
 
 app=Flask(__name__)
-
 # Servers memory
 data = {}
 
@@ -25,8 +26,14 @@ def generate_frames():
         img_id = datas[client_outputs["Data_Index"]]["Img_Id"]
         # Getting camera mode (RGB, Depth, Object_Detection)
         camera_mode = client_outputs["Camera_Mode"]
-        frame_path = os.path.join(data_folder, "images", camera_mode, f"{img_id}.npy")
-        frame = np.load(frame_path)
+        frame_path = os.path.join(data_folder, "big_data", camera_mode)
+        image_format = cfg[camera_mode.upper() + "_FORMAT"]
+        if image_format == "npy":
+            frame = np.load(os.path.join(frame_path, str(img_id) + ".npy"))
+        elif image_format == "jpg" or image_format == "jpeg" or image_format == "png":
+            frame = cv2.imread(os.path.join(frame_path, str(img_id) + "." + image_format))
+        else:
+            logger.warning("Unknown Image Format")
         ret, buffer = cv2.imencode('.jpg', frame)
         frame=buffer.tobytes()
         yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -153,13 +160,16 @@ if __name__=="__main__":
     #     copy_tree(data_folder, copy_folder)
     #     data_folder = copy_folder
     #     folder_name = os.path.basename(data_folder)
-
+    logger = logging.getLogger(__name__)
     json_path = os.path.join(data_folder, "memory.json")
+    cfg_path = os.path.join(data_folder, "cfg.json")
+    with open(cfg_path) as cfg_file:
+        cfg = json.load(cfg_file)
     datas = json.loads(open(json_path, "r").read())
     # Default values for server startup
     client_outputs = {"Data_Lenght": len(datas), "Data_Index": 0, "Data_Folder": folder_name,
     "Left_Marker": 0, "Right_Marker": 0, "Select_List": [], "Camera_Mode": "RGB_Image", "Graph1_Mode": ["Steering"]}
 
-    app.run(host='0.0.0.0', debug=True)
+    serve(app, host="0.0.0.0", port=8080)
 
 # python .\data_cleaner_app.py c:\Users\Mekala\Documents\GitHub\e2e-driver\data\test_data

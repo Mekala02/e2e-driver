@@ -1,3 +1,5 @@
+from config import config as cfg
+
 import numpy as np
 import datetime
 import threading
@@ -9,6 +11,7 @@ import os
 
 logger = logging.getLogger(__name__)
 
+
 class Data_Logger:
     def __init__(self):
         self.threaded = False
@@ -18,10 +21,12 @@ class Data_Logger:
         new_folder_name = datetime.datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
         data_folder = os.path.join("data", new_folder_name)
         os.mkdir(data_folder)
+        with open(os.path.join(data_folder, "cfg.json"), "w+") as config_log:
+            json.dump(cfg, config_log)
         self.big_folder = os.path.join(data_folder, "big_data")
         os.mkdir(self.big_folder)
-        os.mkdir(os.path.join(self.big_folder, "Depth"))
-        os.mkdir(os.path.join(self.big_folder, "RGB"))
+        os.mkdir(os.path.join(self.big_folder, "Depth_Image"))
+        os.mkdir(os.path.join(self.big_folder, "RGB_Image"))
         os.mkdir(os.path.join(self.big_folder, "Object_Detection"))
         self.file = open(os.path.join(data_folder, "memory.json"), "w+")
         self.file.write("[")
@@ -30,7 +35,7 @@ class Data_Logger:
         logger.info(f"Data_Folder: {data_folder}")
 
     def save_to_file(self, img_format, path, name, data):
-        if img_format == "raw":
+        if img_format == "npy":
             np.save(os.path.join(path, name+".npy"), data)
         elif img_format == "jpg" or img_format == "jpeg":
             cv2.imwrite(os.path.join(path, name+".jpg"), data)
@@ -50,11 +55,11 @@ class Data_Logger:
         if self.memory.memory["Record"]:
             self.save_json(self.file, self.memory.memory)
             threading.Thread(target=self.save_to_file,
-                args=(["jpg", os.path.join(self.big_folder, "RGB"), str(self.index), self.memory.big_memory["RGB_Image"]]),
+                args=([cfg["RGB_IMAGE_FORMAT"], os.path.join(self.big_folder, "RGB_Image"), str(self.index), self.memory.big_memory["RGB_Image"]]),
                 daemon=True,
                 name="Rgb_Image").start()
             threading.Thread(target=self.save_to_file,
-                args=(["raw", os.path.join(self.big_folder, "Depth"), str(self.index), self.memory.big_memory["Depth_Array"]]),
+                args=([cfg["DEPTH_IMAGE_FORMAT"], os.path.join(self.big_folder, "Depth_Image"), str(self.index), self.memory.big_memory["Depth_Array"]]),
                 daemon=True,
                 name="Depth_Array").start()
             self.index += 1

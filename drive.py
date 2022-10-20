@@ -1,7 +1,4 @@
-import logging
-import sys
-import time
-
+from config import config as cfg
 from vehicle import Vehicle
 from parts.memory import Memory
 from parts.cameraImu import Camera_IMU
@@ -13,6 +10,11 @@ from parts.data_logger import Data_Logger
 from parts.web_server.app import Web_Server
 from parts.fps_counter import FPS_Counter
 
+import logging
+import sys
+import time
+
+
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: @ %(name)s %(message)s")
 logger = logging.getLogger("drive")
@@ -23,8 +25,10 @@ vehicle.memory = Memory()
 
 logger.info("Adding parts to vehicle ... \n")
 vehicle.add(Camera_IMU())
-vehicle.add(Yolo())
-vehicle.add(Copilot())
+if cfg["USE_OBJECT_DETECTION"]:
+    vehicle.add(Yolo())
+if cfg["USE_COPILOT"]:
+    vehicle.add(Copilot())
 vehicle.add(Pilot())
 vehicle.add(Arduino())
 vehicle.add(Data_Logger())
@@ -34,7 +38,7 @@ vehicle.add(FPS_Counter())
 vehicle.start()
 
 logger.info("Starting the drive loop \n")
-rate_hz = 300
+rate_hz = cfg["DRIVE_LOOP_HZ"]
 try:
     while True:
         start_time = time.time()

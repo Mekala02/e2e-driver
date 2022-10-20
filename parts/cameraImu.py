@@ -1,8 +1,11 @@
+from config import config as cfg
+
 import pyzed.sl as sl
 import time
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 class Camera_IMU:
     def __init__(self):
@@ -21,16 +24,17 @@ class Camera_IMU:
         self.IMU_Gyro_Z = 0
 
         self.zed = sl.Camera()
+
         self.init_params = sl.InitParameters(
-            camera_resolution = sl.RESOLUTION.VGA,
-            camera_fps = 90,
-            camera_image_flip=sl.FLIP_MODE.ON,
-            depth_mode=sl.DEPTH_MODE.ULTRA,
-            coordinate_units=sl.UNIT.MILLIMETER,
-            coordinate_system=sl.COORDINATE_SYSTEM.RIGHT_HANDED_Z_UP
+            camera_resolution=getattr(sl.RESOLUTION, cfg["CAMERA_RESOLUTION"]),
+            camera_fps=cfg["CAMERA_FPS"],
+            camera_image_flip=getattr(sl.FLIP_MODE, cfg["CAMERA_IMAGE_FLIP"]),
+            depth_mode=getattr(sl.DEPTH_MODE, cfg["DEPTH_MODE"]),
+            coordinate_units=getattr(sl.UNIT, cfg["COORDINATE_UNITS"]),
+            coordinate_system=getattr(sl.COORDINATE_SYSTEM, cfg["COORDINATE_SYSTEM"])
         )
 
-        if err:=self.zed.open(self.init_params) != sl.ERROR_CODE.SUCCESS:
+        if (err:=self.zed.open(self.init_params)) != sl.ERROR_CODE.SUCCESS:
             logger.error(err)
 
         self.runtime_parameters = sl.RuntimeParameters()
@@ -44,7 +48,7 @@ class Camera_IMU:
         logger.info("Successfully Added")
 
     def grab_data(self):
-        if err:= self.zed.grab(self.runtime_parameters) == sl.ERROR_CODE.SUCCESS:
+        if (err:=self.zed.grab(self.runtime_parameters)) == sl.ERROR_CODE.SUCCESS:
             # A new image is available if grab() returns SUCCESS
             self.zed.retrieve_image(self.zed_RGB_Image, sl.VIEW.LEFT)
             self.RGB_Image = self.zed_RGB_Image.get_data()
