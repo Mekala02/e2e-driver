@@ -73,15 +73,18 @@ class Camera_IMU:
             self.IMU_Gyro_Y = angular_velocity[1]
             self.IMU_Gyro_Z = angular_velocity[2]
         else:
-            logger.error(err)
-        # Giving time for other threads
-        # Limiting the max loop count to 500 per second
-        time.sleep(0.002)
+            logger.error(err)        
 
     def start_thread(self):
         logger.info("Starting Thread")
         while self.run:
+            start_time = time.time()
             self.grab_data()
+            # Thread is too fast we limiting the run speed othervise other threads will be slow
+            # inverse of elapsed time in 1 seond = fps we limiting according to inverse of time, not fps
+            sleep_time = 1.0 / cfg["CAMERA_FPS"] - (time.time() - start_time)
+            if sleep_time > 0.0:
+                time.sleep(sleep_time)
 
     def update(self):
         self.memory.memory["IMU_Accel_X"] = self.IMU_Accel_X

@@ -23,22 +23,28 @@ class Arduino:
         time.sleep(0.04)
         logger.info("Successfully Added")
 
+    def grab_data(self):
+        buffer = False
+        while (self.arduino.in_waiting > 0):
+            try: buffer = self.arduino.readline().decode('utf-8') 
+            except Exception as e: pass
+        # Looking if data is right format
+        if buffer and buffer[0] == "t":
+            # re.search(r"t\d+.\d+s\d+.\d+v\d+.\d+e", data) // todo
+            data_array = re.split(r't|s|v|e', buffer)
+            self.Throttle = int(data_array[1])
+            self.Steering = int(data_array[2])
+            # data_array[3] sends ticks/sec we convert it to cm/sec
+            self.Speed = float(data_array[3]) / cfg["TICKS_PER_CM"]
+
     def start_thread(self):
         logger.info("Starting Thread")
-        buffer = False
         while self.run:
-            while (self.arduino.in_waiting > 0):
-                try: buffer = self.arduino.readline().decode('utf-8') 
-                except Exception as e: pass
-            # Looking if data is right format
-            if buffer and buffer[0] == "t":
-                # re.search(r"t\d+.\d+s\d+.\d+v\d+.\d+e", data) // todo
-                data_array = re.split(r't|s|v|e', buffer)
-                self.Throttle = int(data_array[1])
-                self.Steering = int(data_array[2])
-                # data_array[3] sends ticks/sec we convert it to cm/sec
-                self.Speed = float(data_array[3]) / cfg["TICKS_PER_CM"]
-            time.sleep(0.003)
+            start_time = time.time()
+            self.grab_data()
+            sleep_time = 1.0 / cfg["CAMERA_FPS"] - (time.time() - start_time)
+            if sleep_time > 0.0:
+                time.sleep(sleep_time)
 
     def update(self):
         # self.Throttle, self.Steering and self.Speed values comes from arduino

@@ -30,8 +30,8 @@ def generate_frames():
             frame=buffer.tobytes()
             yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             camera["Is_New"] = False
-        # While loop is too fast we need to slow down interval is 2ms (500fps)
-        time.sleep(0.002)
+        # While loop is too fast we need to slow down (100fps)
+        time.sleep(0.01)
 
 @app.route('/')
 def index():
