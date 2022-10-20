@@ -1,3 +1,5 @@
+from config import config as cfg
+
 import threading
 import logging
 import serial
@@ -34,7 +36,8 @@ class Arduino:
                 data_array = re.split(r't|s|v|e', buffer)
                 self.Throttle = int(data_array[1])
                 self.Steering = int(data_array[2])
-                self.Speed = float(data_array[3])
+                # data_array[3] sends ticks/sec we convert it to cm/sec
+                self.Speed = float(data_array[3]) / cfg["TICKS_PER_CM"]
             time.sleep(0.003)
 
     def update(self):

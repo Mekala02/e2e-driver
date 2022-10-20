@@ -15,7 +15,7 @@ int steering_value, throttle_value;
 
 unsigned long encoder_last_time;
 unsigned int pulses = 0;
-float speed = 0;
+float dpulses = 0;
 
 Servo throttle;
 Servo steering;
@@ -73,12 +73,12 @@ void loop() {
 
     // Calculating speed at certain rate
     if (millis() - encoder_last_time > 100){
-        speed = (60 * 100 / 20) / (millis() - encoder_last_time) * pulses;
+        dpulses = 1000 * pulses / (millis() - encoder_last_time);
         pulses = 0;
         encoder_last_time = millis();
     }
 
-    Serial.println("t" + String(throttle_value) + "s" + String(steering_value) + "v" + String(speed) + "e");
+    Serial.println("t" + String(throttle_value) + "s" + String(steering_value) + "v" + String(dpulses) + "e");
 
 }
 
