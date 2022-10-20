@@ -207,6 +207,11 @@ class Main_Track {
     bar_lengthen(ID, value, center){
         var bar = document.getElementById(ID)
         var calculated_value = 0
+        // Map the pwm value to -1, 1
+        // Min pwm = 900, max pwm = 2100 so mid = 1500
+        // Substarcting mid value from min and max pwm so our interval is [-600, 600]
+        // So simply divide it by 600 to make it [-1, 1]
+        value = (value - 1500) / 600
         if (value >= 0){
             bar.style.marginLeft = center+"%"
             bar.style.float = "Left"

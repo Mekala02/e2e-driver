@@ -16,8 +16,11 @@ class Pilot:
         
     def update(self):
         # Sin vave for testing web server
-        self.memory.memory["Steering"] = math.sin(time.time())
-        self.memory.memory["Throttle"] = math.sin(time.time() + 2)
+        if self.memory.memory["Pilot_Mode"] == "Angle":
+            self.memory.memory["Steering"] = int(1500 + math.sin(time.time()) * 600)
+        elif self.memory.memory["Pilot_Mode"] == "Full_Auto":
+            self.memory.memory["Throttle"] = int(1500 + math.sin(time.time() + 2) * 600)
+            self.memory.memory["Steering"] = int(1500 + math.sin(time.time()) * 600)
 
     def shut_down(self):
         self.run = False

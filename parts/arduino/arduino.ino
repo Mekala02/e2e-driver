@@ -1,7 +1,6 @@
 #include <Servo.h>
 
 int readChannel(int channelInput, int defaultValue);
-float mapfloat(float x, float in_min, float in_max, float out_min, float out_max);
 
 #define CH1_PIN 3
 #define CH2_PIN 5
@@ -10,17 +9,9 @@ float mapfloat(float x, float in_min, float in_max, float out_min, float out_max
 #define Servo_PIN 10
 #define ENCODER_PIN 2
 
-#define THROTTLE_FORWARD_PWM 500
-#define THROTTLE_STOPPED_PWM 370
-#define THROTTLE_REVERSE_PWM 220
-
-#define STEERING_FULL_RIGHT_VALUE 1200
-#define STEERING_MID_VALUE 1540
-#define STEERING_FULL_LEFT_VALUE 1900
-
 String pyserial_data;
-float pyserial_throttle;
-float pyserial_steering;
+int pyserial_throttle, pyserial_steering;
+int steering_value, throttle_value;
 
 unsigned long encoder_last_time;
 unsigned int pulses = 0;
@@ -38,8 +29,6 @@ void setup() {
     attachInterrupt(digitalPinToInterrupt(ENCODER_PIN), []{pulses++;}, FALLING );
     Serial.begin(115200);
 }
-
-float steering_value, throttle_value;
 
 void loop() {
     // Reading serial input
@@ -66,18 +55,18 @@ void loop() {
     // Received steering and throttle values are between -1 and 1
     // We have to convert them to pwm
     // multiplying with 1 for reversing left and right
-    if (pyserial_throttle == 10)
+    if (pyserial_throttle == 10000)
         throttle_value = readChannel(CH2_PIN, 0);
-    else if (pyserial_throttle < 1 && pyserial_throttle > -1)
+    else if (pyserial_throttle < 2100 && pyserial_throttle > 900)
         throttle_value = readChannel(CH2_PIN, 0); // tmp for safety
-        // throttle_value = mapfloat(-pyserial_throttle, -1, 1, THROTTLE_FORWARD_PWM, THROTTLE_REVERSE_PWM); // not tested
+        // throttle_value = -pyserial_throttle; // not tested
     // else
     //     throttle_value = THROTTLE_STOPPED_PWM // not tested
 
-    if (pyserial_steering == 10)
-        steering_value = readChannel(CH1_PIN, STEERING_MID_VALUE);
-    else if (pyserial_steering < 1 && pyserial_steering > -1)
-        steering_value = mapfloat(-pyserial_steering, -1, 1, STEERING_FULL_RIGHT_VALUE, STEERING_FULL_LEFT_VALUE);
+    if (pyserial_steering == 10000)
+        steering_value = readChannel(CH1_PIN, 1500);
+    else if (pyserial_steering < 2100 && pyserial_steering > 900)
+        steering_value = -pyserial_steering;
 
     throttle.writeMicroseconds(throttle_value);
     steering.writeMicroseconds(steering_value);
@@ -89,13 +78,8 @@ void loop() {
         encoder_last_time = millis();
     }
 
-    Serial.println("t" + String(mapfloat(throttle_value, 900, 2000, -1, 1)) + "s" + String(mapfloat(steering_value, 900, 2000, -1, 1)) + "v" + String(speed) + "e");
+    Serial.println("t" + String(throttle_value) + "s" + String(steering_value) + "v" + String(speed) + "e");
 
-}
-
-float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
-{
-  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 int readChannel(int channelInput, int defaultValue){
