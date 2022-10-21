@@ -170,7 +170,8 @@ if __name__=="__main__":
     cfg_path = os.path.join(data_folder, "cfg.json")
     with open(cfg_path) as cfg_file:
         cfg = json.load(cfg_file)
-    datas = json.loads(open(json_path, "r").read())
+    with open(json_path) as data_file:
+        datas = json.load(data_file)
     # Default values for server startup
     client_outputs = {"Data_Lenght": len(datas), "Data_Index": 0, "Data_Folder": folder_name,
     "Left_Marker": 0, "Right_Marker": 0, "Select_List": [], "Camera_Mode": "RGB_Image", "Graph1_Mode": ["Steering"]}
