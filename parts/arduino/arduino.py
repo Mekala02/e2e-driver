@@ -29,11 +29,11 @@ class Arduino:
             try: buffer = self.arduino.readline().decode('utf-8') 
             except Exception as e: pass
         # Looking if data is right format
-        if buffer and buffer[0] == "t":
+        if buffer and buffer[0] == "s":
             # re.search(r"t\d+.\d+s\d+.\d+v\d+.\d+e", data) // todo
-            data_array = re.split(r't|s|v|e', buffer)
-            self.Throttle = int(data_array[1])
-            self.Steering = int(data_array[2])
+            data_array = re.split(r's|t|v|e', buffer)
+            self.Steering = int(data_array[1])
+            self.Throttle = int(data_array[2])
             # data_array[3] sends ticks/sec we convert it to cm/sec
             self.Speed = float(data_array[3]) / cfg["TICKS_PER_CM"]
 
@@ -62,16 +62,16 @@ class Arduino:
         # If char is = 10000 arduino won't use that values for controlling the motors
         motor_power = self.memory.memory["Motor_Power"]
         if pilot_mode_string == "Manuel":
-            throttle = 10000
-            steering = 10000
+            throttle = 0
+            steering = 0
         elif pilot_mode_string == "Angle":
-            throttle = 10000
+            throttle = 0
             steering = self.memory.memory["Steering"]
         elif pilot_mode_string == "Full_Auto":
             throttle = self.memory.memory["Throttle"] * motor_power
             steering = self.memory.memory["Steering"]
-        # t is for stating start of throttle value s is for steering and e is for end, \r for read ending
-        formatted_data = "t" + str(throttle) + "s" + str(steering) + 'e' + '\r'
+        # s is for stating start of throttle value t is for steering and e is for end, \r for read ending
+        formatted_data = "s" + str(steering) + "t" + str(throttle) + 'e' + '\r'
         try: self.arduino.write(formatted_data.encode())
         except Exception as e: pass # logger.warning(e)
         else: pass # logger.info("Succes !!!")
