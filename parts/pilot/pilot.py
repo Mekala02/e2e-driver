@@ -1,8 +1,10 @@
 import math
 import time
+import torch
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 class Pilot:
     def __init__(self):
@@ -10,9 +12,10 @@ class Pilot:
         self.memory = 0
         self.run = False
         self.outputs = {"Steering": 0, "Throttle": 0}
-
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        logger.info(f"Torch Device: {self.device}")
+        logger.info("Successfully Added")  
         self.i = 0
-        logger.info("Successfully Added")
         
     def update(self):
         # Sin vave for testing web server
