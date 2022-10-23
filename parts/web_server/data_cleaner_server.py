@@ -47,7 +47,7 @@ def generate_frames():
 @app.route('/')
 def index():
     # Rendering template, and sending necessary data to client side
-    return render_template('data_cleaner.html',  outputs={**client_outputs})
+    return render_template('data_cleaner_main.html',  outputs={**client_outputs})
 
 @app.route('/video')
 def video():

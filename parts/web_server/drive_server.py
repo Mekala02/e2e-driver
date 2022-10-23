@@ -35,7 +35,7 @@ def generate_frames():
 
 @app.route('/')
 def index():
-    return render_template('main.html', outputs={**outputs, **web_special})
+    return render_template('drive_main.html', outputs={**outputs, **web_special})
 
 @app.route('/video')
 def video():

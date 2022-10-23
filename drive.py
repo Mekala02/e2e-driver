@@ -7,7 +7,7 @@ from parts.copilot.copilot import Copilot
 from parts.pilot.pilot import Pilot
 from parts.arduino.arduino import Arduino
 from parts.data_logger import Data_Logger
-from parts.web_server.app import Web_Server
+from parts.web_server.drive_server import Web_Server
 from parts.fps_counter import FPS_Counter
 
 import logging
