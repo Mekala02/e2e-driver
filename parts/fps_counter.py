@@ -3,9 +3,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 class FPS_Counter:
-    def __init__(self):
+    def __init__(self, memory):
+        self.memory = memory
         self.threaded = False
-        self.memory = 0
         self.run = True
         self.outputs = {"Fps": 0}
         

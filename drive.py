@@ -19,21 +19,20 @@ import time
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: @ %(name)s %(message)s")
 logger = logging.getLogger("drive")
 
-vehicle = Vehicle()
-
-vehicle.memory = Memory()
+vehicle_memory = Memory()
+vehicle = Vehicle(vehicle_memory)
 
 logger.info("Adding parts to vehicle ... \n")
-vehicle.add(Camera_IMU())
+vehicle.add(Data_Logger(vehicle_memory))
+vehicle.add(Camera_IMU(vehicle_memory))
 if cfg["USE_OBJECT_DETECTION"]:
-    vehicle.add(Yolo())
+    vehicle.add(Yolo(vehicle_memory))
 if cfg["USE_COPILOT"]:
-    vehicle.add(Copilot())
-vehicle.add(Pilot())
-vehicle.add(Arduino())
-vehicle.add(Data_Logger())
-vehicle.add(Web_Server())
-vehicle.add(FPS_Counter())
+    vehicle.add(Copilot(vehicle_memory))
+vehicle.add(Pilot(vehicle_memory))
+vehicle.add(Arduino(vehicle_memory))
+vehicle.add(Web_Server(vehicle_memory))
+vehicle.add(FPS_Counter(vehicle_memory))
 
 vehicle.start()
 

@@ -58,9 +58,9 @@ def send_inputs():
 
 # Wrapper Class flask app problematic when inside the class
 class Web_Server:
-    def __init__(self):
+    def __init__(self, memory):
+        self.memory = memory
         self.threaded = True
-        self.memory = 0
         self.run = True
         self.outputs = outputs
         logger.info("Successfully Added")

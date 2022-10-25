@@ -5,14 +5,12 @@ import time
 logger = logging.getLogger(__name__)
 
 class Vehicle:
-    def __init__(self):
+    def __init__(self, memory=0):
         self.parts = []
-        self.memory = 0
+        self.memory = memory
 
     def add(self, part):
         self.parts.append(part)
-        # Giving memory to part
-        part.memory = self.memory
 
     def start(self):
         logger.info("Starting parts \n")
