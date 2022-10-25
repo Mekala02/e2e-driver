@@ -25,19 +25,31 @@ data = {}
 def generate_frames():
     while True:
         # Geeting img id according to our data index (cursor on the bar)
-        img_id = datas[client_outputs["Data_Index"]]["Img_Id"]
+        data_id = datas[client_outputs["Data_Index"]]["Data_Id"]
         # Getting camera mode (RGB, Depth, Object_Detection)
         camera_mode = client_outputs["Camera_Mode"]
-        frame_path = os.path.join(data_folder, "big_data", camera_mode)
-        image_format = cfg[camera_mode.upper() + "_FORMAT"]
-        if image_format == "npy":
-            frame = np.load(os.path.join(frame_path, str(img_id) + "." + image_format))
-        elif image_format == "npz":
-            frame = np.load(os.path.join(frame_path, str(img_id) + "." + image_format))["arr_0"]
-        elif image_format == "jpg" or image_format == "jpeg" or image_format == "png":
-            frame = cv2.imread(os.path.join(frame_path, str(img_id) + "." + image_format))
+        if cfg["SVO_COMPRESSION_MODE"] == None:
+            frame_path = os.path.join(data_folder, "big_data", camera_mode)
+            image_format = cfg[camera_mode.upper() + "_FORMAT"]
+            if image_format == "npy":
+                frame = np.load(os.path.join(frame_path, str(data_id) + "." + image_format))
+            elif image_format == "npz":
+                frame = np.load(os.path.join(frame_path, str(data_id) + "." + image_format))["arr_0"]
+            elif image_format == "jpg" or image_format == "jpeg" or image_format == "png":
+                frame = cv2.imread(os.path.join(frame_path, str(data_id) + "." + image_format))
+            else:
+                logger.warning("Unknown Image Format")
         else:
-            logger.warning("Unknown Image Format")
+            # We looking current indexes(line in json file) zed data index element
+            # Becouse sometimes on is slover than other so we need to synchronize svo and json
+            zed.set_svo_position(datas[client_outputs["Data_Index"]]["Zed_Data_Id"])
+            if (err:=zed.grab()) == sl.ERROR_CODE.SUCCESS:
+                if camera_mode == "RGB_Image":
+                    zed.retrieve_image(zed_RGB_Image, sl.VIEW.LEFT)
+                    frame = zed_RGB_Image.get_data()
+                elif camera_mode == "Depth_Image":
+                    zed.retrieve_image(zed_Depth_Image, sl.VIEW.DEPTH)
+                    frame = zed_Depth_Image.get_data()
         ret, buffer = cv2.imencode('.jpg', frame)
         frame=buffer.tobytes()
         yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -87,23 +99,23 @@ def receive_search():
     if symbol == "==":
         for row in datas:
             if row[name] == value:
-                search_results.append(row["Img_Id"])
+                search_results.append(row["Data_Id"])
     elif symbol == ">=":
         for row in datas:
             if row[name] >= value:
-                search_results.append(row["Img_Id"])
+                search_results.append(row["Data_Id"])
     elif symbol == "<=":
         for row in datas:
             if row[name] <= value:
-                search_results.append(row["Img_Id"])
+                search_results.append(row["Data_Id"])
     elif symbol == ">":
         for row in datas:
             if row[name] > value:
-                search_results.append(row["Img_Id"])
+                search_results.append(row["Data_Id"])
     elif symbol == "<":
         for row in datas:
             if row[name] < value:
-                search_results.append(row["Img_Id"])
+                search_results.append(row["Data_Id"])
     return "a"
 
 @app.route('/search_results')
@@ -125,10 +137,10 @@ def send_graph():
     for mode in client_outputs["Graph1_Mode"]:
         send[mode] = []
     # Img id is X coordinate of the graph
-    send["Img_Id"] = []
+    send["Data_Id"] = []
     for row in datas:
         # Looping over all dataset and adding neccesry inputs
-        send["Img_Id"].append(row["Img_Id"])
+        send["Data_Id"].append(row["Data_Id"])
         for mode in client_outputs["Graph1_Mode"]:
             send[mode].append(row[mode])
     return jsonify(send)
@@ -175,7 +187,16 @@ if __name__=="__main__":
     # Default values for server startup
     client_outputs = {"Data_Lenght": len(datas), "Data_Index": 0, "Data_Folder": folder_name,
     "Left_Marker": 0, "Right_Marker": 0, "Select_List": [], "Camera_Mode": "RGB_Image", "Graph1_Mode": ["Steering"]}
-
+    if cfg["SVO_COMPRESSION_MODE"]:
+        import pyzed.sl as sl
+        input_path = os.path.join(data_folder, "zed_record.svo")
+        init_parameters = sl.InitParameters()
+        init_parameters.set_from_svo_file(input_path)
+        zed = sl.Camera()
+        zed_RGB_Image = sl.Mat()
+        zed_Depth_Image = sl.Mat()
+        if (err:=zed.open(init_parameters)) != sl.ERROR_CODE.SUCCESS:
+            logger.error(err)
     threading.Thread(target=server_thread, daemon=True, name="Server_Thread").start()
 
     try:
@@ -183,5 +204,3 @@ if __name__=="__main__":
             time.sleep(1)
     except KeyboardInterrupt:
         sys.exit()
-
-# python .\data_cleaner_app.py c:\Users\Mekala\Documents\GitHub\e2e-driver\data\test_data

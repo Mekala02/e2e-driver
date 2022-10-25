@@ -3,28 +3,31 @@ from config import config as cfg
 import pyzed.sl as sl
 import time
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
 
 class Camera_IMU:
-    def __init__(self):
+    def __init__(self, memory=0):
+        self.memory = memory
         self.threaded = True
-        self.memory = 0
         self.run = True
-        self.outputs = {"IMU_Accel_X": 0, "IMU_Accel_Y": 0, "IMU_Accel_Z": 0, "IMU_Gyro_X": 0, "IMU_Gyro_Y": 0, "IMU_Gyro_Z": 0}
+        self.outputs = {"Zed_Timestamp": 0, "Zed_Data_Id": 0, "IMU_Accel_X": 0, "IMU_Accel_Y": 0, "IMU_Accel_Z": 0, "IMU_Gyro_X": 0, "IMU_Gyro_Y": 0, "IMU_Gyro_Z": 0}
         self.big_outputs = {"RGB_Image": 0, "Depth_Image": 0, "Object_Detection_Image": 0}
         self.RGB_Image = 0
         self.Depth_Image = 0
+        self.Zed_Timestamp = 0
+        self.Zed_Data_Id = 0
         self.IMU_Accel_X = 0
         self.IMU_Accel_Y = 0
         self.IMU_Accel_Z = 0
         self.IMU_Gyro_X = 0
         self.IMU_Gyro_Y = 0
         self.IMU_Gyro_Z = 0
+        self.record = 0
 
         self.zed = sl.Camera()
-
         self.init_params = sl.InitParameters(
             camera_resolution=getattr(sl.RESOLUTION, cfg["CAMERA_RESOLUTION"]),
             camera_fps=cfg["CAMERA_FPS"],
@@ -33,10 +36,16 @@ class Camera_IMU:
             coordinate_units=getattr(sl.UNIT, cfg["COORDINATE_UNITS"]),
             coordinate_system=getattr(sl.COORDINATE_SYSTEM, cfg["COORDINATE_SYSTEM"])
         )
-
         if (err:=self.zed.open(self.init_params)) != sl.ERROR_CODE.SUCCESS:
             logger.error(err)
-
+        # If we save data in svo format we opening svo file and activating recording
+        if cfg["SVO_COMPRESSION_MODE"]:
+            svo_path = os.path.join(memory.untracked["Data_Folder"], "zed_record.svo")
+            recording_param = sl.RecordingParameters(svo_path, getattr(sl.SVO_COMPRESSION_MODE, cfg["SVO_COMPRESSION_MODE"]))
+            if ((err:=self.zed.enable_recording(recording_param)) == sl.ERROR_CODE.SUCCESS):
+                self.zed.pause_recording(True)
+            else:
+                logger.error(repr(err))
         self.runtime_parameters = sl.RuntimeParameters()
         self.zed_RGB_Image = sl.Mat(self.zed.get_camera_information().camera_resolution.width,
             self.zed.get_camera_information().camera_resolution.height,
@@ -45,10 +54,20 @@ class Camera_IMU:
         self.zed_depth_Image = sl.Mat()
         self.zed_sensors_data = sl.SensorsData()
         self.zed_depth_map = sl.Mat()
+        time.sleep(1)
         logger.info("Successfully Added")
 
+
     def grab_data(self):
+        if cfg["SVO_COMPRESSION_MODE"]:
+            if self.record:
+                self.zed.pause_recording(False)
+            else:
+                self.zed.pause_recording(True)
         if (err:=self.zed.grab(self.runtime_parameters)) == sl.ERROR_CODE.SUCCESS:
+            if self.record and self.zed.get_recording_status().status:
+                self.Zed_Data_Id += 1
+            self.Zed_Timestamp = self.zed.get_timestamp(sl.TIME_REFERENCE.IMAGE).get_nanoseconds()
             # A new image is available if grab() returns SUCCESS
             self.zed.retrieve_image(self.zed_RGB_Image, sl.VIEW.LEFT)
             self.RGB_Image = self.zed_RGB_Image.get_data()
@@ -87,6 +106,10 @@ class Camera_IMU:
                 time.sleep(sleep_time)
 
     def update(self):
+        # For synchronizing json saved data and svo saved data
+        #  Zed_Timestamp is 
+        self.memory.memory["Zed_Timestamp"] = self.Zed_Timestamp
+        self.memory.memory["Zed_Data_Id"] = self.Zed_Data_Id
         self.memory.memory["IMU_Accel_X"] = self.IMU_Accel_X
         self.memory.memory["IMU_Accel_Y"] = self.IMU_Accel_Y
         self.memory.memory["IMU_Accel_Z"] = self.IMU_Accel_Z
@@ -101,7 +124,10 @@ class Camera_IMU:
 
         self.memory.big_memory["Depth_Array"] = self.Depth_array
 
+        self.record = self.memory.memory["Record"]
+
     def shut_down(self):
         self.run = False
+        # Zed close calls disable_recording so we dont have to explicitly turn of recording
         self.zed.close()
         logger.info("Stopped")

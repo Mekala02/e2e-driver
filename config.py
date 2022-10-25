@@ -2,6 +2,8 @@ config = dict(
     USE_OBJECT_DETECTION = True,
     USE_COPILOT = True,
 
+    # If SVO_COMPRESSION_MODE != None other formats will be overwritten
+    SVO_COMPRESSION_MODE = "H264",
     RGB_IMAGE_FORMAT = "jpg",
     DEPTH_IMAGE_FORMAT = "npz",
     OBJECT_DETECTION_FORMAT = "npy",
@@ -21,6 +23,6 @@ config = dict(
     STEERING_FULL_LEFT_PWM = 1900,
     ENCODER_UNITS = "cm/s",
     ENCODER_TICKS = 600,
-    DRIVE_LOOP_HZ = 300,
+    DRIVE_LOOP_HZ = 150,
     TICKS_PER_CM = 11.7
 )

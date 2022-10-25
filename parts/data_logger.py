@@ -13,24 +13,27 @@ logger = logging.getLogger(__name__)
 
 
 class Data_Logger:
-    def __init__(self):
+    def __init__(self, memory):
+        self.memory = memory
         self.threaded = False
-        self.memory = 0
         self.run = True
-        self.outputs = {"Img_Id": 0, "Timestamp": 0}
+        self.outputs = {"Data_Id": 0, "Timestamp": 0}
+        self.index = 0
         new_folder_name = datetime.datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
         data_folder = os.path.join("data", new_folder_name)
         os.mkdir(data_folder)
+        memory.untracked["Data_Folder"] = data_folder
         with open(os.path.join(data_folder, "cfg.json"), "w+") as config_log:
             json.dump(cfg, config_log)
-        self.big_folder = os.path.join(data_folder, "big_data")
-        os.mkdir(self.big_folder)
-        os.mkdir(os.path.join(self.big_folder, "Depth_Image"))
-        os.mkdir(os.path.join(self.big_folder, "RGB_Image"))
-        os.mkdir(os.path.join(self.big_folder, "Object_Detection"))
+        # If we saving data in svo file don't creating folders
+        if cfg["SVO_COMPRESSION_MODE"] is None:
+            self.big_folder = os.path.join(data_folder, "big_data")
+            os.mkdir(self.big_folder)
+            os.mkdir(os.path.join(self.big_folder, "Depth_Image"))
+            os.mkdir(os.path.join(self.big_folder, "RGB_Image"))
+            os.mkdir(os.path.join(self.big_folder, "Object_Detection"))
         self.file = open(os.path.join(data_folder, "memory.json"), "w+")
         self.file.write("[")
-        self.index = 0
         logger.info("Successfully Added")
         logger.info(f"Data_Folder: {data_folder}")
 
@@ -50,18 +53,19 @@ class Data_Logger:
         opened_file.write('\n')
 
     def update(self):
-        self.memory.memory["Img_Id"] = self.index
-        self.memory.memory["Timestamp"] = int(time.time_ns() * 1e-6)
+        self.memory.memory["Data_Id"] = self.index
+        self.memory.memory["Timestamp"] = int(time.time_ns())
         if self.memory.memory["Record"]:
             self.save_json(self.file, self.memory.memory)
-            threading.Thread(target=self.save_to_file,
-                args=([cfg["RGB_IMAGE_FORMAT"], os.path.join(self.big_folder, "RGB_Image"), str(self.index), self.memory.big_memory["RGB_Image"]]),
-                daemon=True,
-                name="Rgb_Image").start()
-            threading.Thread(target=self.save_to_file,
-                args=([cfg["DEPTH_IMAGE_FORMAT"], os.path.join(self.big_folder, "Depth_Image"), str(self.index), self.memory.big_memory["Depth_Array"]]),
-                daemon=True,
-                name="Depth_Array").start()
+            if cfg["SVO_COMPRESSION_MODE"] is None:
+                threading.Thread(target=self.save_to_file,
+                    args=([cfg["RGB_IMAGE_FORMAT"], os.path.join(self.big_folder, "RGB_Image"), str(self.index), self.memory.big_memory["RGB_Image"]]),
+                    daemon=True,
+                    name="Rgb_Image").start()
+                threading.Thread(target=self.save_to_file,
+                    args=([cfg["DEPTH_IMAGE_FORMAT"], os.path.join(self.big_folder, "Depth_Image"), str(self.index), self.memory.big_memory["Depth_Array"]]),
+                    daemon=True,
+                    name="Depth_Array").start()
             self.index += 1
     
     def shut_down(self):
