@@ -50,9 +50,11 @@ def generate_frames():
                 elif camera_mode == "Depth_Image":
                     zed.retrieve_image(zed_Depth_Image, sl.VIEW.DEPTH)
                     frame = zed_Depth_Image.get_data()
-        ret, buffer = cv2.imencode('.jpg', frame)
-        frame=buffer.tobytes()
-        yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                ret, buffer = cv2.imencode('.jpg', frame)
+                frame=buffer.tobytes()
+                yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            else:
+                print(err)
         # While loop is too fast we need to slow down interval is 4ms (250fps)
         time.sleep(0.004)
 

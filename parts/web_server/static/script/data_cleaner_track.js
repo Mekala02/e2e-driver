@@ -78,8 +78,10 @@ class Data_Clear_Track extends Main_Track {
 
     Update_Data_Index(index, synchronize=0){
         if (synchronize == 0){
-            this.outputs["Data_Index"] = index
-            this.send_data({Data_Index: this.outputs["Data_Index"]})
+            if (index < this.outputs["Data_Lenght"] && index >= 0){
+                this.outputs["Data_Index"] = index
+                this.send_data({Data_Index: this.outputs["Data_Index"]})
+            }
         }
         // Updates Data_Index indicator accordingly
         document.getElementById("Data_Index").innerHTML = this.outputs["Data_Index"]
