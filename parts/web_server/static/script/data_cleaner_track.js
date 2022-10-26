@@ -30,12 +30,12 @@ class Data_Clear_Track extends Main_Track {
             {
                 type: 'line',
                 x0: this.outputs["Data_Index"],
-                y0: -1,
+                y0: this.y_min_value-1,
                 x1: this.outputs["Data_Index"],
-                y1: 1,
+                y1: this.y_max_value+1,
                 line: {
-                color: 'white',
-                width: 3
+                    color: 'white',
+                    width: 3
                 }
             }]
         Plotly.react("Graph1", this.traces, this.graph_layout, {displayModeBar: false})
@@ -44,15 +44,20 @@ class Data_Clear_Track extends Main_Track {
     Update_Graph_Display(){
         // Ploting the graph
         this.traces = []
+        this.y_max_value = -Infinity
+        this.y_min_value = Infinity
         for (let mode of this.outputs["Graph1_Mode"]){
             this.traces.push({
-            x: this.graph["Img_Id"],
+            x: this.graph["Data_Id"],
             y: this.graph[mode],
             name: mode,
             type:'line',
             line: {
             width: 4
             }})
+            // We calculating y axis max and min values to determine vertical lines border (Using in Update_Graph_Index)
+            this.y_max_value = Math.max(this.y_max_value, Math.max(...this.graph[mode]))
+            this.y_min_value = Math.min(this.y_min_value, Math.min(...this.graph[mode]))
         }
         this.Update_Graph_Index()
       }
