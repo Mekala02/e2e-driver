@@ -8,9 +8,13 @@ Options:
 
 import json
 from torch.utils.data import Dataset
+import pyzed.sl as sl
+import logging
 import numpy as np
 import cv2
 import os
+
+logger = logging.getLogger(__name__)
 
 
 class Load_Data(Dataset):
@@ -52,6 +56,16 @@ class Load_Data(Dataset):
             for deleted_indexes in self.deleted_data_indexes:
                 self.datas= np.delete(self.datas, [range(deleted_indexes[0], deleted_indexes[1]+1)])
 
+        if self.cfg["SVO_COMPRESSION_MODE"]:
+            input_path = os.path.join(data_folder, "zed_record.svo")
+            init_parameters = sl.InitParameters()
+            init_parameters.set_from_svo_file(input_path)
+            self.zed = sl.Camera()
+            self.zed_RGB_Image = sl.Mat()
+            self.zed_Depth_Map = sl.Mat()
+            if (err:=self.zed.open(init_parameters)) != sl.ERROR_CODE.SUCCESS:
+                logger.error(err)
+
         self.RGB_image_format = self.cfg["RGB_IMAGE_FORMAT"]
         self.Depth_image_format = self.cfg["DEPTH_IMAGE_FORMAT"]
 
@@ -72,13 +86,26 @@ class Load_Data(Dataset):
         return(len(self.datas))
 
     def __getitem__(self, index):
-        rgb_image = self.load_RGB_image(os.path.join(self.RGB_image_path, str(self.datas[index]["Img_Id"]) + "." + self.RGB_image_format))
+        if self.cfg["SVO_COMPRESSION_MODE"]:
+            self.zed.set_svo_position(self.datas[index]["Zed_Data_Id"])
+            if (err:=self.zed.grab()) == sl.ERROR_CODE.SUCCESS:
+                self.zed.retrieve_image(self.zed_RGB_Image, sl.VIEW.LEFT)
+                rgba_image = self.zed_RGB_Image.get_data()
+                rgb_image = cv2.cvtColor(rgba_image, cv2.COLOR_RGBA2RGB)
+                if self.use_depth_input:
+                    self.zed.retrieve_measure(self.zed_Depth_Map, sl.MEASURE.DEPTH)
+                    Depth_array = self.zed_Depth_Map.get_data()
+            else:
+                logger.warning(err)
+        else:
+            rgb_image = self.load_RGB_image(os.path.join(self.RGB_image_path, str(self.datas[index]["Data_Id"]) + "." + self.RGB_image_format))
+            if self.use_depth_input:
+                Depth_array = self.load_Depth_image(os.path.join(self.Depth_image_path, str(self.datas[index]["Data_Id"]) + "." + self.Depth_image_format))
 
         if self.use_depth_input:
-            depth_image = self.load_Depth_image(os.path.join(self.Depth_image_path, str(self.datas[index]["Img_Id"]) + "." + self.Depth_image_format))
-            depth_image = depth_image.reshape(rgb_image.shape[0], rgb_image.shape[1], 1)
-            np.nan_to_num(depth_image, copy=False)
-            images = np.concatenate((rgb_image, depth_image), axis=2)
+            Depth_array = Depth_array.reshape(rgb_image.shape[0], rgb_image.shape[1], 1)
+            np.nan_to_num(Depth_array, copy=False)
+            images = np.concatenate((rgb_image, Depth_array), axis=2)
         else:
             images = rgb_image
 
@@ -109,7 +136,7 @@ if __name__ == "__main__":
     import torchvision.transforms as transforms
     args = docopt(__doc__)
     data_folder = args["<data_dir>"]
-    test = Load_Data(data_folder, transforms.ToTensor())
+    test = Load_Data(data_folder, transform=transforms.ToTensor())
     images, other_inputs, label = test[100]
     print(images.shape)
     print(other_inputs.shape)

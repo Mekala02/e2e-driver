@@ -4,6 +4,7 @@ import pyzed.sl as sl
 import time
 import logging
 import os
+import cv2
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +48,7 @@ class Camera_IMU:
             else:
                 logger.error(repr(err))
         self.runtime_parameters = sl.RuntimeParameters()
-        self.zed_RGB_Image = sl.Mat(self.zed.get_camera_information().camera_resolution.width,
+        self.zed_RGBA_Image = sl.Mat(self.zed.get_camera_information().camera_resolution.width,
             self.zed.get_camera_information().camera_resolution.height,
             sl.MAT_TYPE.U8_C4,
             sl.MEM.CPU)
@@ -68,15 +69,17 @@ class Camera_IMU:
             if self.record and self.zed.get_recording_status().status:
                 self.Zed_Data_Id += 1
             self.Zed_Timestamp = self.zed.get_timestamp(sl.TIME_REFERENCE.IMAGE).get_nanoseconds()
-            # A new image is available if grab() returns SUCCESS
-            self.zed.retrieve_image(self.zed_RGB_Image, sl.VIEW.LEFT)
-            self.RGB_Image = self.zed_RGB_Image.get_data()
 
-            self.zed.retrieve_image(self.zed_depth_Image, sl.VIEW.DEPTH)
-            self.Depth_Image = self.zed_depth_Image.get_data()
+            self.zed.retrieve_image(self.zed_RGBA_Image, sl.VIEW.LEFT)
+            self.RGB_Image = cv2.cvtColor(self.zed_RGBA_Image.get_data(), cv2.COLOR_RGBA2RGB)
 
             self.zed.retrieve_measure(self.zed_depth_map, sl.MEASURE.DEPTH)
             self.Depth_array = self.zed_depth_map.get_data()
+            
+            # This is only for web server depth image display
+            self.zed.retrieve_image(self.zed_depth_Image, sl.VIEW.DEPTH)
+            self.Depth_Image = self.zed_depth_Image.get_data()
+
 
             self.zed.get_sensors_data(self.zed_sensors_data, sl.TIME_REFERENCE.IMAGE)
 
@@ -106,8 +109,8 @@ class Camera_IMU:
                 time.sleep(sleep_time)
 
     def update(self):
-        # For synchronizing json saved data and svo saved data
-        #  Zed_Timestamp is 
+        # Recording Zed_Timestamp for synchronizing
+        # json saved data and svo saved data
         self.memory.memory["Zed_Timestamp"] = self.Zed_Timestamp
         self.memory.memory["Zed_Data_Id"] = self.Zed_Data_Id
         self.memory.memory["IMU_Accel_X"] = self.IMU_Accel_X
