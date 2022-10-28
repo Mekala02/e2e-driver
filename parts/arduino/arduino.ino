@@ -32,22 +32,20 @@ void setup() {
 
 void loop() {
     // Reading serial input
-	if(Serial.available() > 0) {
-		pyserial_data =  Serial.readStringUntil('\r');
-		// Serial.print(pyserial_data);
-	}
-
-    int deliminator_index = 0;
-    if (pyserial_data[0] == 's'){
-        for (int i = 1; i < pyserial_data.length(); i++) {
-            if (pyserial_data[i] == 't'){
-                pyserial_steering = pyserial_data.substring(1, i).toFloat();
-                // Serial.print(pyserial_throttle);
-                deliminator_index = i;
-            }
-            else if (pyserial_data[i] == 'e'){
-                pyserial_throttle = pyserial_data.substring(deliminator_index+1, i).toFloat();
-                break;
+    // Serial inputs shape: s(float)t(float)e
+    if(Serial.available() > 0) {
+        pyserial_data =  Serial.readStringUntil('\r');
+        int deliminator_index = 0;
+        if (pyserial_data[0] == 's'){
+            for (int i = 1; i < pyserial_data.length(); i++) {
+                if (pyserial_data[i] == 't'){
+                    pyserial_steering = pyserial_data.substring(1, i).toFloat();
+                    deliminator_index = i;
+                }
+                else if (pyserial_data[i] == 'e'){
+                    pyserial_throttle = pyserial_data.substring(deliminator_index+1, i).toFloat();
+                    break;
+                }
             }
         }
     }
@@ -56,7 +54,7 @@ void loop() {
         steering_value = readChannel(CH1_PIN, 1500);
     else if (900 < pyserial_steering && pyserial_steering < 2100)
         steering_value = pyserial_steering;
-        
+    
     if (pyserial_throttle == 0)
         throttle_value = readChannel(CH2_PIN, 0);
     else if (900 < pyserial_throttle && pyserial_throttle < 2100)
@@ -76,7 +74,6 @@ void loop() {
     }
 
     Serial.println("s" + String(steering_value) + "t" + String(throttle_value) + "v" + String(dpulses) + "e");
-
 }
 
 int readChannel(int channelInput, int defaultValue){
