@@ -1,7 +1,5 @@
 #include <Servo.h>
 
-int readChannel(int channelInput, int defaultValue);
-
 #define CH1_PIN 3
 #define CH2_PIN 5
 #define CH3_PIN 6
@@ -20,6 +18,7 @@ float dpulses = 0;
 Servo throttle;
 Servo steering;
 
+int readChannel(int channelInput, int defaultValue);
 
 void setup() {
     pinMode(CH1_PIN, INPUT);
@@ -52,10 +51,7 @@ void loop() {
             }
         }
     }
-    // If value equals to 10 that means we are in manuel mode
-    // Received steering and throttle values are between -1 and 1
-    // We have to convert them to pwm
-    // multiplying with 1 for reversing left and right
+    // If value equals to 0 that means we are in manuel mode
     if (pyserial_steering == 0)
         steering_value = readChannel(CH1_PIN, 1500);
     else if (900 < pyserial_steering && pyserial_steering < 2100)
