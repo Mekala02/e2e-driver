@@ -148,9 +148,9 @@ RUN cd /tmp && bash opencv_install.sh ${OPENCV_URL} ${OPENCV_DEB}
 ENV LOGNAME root
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update || true
-RUN apt-get install --no-install-recommends lsb-release wget less udev sudo apt-transport-https build-essential cmake -y&& \
+RUN apt-get install --no-install-recommends zstd lsb-release wget less udev sudo apt-transport-https build-essential cmake -y&& \
     echo "# R35 (release), REVISION: 1.0" > /etc/nv_tegra_release ; \
-    wget -q --no-check-certificate -O ZED_SDK_Linux.run https://download.stereolabs.com/zedsdk/3.7/l4t35.1/jetsons && \
+    wget -q --no-check-certificate -O ZED_SDK_Linux.run https://download.stereolabs.com/zedsdk/3.8/l4t35.1/jetsons && \
     chmod +x ZED_SDK_Linux.run ; ./ZED_SDK_Linux.run silent skip_tools && \
     rm -rf /usr/local/zed/resources/* \
     rm -rf ZED_SDK_Linux.run && \
