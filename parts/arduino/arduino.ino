@@ -1,4 +1,5 @@
 #include <Servo.h>
+#include <Ewma.h>
 
 #define CH1_PIN 3
 #define CH2_PIN 5
@@ -6,6 +7,13 @@
 #define ESC_PIN 9
 #define Servo_PIN 10
 #define ENCODER_PIN 2
+
+// Rc receiver filters (Exponentially Weighted Moving Average)
+Ewma Steering_Filter(0.25);
+Ewma Thorttle_Filter(0.2);
+
+Servo throttle;
+Servo steering;
 
 String pyserial_data;
 int pyserial_throttle, pyserial_steering;
@@ -15,8 +23,6 @@ unsigned long encoder_last_time;
 unsigned int pulses = 0;
 float dpulses = 0;
 
-Servo throttle;
-Servo steering;
 
 int readChannel(int channelInput, int defaultValue);
 
@@ -51,12 +57,12 @@ void loop() {
     }
     // If value equals to 0 that means we are in manuel mode
     if (pyserial_steering == 0)
-        steering_value = readChannel(CH1_PIN, 1500);
+        steering_value = Steering_Filter.filter(readChannel(CH1_PIN, 1500));
     else if (900 < pyserial_steering && pyserial_steering < 2100)
         steering_value = pyserial_steering;
     
     if (pyserial_throttle == 0)
-        throttle_value = readChannel(CH2_PIN, 0);
+        throttle_value = Thorttle_Filter.filter(readChannel(CH2_PIN, 0));
     else if (900 < pyserial_throttle && pyserial_throttle < 2100)
         throttle_value = readChannel(CH2_PIN, 0); // tmp for safety
         // throttle_value = pyserial_throttle; // not tested
