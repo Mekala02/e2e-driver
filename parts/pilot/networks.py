@@ -54,7 +54,7 @@ class Linear(nn.Module):
         z = self.relu(self.cfc2(z))
         z = self.drop(z)
 
-        angle = self.out1(z)
+        steering = self.out1(z)
         throttle = self.out2(z)
 
-        return torch.cat((angle, throttle), 1)
+        return steering, throttle

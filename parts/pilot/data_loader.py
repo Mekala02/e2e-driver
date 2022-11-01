@@ -7,7 +7,9 @@ Options:
 """
 
 import json
+import torch
 from torch.utils.data import Dataset
+import torchvision.transforms as transforms
 import pyzed.sl as sl
 import logging
 import numpy as np
@@ -18,9 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 class Load_Data(Dataset):
-    def __init__(self, data_folder, use_depth_input=False, transform=None):
+    def __init__(self, data_folder, use_depth_input=False):
         self.data_folder_path = data_folder
-        self.transform = transform
         self.use_depth_input = use_depth_input
         self.changes = None
 
@@ -109,35 +110,44 @@ class Load_Data(Dataset):
         else:
             images = rgb_image
 
-        other_inputs = np.array([[
-            self.datas[index]["IMU_Accel_X"],
-            self.datas[index]["IMU_Accel_Y"],
-            self.datas[index]["IMU_Accel_Z"],
-            self.datas[index]["IMU_Gyro_X"],
-            self.datas[index]["IMU_Gyro_Y"],
-            self.datas[index]["IMU_Gyro_Z"],
-            self.datas[index]["Speed"]
-        ]], dtype=np.float32)
+        other_inputs = np.array([
+            [self.datas[index]["IMU_Accel_X"]],
+            [self.datas[index]["IMU_Accel_Y"]],
+            [self.datas[index]["IMU_Accel_Z"]],
+            [self.datas[index]["IMU_Gyro_X"]],
+            [self.datas[index]["IMU_Gyro_Y"]],
+            [self.datas[index]["IMU_Gyro_Z"]],
+            [self.datas[index]["Speed"]]
+        ], dtype=np.float32)
 
+        steering_label = np.array([self.datas[index]["Steering"]], dtype=np.float32)
+        throttle_label = np.array([self.datas[index]["Throttle"]], dtype=np.float32)
         # Making pwm data between -1, 1
-        label = np.array([[self.datas[index]["Steering"], self.datas[index]["Throttle"]]], dtype=np.float32)
-        label = (label - 1500) / 600
+        steering_label = (steering_label - 1500) / 600
+        throttle_label = (throttle_label - 1500) / 600
 
-        if self.transform:
-            images = self.transform(images)
-            other_inputs = self.transform(other_inputs)
-            label = self.transform(label)
+        # Converts numpy.ndarray (H x W x C) in the range [0, 255] to a torch.FloatTensor of shape (C x H x W) in the range [0.0, 1.0] 
+        images = transforms.ToTensor()(images)
+        
+        other_inputs = torch.tensor(other_inputs)
+        steering_label = torch.tensor(steering_label)
+        throttle_label = torch.tensor(throttle_label)
 
-        return images, other_inputs, label
+        return images, other_inputs, steering_label, throttle_label
 
 
 if __name__ == "__main__":
     from docopt import docopt
-    import torchvision.transforms as transforms
     args = docopt(__doc__)
     data_folder = args["<data_dir>"]
-    test = Load_Data(data_folder, transform=transforms.ToTensor())
-    images, other_inputs, label = test[100]
+    test = Load_Data(data_folder)
+    images, other_inputs, steering_label, throttle_label = test[100]
     print(images.shape)
     print(other_inputs.shape)
-    print(label.shape)
+    print(steering_label.shape)
+    print(throttle_label.shape)
+
+    print(images.type())
+    print(other_inputs.type())
+    print(steering_label.type())
+    print(throttle_label.type())
