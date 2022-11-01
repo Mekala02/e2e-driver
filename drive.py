@@ -1,3 +1,11 @@
+"""
+Usage:
+    drive.py  [<data_dir>]
+
+Options:
+  -h --help     Show this screen.
+"""
+
 from config import config as cfg
 from vehicle import Vehicle
 from parts.memory import Memory
@@ -10,17 +18,22 @@ from parts.data_logger import Data_Logger
 from parts.web_server.drive_server import Web_Server
 from parts.fps_counter import FPS_Counter
 
+from docopt import docopt
 import logging
 import sys
 import time
 
 
-
+args = docopt(__doc__)
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: @ %(name)s %(message)s")
 logger = logging.getLogger("drive")
 
 vehicle_memory = Memory()
 vehicle = Vehicle(vehicle_memory)
+
+model_folder_path = args["<data_dir>"]
+if model_folder_path:
+    vehicle_memory.untracked["Model_Folder_Path"] = model_folder_path
 
 logger.info("Adding parts to vehicle ... \n")
 vehicle.add(Data_Logger(vehicle_memory))
