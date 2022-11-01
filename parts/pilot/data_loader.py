@@ -20,9 +20,10 @@ logger = logging.getLogger(__name__)
 
 
 class Load_Data(Dataset):
-    def __init__(self, data_folder, use_depth_input=False):
+    def __init__(self, data_folder, use_depth_input=False, use_other_inputs=False):
         self.data_folder_path = data_folder
         self.use_depth_input = use_depth_input
+        self.use_other_inputs = use_other_inputs
         self.changes = None
 
         # Constructing paths
@@ -109,31 +110,32 @@ class Load_Data(Dataset):
             images = np.concatenate((rgb_image, Depth_array), axis=2)
         else:
             images = rgb_image
-
-        other_inputs = np.array([
-            [self.datas[index]["IMU_Accel_X"]],
-            [self.datas[index]["IMU_Accel_Y"]],
-            [self.datas[index]["IMU_Accel_Z"]],
-            [self.datas[index]["IMU_Gyro_X"]],
-            [self.datas[index]["IMU_Gyro_Y"]],
-            [self.datas[index]["IMU_Gyro_Z"]],
-            [self.datas[index]["Speed"]]
-        ], dtype=np.float32)
-
-        steering_label = np.array([self.datas[index]["Steering"]], dtype=np.float32)
-        throttle_label = np.array([self.datas[index]["Throttle"]], dtype=np.float32)
-        # Making pwm data between -1, 1
-        steering_label = (steering_label - 1500) / 600
-        throttle_label = (throttle_label - 1500) / 600
-
         # Converts numpy.ndarray (H x W x C) in the range [0, 255] to a torch.FloatTensor of shape (C x H x W) in the range [0.0, 1.0] 
         images = transforms.ToTensor()(images)
-        
-        other_inputs = torch.tensor(other_inputs)
+
+        if self.use_other_inputs:
+            other_inputs = np.array([
+                [self.datas[index]["IMU_Accel_X"]],
+                [self.datas[index]["IMU_Accel_Y"]],
+                [self.datas[index]["IMU_Accel_Z"]],
+                [self.datas[index]["IMU_Gyro_X"]],
+                [self.datas[index]["IMU_Gyro_Y"]],
+                [self.datas[index]["IMU_Gyro_Z"]],
+                [self.datas[index]["Speed"]]
+            ], dtype=np.float32)
+            other_inputs = torch.tensor(other_inputs)
+
+        # Making pwm data between -1, 1
+        steering_label = np.array([self.datas[index]["Steering"]], dtype=np.float32)
+        throttle_label = np.array([self.datas[index]["Throttle"]], dtype=np.float32)
+        steering_label = (steering_label - 1500) / 600
+        throttle_label = (throttle_label - 1500) / 600
         steering_label = torch.tensor(steering_label)
         throttle_label = torch.tensor(throttle_label)
 
-        return images, other_inputs, steering_label, throttle_label
+        if self.use_other_inputs:
+            return images, other_inputs, steering_label, throttle_label
+        return images, steering_label, throttle_label
 
 
 if __name__ == "__main__":
