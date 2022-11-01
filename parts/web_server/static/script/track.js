@@ -252,8 +252,6 @@ class Main_Track {
         if (style == 0){
             document.getElementById("Record").style = this.not_record_style
             document.getElementById("Record_Timer").style.visibility = "hidden"
-            record_timer = 0
-            document.getElementById("Record_Timer").innerHTML = 0
             clearInterval(this.print_record_time_interval)
         }
         else if (style == 1){
