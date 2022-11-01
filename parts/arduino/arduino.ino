@@ -11,6 +11,7 @@
 // Rc receiver filters (Exponentially Weighted Moving Average)
 Ewma Steering_Filter(0.25);
 Ewma Thorttle_Filter(0.2);
+Ewma Encoder_Filter(0.15);
 
 Servo throttle;
 Servo steering;
@@ -19,6 +20,7 @@ String pyserial_data;
 int pyserial_throttle, pyserial_steering;
 int steering_value, throttle_value;
 
+unsigned long current_time;
 unsigned long encoder_last_time;
 unsigned int pulses = 0;
 float dpulses = 0;
@@ -72,11 +74,12 @@ void loop() {
     steering.writeMicroseconds(steering_value);
     throttle.writeMicroseconds(throttle_value);
 
+    current_time = millis();
     // Calculating speed at certain rate
-    if (millis() - encoder_last_time > 100){
-        dpulses = 1000 * pulses / (millis() - encoder_last_time);
+    if (current_time - encoder_last_time > 10){
+        dpulses = Encoder_Filter.filter(1000 * pulses / (current_time - encoder_last_time));
         pulses = 0;
-        encoder_last_time = millis();
+        encoder_last_time = current_time;
     }
 
     Serial.println("s" + String(steering_value) + "t" + String(throttle_value) + "v" + String(dpulses) + "e");
