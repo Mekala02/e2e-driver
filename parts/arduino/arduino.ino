@@ -21,6 +21,7 @@ int pyserial_throttle, pyserial_steering;
 int steering_value, throttle_value;
 
 unsigned long current_time;
+unsigned long serialOut_last_time;
 unsigned long encoder_last_time;
 unsigned int pulses = 0;
 float dpulses = 0;
@@ -39,6 +40,7 @@ void setup() {
 }
 
 void loop() {
+    current_time = millis();
     // Reading serial input
     // Serial inputs shape: s(float)t(float)e
     if(Serial.available() > 0) {
@@ -57,6 +59,7 @@ void loop() {
             }
         }
     }
+
     // If value equals to 0 that means we are in manuel mode
     if (pyserial_steering == 0)
         steering_value = Steering_Filter.filter(readChannel(CH1_PIN, 1500));
@@ -74,7 +77,6 @@ void loop() {
     steering.writeMicroseconds(steering_value);
     throttle.writeMicroseconds(throttle_value);
 
-    current_time = millis();
     // Calculating speed at certain rate
     if (current_time - encoder_last_time > 10){
         dpulses = Encoder_Filter.filter(1000 * pulses / (current_time - encoder_last_time));
@@ -82,7 +84,11 @@ void loop() {
         encoder_last_time = current_time;
     }
 
-    Serial.println("s" + String(steering_value) + "t" + String(throttle_value) + "v" + String(dpulses) + "e");
+    // Sending data 200fps
+    if (current_time - serialOut_last_time > 5){
+        Serial.println("s" + String(steering_value) + "t" + String(throttle_value) + "v" + String(dpulses) + "e");
+        serialOut_last_time = current_time;
+    }
 }
 
 int readChannel(int channelInput, int defaultValue){
