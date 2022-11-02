@@ -15,7 +15,7 @@ class Linear(nn.Module):
         self.conv3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(5, 5), stride=(2, 2), padding=(3, 3))
         self.conv4 = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=(3, 3), stride=(1, 1), padding=(4, 4))
         self.conv5 = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=(3, 3), stride=(1, 1), padding=(5, 5))
-        self.fc1 = nn.LazyLinear(100)
+        self.fc1 = nn.Linear(392832, 100)
         self.fc2 = nn.Linear(100, 50)
 
         self.out1 = nn.Linear(50, 1)
@@ -55,7 +55,7 @@ class Linear_With_Others(nn.Module):
         self.conv3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(5, 5), stride=(2, 2), padding=(3, 3))
         self.conv4 = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=(3, 3), stride=(1, 1), padding=(4, 4))
         self.conv5 = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=(3, 3), stride=(1, 1), padding=(5, 5))
-        self.fc1 = nn.LazyLinear(100)
+        self.fc1 = nn.Linear(392832, 100)
 
         self.ofc1 = nn.LazyLinear(40)
         self.ofc2 = nn.Linear(40, 30)

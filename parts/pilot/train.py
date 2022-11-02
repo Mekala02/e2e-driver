@@ -76,9 +76,11 @@ def evaluate(model, test_set_loader):
     return criterion(steering_prediction, steering_labels), criterion(throttle_prediction, throttle_labels)
 
 def save_model():
-    save_filename = os.path.basename(args["<data_dir>"])
-    save_file_path = os.path.join('./models', save_filename+".pt")
-    torch.save(model.state_dict(), save_file_path)
+    model_save_path = os.path.join('./models', "model.pt")
+    jit_model_save_path = os.path.join('./models', "model_jit.pt")
+    torch.save(model.state_dict(), model_save_path)
+    script_cell = torch.jit.script(model)
+    torch.jit.save(script_cell, jit_model_save_path)
 
 if __name__ == "__main__":
     args = docopt(__doc__)
