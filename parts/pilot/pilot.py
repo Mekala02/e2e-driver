@@ -1,4 +1,5 @@
 from parts.pilot.networks import Linear
+from config import config as cfg
 
 import math
 import time
@@ -11,10 +12,16 @@ logger = logging.getLogger(__name__)
 class Pilot:
     def __init__(self, memory):
         self.memory = memory
-        self.threaded = False
-        self.run = False
+        self.threaded = True
+        self.run = True
         self.outputs = {"Steering": 0, "Throttle": 0}
+
         self.model_path = None
+        self.pilot_mode = 0
+        self.image = 0
+        self.steering_prediction = 0
+        self.throttle_prediction = 0
+
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         logger.info(f"Torch Device: {self.device}")
         try:
@@ -27,22 +34,43 @@ class Pilot:
             logger.warning("Can Not Load The Model") 
         logger.info("Successfully Added")  
         self.i = 0
-        
+    
+    def predict(self):
+        # start_time = time.time()
+        image = transforms.ToTensor()(self.image)
+        # logger.info(f"Transform to tensor: {time.time() - start_time}")
+        # start_time = time.time()
+        image = image.to(device=self.device)
+        # logger.info(f"To device: {time.time() - start_time}")
+        image = image.view(1, 3, 376, 672)
+        # start_time = time.time()
+        with torch.no_grad():
+            steering_prediction, throttle_prediction = self.model(image)
+        # logger.info(f"Prediction: {time.time() - start_time}")
+        # We made data between -1, 1 when trainig so unpacking thoose to pwm value
+        self.steering_prediction = int(steering_prediction * 600 + 1500)
+        self.throttle_prediction = int(throttle_prediction * 600 + 1500)
+
+    def start_thread(self):
+        logger.info("Starting Thread")
+        while self.run:
+            start_time = time.time()
+            if self.pilot_mode == "Angle" or self.pilot_mode == "Full_Auto":
+                self.predict()
+            sleep_time = 1.0 / cfg["CAMERA_FPS"] - (time.time() - start_time)
+            if sleep_time > 0.0:
+                time.sleep(sleep_time)
+            # logger.info(1.0 / (time.time() - start_time))
+
     def update(self):
-        pilot_mode = self.memory.memory["Pilot_Mode"]
+        self.pilot_mode = self.memory.memory["Pilot_Mode"]
+        self.image = self.memory.big_memory["RGB_Image"]
         if self.model_path:
-            if pilot_mode == "Angle" or pilot_mode == "Full_Auto":
-                image = transforms.ToTensor()(self.memory.big_memory["RGB_Image"])
-                image = image.to(device=self.device)
-                steering_prediction, throttle_prediction = self.model(image)
-                # We made data between -1, 1 when trainig so unpacking thoose to pwm value
-                steering_prediction = steering_prediction * 600 + 1500
-                throttle_prediction = steering_prediction * 600 + 1500
-            if pilot_mode == "Angle":
-                self.memory.memory["Steering"] = steering_prediction
-            elif pilot_mode == "Full_Auto":
-                self.memory.memory["Steering"] = steering_prediction
-                self.memory.memory["Throttle"] = throttle_prediction
+            if self.pilot_mode == "Angle":
+                self.memory.memory["Steering"] = self.steering_prediction
+            elif self.pilot_mode == "Full_Auto":
+                self.memory.memory["Steering"] = self.steering_prediction
+                self.memory.memory["Throttle"] = self.throttle_prediction
         else:
             # Sin vave for testing web server
             if self.memory.memory["Pilot_Mode"] == "Angle":
