@@ -1,6 +1,6 @@
 """
 Usage:
-    drive.py  [<data_dir>]
+    drive.py  [<model>]
 
 Options:
   -h --help     Show this screen.
@@ -31,7 +31,7 @@ logger = logging.getLogger("drive")
 vehicle_memory = Memory()
 vehicle = Vehicle(vehicle_memory)
 
-model_folder_path = args["<data_dir>"]
+model_folder_path = args["<model>"]
 if model_folder_path:
     vehicle_memory.untracked["Model_Folder_Path"] = model_folder_path
 
