@@ -24,15 +24,13 @@ class Pilot:
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         logger.info(f"Torch Device: {self.device}")
-        try:
+        if "Model_Folder_Path" in  memory.untracked.keys():
             # self.model = Linear(in_channels=3).to(self.device)
             # self.model.load_state_dict(torch.load(self.model_path))
             self.model_path = memory.untracked["Model_Folder_Path"]
             self.model = torch.jit.load(self.model_path)
             self.model.eval()
             logger.info(f"Successfully Loaded Model At {self.model_path}")  
-        except:
-            logger.warning("Can Not Load The Model") 
         logger.info("Successfully Added")  
         self.i = 0
     
