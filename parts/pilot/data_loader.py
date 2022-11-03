@@ -19,6 +19,22 @@ import os
 logger = logging.getLogger(__name__)
 
 
+def main():
+    from docopt import docopt
+    args = docopt(__doc__)
+    data_folder = args["<data_dir>"]
+    test = Load_Data(data_folder)
+    images, other_inputs, steering_label, throttle_label = test[100]
+    print(images.shape)
+    print(other_inputs.shape)
+    print(steering_label.shape)
+    print(throttle_label.shape)
+
+    print(images.type())
+    print(other_inputs.type())
+    print(steering_label.type())
+    print(throttle_label.type())
+
 class Load_Data(Dataset):
     def __init__(self, data_folder, use_depth_input=False, use_other_inputs=False):
         self.data_folder_path = data_folder
@@ -139,17 +155,4 @@ class Load_Data(Dataset):
 
 
 if __name__ == "__main__":
-    from docopt import docopt
-    args = docopt(__doc__)
-    data_folder = args["<data_dir>"]
-    test = Load_Data(data_folder)
-    images, other_inputs, steering_label, throttle_label = test[100]
-    print(images.shape)
-    print(other_inputs.shape)
-    print(steering_label.shape)
-    print(throttle_label.shape)
-
-    print(images.type())
-    print(other_inputs.type())
-    print(steering_label.type())
-    print(throttle_label.type())
+    main()
