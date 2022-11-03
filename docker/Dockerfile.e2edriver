@@ -173,6 +173,15 @@ RUN arduino-cli core install arduino:avr
 RUN pip3 install --no-cache-dir --verbose waitress
 RUN pip3 install --no-cache-dir --verbose docopt
 RUN pip3 install --no-cache-dir --verbose pyserial
+RUN pip3 install --no-cache-dir --verbose pip install tqdm
 
+#
+# Tensorrt
+#
+RUN git clone --recursive https://github.com/NVIDIA-AI-IOT/torch2trt torch2trt && \
+	cd torch2trt && \
+	python3 setup.py install --verbose && \
+	cd ../ && \
+    rm -rf torch2trt
 
 WORKDIR /root
