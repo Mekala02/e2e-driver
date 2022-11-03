@@ -19,6 +19,7 @@ class Pilot:
         self.model_path = None
         self.pilot_mode = 0
         self.image = 0
+        self.transform_image = transforms.ToTensor()
         self.steering_prediction = 0
         self.throttle_prediction = 0
 
@@ -36,7 +37,7 @@ class Pilot:
     
     def predict(self):
         # start_time = time.time()
-        image = transforms.ToTensor()(self.image)
+        image = self.transform_image(self.image)
         # logger.info(f"Transform to tensor: {time.time() - start_time}")
         # start_time = time.time()
         image = image.to(device=self.device)

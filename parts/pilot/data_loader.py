@@ -23,7 +23,8 @@ def main():
     from docopt import docopt
     args = docopt(__doc__)
     data_folder = args["<data_dir>"]
-    test = Load_Data(data_folder)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    test = Load_Data(data_folder, device)
     images, other_inputs, steering_label, throttle_label = test[100]
     print(images.shape)
     print(other_inputs.shape)
@@ -36,11 +37,13 @@ def main():
     print(throttle_label.type())
 
 class Load_Data(Dataset):
-    def __init__(self, data_folder, use_depth_input=False, use_other_inputs=False):
+    def __init__(self, data_folder, device, use_depth_input=False, use_other_inputs=False):
         self.data_folder_path = data_folder
+        self.device = device
         self.use_depth_input = use_depth_input
         self.use_other_inputs = use_other_inputs
         self.changes = None
+        self.image_transform = transforms.ToTensor()
 
         # Constructing paths
         self.config_file_path = os.path.join(self.data_folder_path, "cfg.json")
@@ -127,7 +130,7 @@ class Load_Data(Dataset):
         else:
             images = rgb_image
         # Converts numpy.ndarray (H x W x C) in the range [0, 255] to a torch.FloatTensor of shape (C x H x W) in the range [0.0, 1.0] 
-        images = transforms.ToTensor()(images)
+        images = self.image_transform(images).to(device=self.device)
 
         if self.use_other_inputs:
             other_inputs = np.array([
@@ -139,15 +142,13 @@ class Load_Data(Dataset):
                 [self.datas[index]["IMU_Gyro_Z"]],
                 [self.datas[index]["Speed"]]
             ], dtype=np.float32)
-            other_inputs = torch.tensor(other_inputs)
+            other_inputs = torch.tensor(other_inputs, device=self.device)
 
         # Making pwm data between -1, 1
-        steering_label = np.array([self.datas[index]["Steering"]], dtype=np.float32)
-        throttle_label = np.array([self.datas[index]["Throttle"]], dtype=np.float32)
-        steering_label = (steering_label - 1500) / 600
-        throttle_label = (throttle_label - 1500) / 600
-        steering_label = torch.tensor(steering_label)
-        throttle_label = torch.tensor(throttle_label)
+        steering_label = (self.datas[index]["Steering"] - 1500) / 600
+        throttle_label = (self.datas[index]["Throttle"] - 1500) / 600
+        steering_label = torch.tensor([steering_label], device=self.device)
+        throttle_label = torch.tensor([throttle_label], device=self.device)
 
         if self.use_other_inputs:
             return images, other_inputs, steering_label, throttle_label

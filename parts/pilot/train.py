@@ -44,7 +44,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     criterion = torch.nn.MSELoss()
 
-    dataset = Load_Data(args["<data_dir>"], use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
+    dataset = Load_Data(args["<data_dir>"], device, use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
     test_len = math.floor(len(dataset) * test_data_percentage / 100)
     train_set, test_set = torch.utils.data.random_split(dataset, [len(dataset)-test_len, test_len], generator=torch.Generator().manual_seed(random_split_seed))
     train_set_loader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True)
@@ -92,13 +92,8 @@ class Trainer:
                 self.optimizer.zero_grad()
                 if self.use_other_inputs:
                     images, other_inputs, steering_labels, throttle_labels = data
-                    other_inputs = other_inputs.to(device=self.device)
                 else:
                     images, steering_labels, throttle_labels = data
-                # Get data to cuda
-                images = images.to(device=self.device)
-                steering_labels = steering_labels.to(device=self.device)
-                throttle_labels = throttle_labels.to(device=self.device)
                 # Forward
                 if self.use_other_inputs:
                     steering_prediction, throttle_prediction = self.model(images, other_inputs)
@@ -159,12 +154,8 @@ class Trainer:
             for batch_no, data in enumerate(tqdm(self.test_set_loader, file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}'), 1):
                 if self.use_other_inputs:
                     images, other_inputs, steering_labels, throttle_labels = data
-                    other_inputs = other_inputs.to(device=self.device)
                 else:
                     images, steering_labels, throttle_labels = data
-                images = images.to(device=self.device)
-                steering_labels = steering_labels.to(device=self.device)
-                throttle_labels = throttle_labels.to(device=self.device)
                 if self.use_other_inputs:  
                     steering_prediction, throttle_prediction = self.model(images, other_inputs)
                 else:
