@@ -1,6 +1,6 @@
 """
 Usage:
-    train.py  <data_dir>
+    train.py  <data_dir> [<model>]
 
 Options:
   -h --help     Show this screen.
@@ -51,7 +51,7 @@ def train(device, model, criterion, optimizer, train_set_loader, test_set_loader
             # Backward
             loss.backward()
             # Gradient clipping
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 5)
+            # torch.nn.utils.clip_grad_norm_(model.parameters(), 5)
             # Gradient Descent Step
             optimizer.step()
             print(f"\nBatch[{batch_no}/{nu_of_batches}] Steering Loss: {steering_loss:.2e}, Throttle Loss: {throttle_loss:.2e}")
@@ -105,7 +105,10 @@ if __name__ == "__main__":
     batch_size = 256
     num_epochs = 10
 
+    model_path = args["<model>"]
     model = Linear(in_channels=in_channels).to(device)
+    if model_path:
+        model.load_state_dict(torch.load(model_path))
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     criterion = torch.nn.MSELoss()
 
