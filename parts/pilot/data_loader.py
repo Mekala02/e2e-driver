@@ -37,18 +37,18 @@ def main():
 
 class Load_Data(Dataset):
     def __init__(self, data_folder, use_depth_input=False, use_other_inputs=False):
-        self.data_folder_path = data_folder
+        self.data_folder = data_folder
         self.use_depth_input = use_depth_input
         self.use_other_inputs = use_other_inputs
         self.changes = None
         self.image_transform = transforms.ToTensor()
 
         # Constructing paths
-        self.config_file_path = os.path.join(self.data_folder_path, "cfg.json")
-        self.changes_file_path = os.path.join(self.data_folder_path, "changes.json")
-        self.memory_file_path = os.path.join(self.data_folder_path, "memory.json")
-        self.RGB_image_path = os.path.join(self.data_folder_path, "big_data", "RGB_Image")
-        self.Depth_image_path = os.path.join(self.data_folder_path, "big_data", "Depth_Image")
+        self.config_file_path = os.path.join(self.data_folder, "cfg.json")
+        self.changes_file_path = os.path.join(self.data_folder, "changes.json")
+        self.memory_file_path = os.path.join(self.data_folder, "memory.json")
+        self.RGB_image_path = os.path.join(self.data_folder, "big_data", "RGB_Image")
+        self.Depth_image_path = os.path.join(self.data_folder, "big_data", "Depth_Image")
 
         # Opening and reading from files
         with open(self.config_file_path) as cfg_file:
