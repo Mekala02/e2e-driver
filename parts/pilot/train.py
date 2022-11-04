@@ -34,8 +34,8 @@ def main():
     random_split_seed = 22
     test_data_percentage = 10
     learning_rate = 1e-3
-    batch_size = 256
-    num_epochs = 10
+    batch_size = 1024
+    num_epochs = 100
 
     # Our input size is not changing so we can use cudnn's optimization
     torch.backends.cudnn.benchmark = True
@@ -47,13 +47,13 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     criterion = torch.nn.MSELoss()
 
-    dataset = Load_Data(args["<data_dir>"], use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
+    dataset = Load_Data(args["<data_dir>"], use_depth_input=use_depth_input, use_other_inputs=use_other_inputs, expend_svo=True)
     test_len = math.floor(len(dataset) * test_data_percentage / 100)
     train_set, test_set = torch.utils.data.random_split(dataset, [len(dataset)-test_len, test_len], generator=torch.Generator().manual_seed(random_split_seed))
     # We using torch.backends.cudnn.benchmark 
     # it will be slow if input size change (batch size is changing on last layer if data_set_len%batch_size!=0) so we set drop_last = True
-    train_set_loader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True, drop_last = True)
-    test_set_loader = DataLoader(dataset=test_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
+    train_set_loader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
+    test_set_loader = DataLoader(dataset=test_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)
     trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, test_set_loader=test_set_loader, use_other_inputs=False, patience=3, delta=0.0005)
     trainer.fit()
     # Saving the model
@@ -85,14 +85,14 @@ class Trainer:
         # torch.autograd.set_detect_anomaly(True)
         # logger.info(self.model)
         logger.info(f"Trainig on {self.device}...")
-        epoch_steering_losses = []
-        epoch_throttle_losses = []
         for epoch in range(1, self.num_epochs+1):
+            epoch_steering_losses = []
+            epoch_throttle_losses = []
             self.model.train()
-            batch_steering_losses = []
-            batch_throttle_losses = []
-            pbar = tqdm(self.train_set_loader, desc=f"Epoch: {epoch}", file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}')
+            pbar = tqdm(self.train_set_loader, desc=f"Epoch: {epoch} ", file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}')
             for batch_no, data in enumerate(pbar, 1):
+                batch_steering_losses = []
+                batch_throttle_losses = []
                 for param in self.model.parameters():
                     param.grad = None
                 if self.use_other_inputs:
@@ -117,13 +117,14 @@ class Trainer:
                 # Gradient clipping
                 # torch.nn.utils.clip_grad_norm_(self.model.parameters(), 5)
                 self.optimizer.step()
+            
             # After finishing epoch we evaluating the model
             epoch_steering_loss = sum(batch_steering_losses) / len(batch_steering_losses)
             epoch_throttle_loss = sum(batch_throttle_losses) / len(batch_throttle_losses)
             epoch_total_loss = epoch_steering_loss + epoch_throttle_loss
             epoch_steering_losses.append(epoch_steering_loss)
             epoch_throttle_losses.append(epoch_throttle_loss)
-            loss_string = f"For Epoch {epoch} --> Total Loss: {epoch_steering_loss:.2e}, Steering Loss: {epoch_throttle_loss:.2e}, Throttle Loss: {epoch_total_loss:.2e}"
+            loss_string = f"For Epoch {epoch} --> Total Loss: {epoch_total_loss:.2e}, Steering Loss: {epoch_steering_loss:.2e}, Throttle Loss: {epoch_throttle_loss:.2e}"
             if self.test_set_loader:
                 logger.info("Evaluating on test set ...")
                 eval_total_loss, eval_steering_loss, eval_throttle_loss = self.evaluate()
@@ -141,15 +142,15 @@ class Trainer:
                 if eval_total_loss < self.test_set_min_loss:
                     self.test_set_min_loss = eval_total_loss
                     self.save_model()
-
-            # Early stopping
-            if batch_no >= self.patience:
-                last_index = batch_no-1
-                epochs_total_losses = sum(epoch_steering_losses) + sum(epoch_throttle_losses)
-                # If loss improve smaller than delta for patience times stops training 
-                if (epochs_total_losses[last_index] - epochs_total_losses[last_index-1] < self.delta) and (epochs_total_losses[last_index-1] - epochs_total_losses[last_index-2] < self.delta):
-                    logger.info(f"Stopped Training: Delta Loss Is Smaller Than {self.delta} For {self.patience} Times")
-                    break
+            # # Early stopping ()
+            # if epoch >= self.patience:
+            #     # Epoch starts from one but lists first index is zero
+            #     last_index = epoch - 1
+            #     epochs_total_losses = epoch_steering_losses + epoch_throttle_losses
+            #     # If loss improve smaller than delta for patience times stops training 
+            #     if (epochs_total_losses[last_index] - epochs_total_losses[last_index-1] < self.delta) and (epochs_total_losses[last_index-1] - epochs_total_losses[last_index-2] < self.delta):
+            #         logger.info(f"Stopped Training: Delta Loss Is Smaller Than {self.delta} For {self.patience} Times")
+            #         break
 
     def evaluate(self):
         logger.info("Evaluation Mode")
@@ -160,8 +161,12 @@ class Trainer:
             for batch_no, data in enumerate(tqdm(self.test_set_loader, file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}'), 1):
                 if self.use_other_inputs:
                     images, other_inputs, steering_labels, throttle_labels = data
+                    other_inputs = other_inputs.to(self.device)
                 else:
                     images, steering_labels, throttle_labels = data
+                images = images.to(self.device, non_blocking=True) / 255.0
+                steering_labels = steering_labels.to(self.device)
+                throttle_labels = throttle_labels.to(self.device)
                 if self.use_other_inputs:  
                     steering_prediction, throttle_prediction = self.model(images, other_inputs)
                 else:
