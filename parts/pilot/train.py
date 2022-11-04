@@ -33,9 +33,12 @@ def main():
         in_channels = 3
     random_split_seed = 22
     test_data_percentage = 10
-    learning_rate = 0.0001
+    learning_rate = 1e-3
     batch_size = 256
     num_epochs = 10
+
+    # Our input size is not changing so we can use cudnn's optimization
+    torch.backends.cudnn.benchmark = True
 
     model_path = args["<model>"]
     model = Linear(in_channels=in_channels).to(device)
@@ -47,9 +50,10 @@ def main():
     dataset = Load_Data(args["<data_dir>"], use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
     test_len = math.floor(len(dataset) * test_data_percentage / 100)
     train_set, test_set = torch.utils.data.random_split(dataset, [len(dataset)-test_len, test_len], generator=torch.Generator().manual_seed(random_split_seed))
-    train_set_loader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
+    # We using torch.backends.cudnn.benchmark 
+    # it will be slow if input size change (batch size is changing on last layer if data_set_len%batch_size!=0) so we set drop_last = True
+    train_set_loader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True, drop_last = True)
     test_set_loader = DataLoader(dataset=test_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
-
     trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, test_set_loader=test_set_loader, use_other_inputs=False, patience=3, delta=0.0005)
     trainer.fit()
     # Saving the model
@@ -89,7 +93,8 @@ class Trainer:
             batch_throttle_losses = []
             pbar = tqdm(self.train_set_loader, desc=f"Epoch: {epoch}", file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}')
             for batch_no, data in enumerate(pbar, 1):
-                self.optimizer.zero_grad()
+                for param in self.model.parameters():
+                    param.grad = None
                 if self.use_other_inputs:
                     images, other_inputs, steering_labels, throttle_labels = data
                     other_inputs = other_inputs.to(self.device)
@@ -98,7 +103,6 @@ class Trainer:
                 images = images.to(self.device, non_blocking=True) / 255.0
                 steering_labels = steering_labels.to(self.device)
                 throttle_labels = throttle_labels.to(self.device)
-                # Forward
                 if self.use_other_inputs:
                     steering_prediction, throttle_prediction = self.model(images, other_inputs)
                 else:
@@ -109,11 +113,9 @@ class Trainer:
                 batch_steering_losses.append(batch_steering_loss.item())
                 batch_throttle_losses.append(batch_throttle_loss.item())
                 logger.info(f"\nBatch[{batch_no}/{self.nu_of_train_batches}] Total Loss: {total_loss:.2e}, Steering Loss: {batch_steering_loss:.2e}, Throttle Loss: {batch_throttle_loss:.2e}")
-                # Backward
                 total_loss.backward()
                 # Gradient clipping
-                torch.nn.utils.clip_grad_norm_(self.model.parameters(), 5)
-                # Gradient Descent Step
+                # torch.nn.utils.clip_grad_norm_(self.model.parameters(), 5)
                 self.optimizer.step()
             # After finishing epoch we evaluating the model
             epoch_steering_loss = sum(batch_steering_losses) / len(batch_steering_losses)
