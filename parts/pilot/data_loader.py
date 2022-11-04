@@ -36,12 +36,12 @@ def main():
     print(throttle_label.type())
 
 class Load_Data(Dataset):
-    def __init__(self, data_folder, use_depth_input=False, use_other_inputs=False):
+    def __init__(self, data_folder, use_depth_input=False, use_other_inputs=False, expend_svo=False):
         self.data_folder = data_folder
         self.use_depth_input = use_depth_input
         self.use_other_inputs = use_other_inputs
         self.changes = None
-        self.image_transform = transforms.ToTensor()
+        self.expend_svo = expend_svo
 
         # Constructing paths
         self.config_file_path = os.path.join(self.data_folder, "cfg.json")
@@ -76,14 +76,25 @@ class Load_Data(Dataset):
                 self.datas= np.delete(self.datas, [range(deleted_indexes[0], deleted_indexes[1]+1)])
 
         if self.cfg["SVO_COMPRESSION_MODE"]:
-            input_path = os.path.join(data_folder, "zed_record.svo")
-            init_parameters = sl.InitParameters()
-            init_parameters.set_from_svo_file(input_path)
-            self.zed = sl.Camera()
-            self.zed_RGB_Image = sl.Mat()
-            self.zed_Depth_Map = sl.Mat()
-            if (err:=self.zed.open(init_parameters)) != sl.ERROR_CODE.SUCCESS:
-                logger.error(err)
+            # If we recorded the data to SVO file but want fast training
+            # we converting SVO data to jpg and saving them then using jpg's for training
+            if self.expend_svo:
+                self.RGB_image_path = os.path.join(self.data_folder, "RGB_Image")
+                if not os.path.isdir(self.RGB_image_path):
+                    logger.error(f"Can't Open Folder {self.RGB_image_path}")
+                    quit()
+                self.cfg["RGB_IMAGE_FORMAT"] = "jpg"
+
+            else:
+                input_path = os.path.join(data_folder, "zed_record.svo")
+                init_parameters = sl.InitParameters()
+                init_parameters.set_from_svo_file(input_path)
+                init_parameters.svo_real_time_mode = False
+                self.zed = sl.Camera()
+                self.zed_RGB_Image = sl.Mat()
+                self.zed_Depth_Map = sl.Mat()
+                if (err:=self.zed.open(init_parameters)) != sl.ERROR_CODE.SUCCESS:
+                    logger.error(err)
 
         self.RGB_image_format = self.cfg["RGB_IMAGE_FORMAT"]
         self.Depth_image_format = self.cfg["DEPTH_IMAGE_FORMAT"]
@@ -105,7 +116,7 @@ class Load_Data(Dataset):
         return(len(self.datas))
 
     def __getitem__(self, index):
-        if self.cfg["SVO_COMPRESSION_MODE"]:
+        if self.cfg["SVO_COMPRESSION_MODE"] and not self.expend_svo:
             self.zed.set_svo_position(self.datas[index]["Zed_Data_Id"])
             if (err:=self.zed.grab()) == sl.ERROR_CODE.SUCCESS:
                 self.zed.retrieve_image(self.zed_RGB_Image, sl.VIEW.LEFT)
@@ -128,9 +139,6 @@ class Load_Data(Dataset):
             images = np.concatenate((rgb_image, Depth_array), axis=2)
         else:
             images = rgb_image
-
-        # # Converts numpy.ndarray (H x W x C) in the range [0, 255] to a torch.FloatTensor of shape (C x H x W) in the range [0.0, 1.0] 
-        # images = self.image_transform(images)
 
         # (H x W x C) to (C x H x W)
         images = images.transpose(2, 0, 1)
