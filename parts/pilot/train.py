@@ -44,11 +44,11 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     criterion = torch.nn.MSELoss()
 
-    dataset = Load_Data(args["<data_dir>"], device, use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
+    dataset = Load_Data(args["<data_dir>"], use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
     test_len = math.floor(len(dataset) * test_data_percentage / 100)
     train_set, test_set = torch.utils.data.random_split(dataset, [len(dataset)-test_len, test_len], generator=torch.Generator().manual_seed(random_split_seed))
-    train_set_loader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True)
-    test_set_loader = DataLoader(dataset=test_set, batch_size=batch_size, shuffle=True)
+    train_set_loader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
+    test_set_loader = DataLoader(dataset=test_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
 
     trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, test_set_loader=test_set_loader, use_other_inputs=False, patience=3, delta=0.0005)
     trainer.fit()
@@ -92,8 +92,12 @@ class Trainer:
                 self.optimizer.zero_grad()
                 if self.use_other_inputs:
                     images, other_inputs, steering_labels, throttle_labels = data
+                    other_inputs = other_inputs.to(self.device)
                 else:
                     images, steering_labels, throttle_labels = data
+                images = images.to(self.device, non_blocking=True) / 255.0
+                steering_labels = steering_labels.to(self.device)
+                throttle_labels = throttle_labels.to(self.device)
                 # Forward
                 if self.use_other_inputs:
                     steering_prediction, throttle_prediction = self.model(images, other_inputs)

@@ -23,8 +23,7 @@ def main():
     from docopt import docopt
     args = docopt(__doc__)
     data_folder = args["<data_dir>"]
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    test = Load_Data(data_folder, device)
+    test = Load_Data(data_folder, use_other_inputs=True)
     images, other_inputs, steering_label, throttle_label = test[100]
     print(images.shape)
     print(other_inputs.shape)
@@ -37,9 +36,8 @@ def main():
     print(throttle_label.type())
 
 class Load_Data(Dataset):
-    def __init__(self, data_folder, device, use_depth_input=False, use_other_inputs=False):
+    def __init__(self, data_folder, use_depth_input=False, use_other_inputs=False):
         self.data_folder_path = data_folder
-        self.device = device
         self.use_depth_input = use_depth_input
         self.use_other_inputs = use_other_inputs
         self.changes = None
@@ -113,6 +111,7 @@ class Load_Data(Dataset):
                 self.zed.retrieve_image(self.zed_RGB_Image, sl.VIEW.LEFT)
                 rgba_image = self.zed_RGB_Image.get_data()
                 rgb_image = cv2.cvtColor(rgba_image, cv2.COLOR_RGBA2RGB)
+                rgb_image = cv2.resize(rgb_image, (160, 120), interpolation= cv2.INTER_LINEAR)
                 if self.use_depth_input:
                     self.zed.retrieve_measure(self.zed_Depth_Map, sl.MEASURE.DEPTH)
                     Depth_array = self.zed_Depth_Map.get_data()
@@ -129,8 +128,16 @@ class Load_Data(Dataset):
             images = np.concatenate((rgb_image, Depth_array), axis=2)
         else:
             images = rgb_image
-        # Converts numpy.ndarray (H x W x C) in the range [0, 255] to a torch.FloatTensor of shape (C x H x W) in the range [0.0, 1.0] 
-        images = self.image_transform(images).to(device=self.device)
+
+        # # Converts numpy.ndarray (H x W x C) in the range [0, 255] to a torch.FloatTensor of shape (C x H x W) in the range [0.0, 1.0] 
+        # images = self.image_transform(images)
+
+        # (H x W x C) to (C x H x W)
+        images = images.transpose(2, 0, 1)
+        # Making image contiguous on memory
+        images = np.ascontiguousarray(images)
+        # Not normalizing yet
+        images = torch.from_numpy(images)
 
         if self.use_other_inputs:
             other_inputs = np.array([
@@ -142,13 +149,13 @@ class Load_Data(Dataset):
                 [self.datas[index]["IMU_Gyro_Z"]],
                 [self.datas[index]["Speed"]]
             ], dtype=np.float32)
-            other_inputs = torch.tensor(other_inputs, device=self.device)
+            other_inputs = torch.from_numpy(other_inputs)
 
         # Making pwm data between -1, 1
         steering_label = (self.datas[index]["Steering"] - 1500) / 600
         throttle_label = (self.datas[index]["Throttle"] - 1500) / 600
-        steering_label = torch.tensor([steering_label], device=self.device)
-        throttle_label = torch.tensor([throttle_label], device=self.device)
+        steering_label = torch.tensor([steering_label], dtype=torch.float)
+        throttle_label = torch.tensor([throttle_label], dtype=torch.float)
 
         if self.use_other_inputs:
             return images, other_inputs, steering_label, throttle_label
