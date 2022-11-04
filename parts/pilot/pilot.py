@@ -6,6 +6,7 @@ import time
 import torch
 import logging
 import torchvision.transforms as transforms
+import cv2
 
 logger = logging.getLogger(__name__)
 
@@ -37,15 +38,17 @@ class Pilot:
     
     def predict(self):
         # start_time = time.time()
-        image = self.transform_image(self.image)
+        rgb_image = cv2.resize(self.image, (160, 120), interpolation= cv2.INTER_LINEAR)
+        rgb_image = rgb_image.transpose(2, 0, 1)
+        rgb_image = torch.from_numpy(rgb_image)
         # logger.info(f"Transform to tensor: {time.time() - start_time}")
         # start_time = time.time()
-        image = image.to(device=self.device)
+        rgb_image = rgb_image.to(self.device, non_blocking=True) / 255.0
         # logger.info(f"To device: {time.time() - start_time}")
-        image = image.view(1, 3, 376, 672)
+        rgb_image = rgb_image.view(1, 3, 160, 120)
         # start_time = time.time()
         with torch.no_grad():
-            steering_prediction, throttle_prediction = self.model(image)
+            steering_prediction, throttle_prediction = self.model(rgb_image)
         # logger.info(f"Prediction: {time.time() - start_time}")
         # We made data between -1, 1 when trainig so unpacking thoose to pwm value
         self.steering_prediction = int(steering_prediction * 600 + 1500)
