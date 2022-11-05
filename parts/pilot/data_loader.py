@@ -44,7 +44,7 @@ class Load_Data(Dataset):
     def calculate_index(self, index):
         # If we use one file index will be same
         if self.len_data_fodlers == 1:
-            return index
+            return 0, index
         data_index = index
         # For multiple data files we finding corresponding file no and data index
         for folder_index, datas in enumerate(self.data_folders):

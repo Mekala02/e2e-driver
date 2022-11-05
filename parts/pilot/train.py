@@ -195,11 +195,10 @@ class Trainer:
         return eval_loss, eval_steering_loss, eval_throttle_loss
 
     def save_model(self):
-        model_save_path = os.path.join('~/e2e-driver/models', "model.pt")
-        jit_model_save_path = os.path.join('~/e2e-driver/models', "model_jit.pt")
-        torch.save(self.model.state_dict(), model_save_path)
+        model_save_path = os.path.join(os.path.expanduser('~'), "e2e-driver", "models")
+        torch.save(self.model.state_dict(), os.path.join(model_save_path, "model.pt"))
         script_cell = torch.jit.script(self.model)
-        torch.jit.save(script_cell, jit_model_save_path)
+        torch.jit.save(script_cell, os.path.join(model_save_path, "model_jit.pt"))
         logger.info(f"Saved the model to {model_save_path}\n")
 
 
