@@ -1,6 +1,6 @@
 """
 Usage:
-    train.py  <data_dir> [<model>]
+    train.py  <data_dirs>... [--model=None]
 
 Options:
   -h --help     Show this screen.
@@ -32,7 +32,8 @@ def main():
         in_channels = 4
     else:
         in_channels = 3
-    test_data_percentage = 20
+    test_data_percentage = 10
+    #2e-3 for startup then reduce to 1e-3
     learning_rate = 2e-3
     batch_size = 1024
     num_epochs = 100
@@ -40,21 +41,21 @@ def main():
     # Our input size is not changing so we can use cudnn's optimization
     torch.backends.cudnn.benchmark = True
 
-    model_path = args["<model>"]
+    model_path = args["--model"]
     model = Linear(in_channels=in_channels).to(device)
     if model_path:
         model.load_state_dict(torch.load(model_path))
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     criterion = torch.nn.MSELoss()
 
-    dataset = Load_Data(args["<data_dir>"], use_depth_input=use_depth_input, use_other_inputs=use_other_inputs, expend_svo=True)
+    dataset = Load_Data(args["<data_dirs>"], use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
     test_len = math.floor(len(dataset) * test_data_percentage / 100)
     train_set, test_set = torch.utils.data.random_split(dataset, [len(dataset)-test_len, test_len])
     # We using torch.backends.cudnn.benchmark 
     # it will be slow if input size change (batch size is changing on last layer if data_set_len%batch_size!=0) so we set drop_last = True
     train_set_loader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
     test_set_loader = DataLoader(dataset=test_set, batch_size=batch_size, num_workers=4, pin_memory=True)
-    trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, test_set_loader=test_set_loader, use_other_inputs=False, patience=3, delta=0.00005)
+    trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, test_set_loader=test_set_loader, use_other_inputs=False, patience=5, delta=0.00005)
     trainer.fit()
     # Saving the model
     # trainer.save_model()
@@ -81,8 +82,8 @@ class Trainer:
         self.not_improved_count = 0
         self.train_set_min_loss = float('inf')
         self.test_set_min_loss = float('inf')
-        self.steering_weight = 0.8
-        self.throttle_weight = 0.2
+        self.steering_weight = 0.9
+        self.throttle_weight = 0.1
 
     def fit(self):
         # torch.autograd.set_detect_anomaly(True)

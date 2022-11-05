@@ -1,6 +1,6 @@
 """
 Usage:
-    train.py  <data_dir>
+    data_loader.py  <data_dir>...
 
 Options:
   -h --help     Show this screen.
@@ -9,7 +9,6 @@ Options:
 import json
 import torch
 from torch.utils.data import Dataset
-import torchvision.transforms as transforms
 import pyzed.sl as sl
 import logging
 import numpy as np
@@ -22,8 +21,8 @@ logger = logging.getLogger(__name__)
 def main():
     from docopt import docopt
     args = docopt(__doc__)
-    data_folder = args["<data_dir>"]
-    test = Load_Data(data_folder, use_other_inputs=True)
+    data_folders = args["<data_dir>"]
+    test = Load_Data(data_folders, use_other_inputs=True)
     images, other_inputs, steering_label, throttle_label = test[100]
     print(images.shape)
     print(other_inputs.shape)
@@ -36,19 +35,55 @@ def main():
     print(throttle_label.type())
 
 class Load_Data(Dataset):
-    def __init__(self, data_folder, use_depth_input=False, use_other_inputs=False, expend_svo=False):
-        self.data_folder = data_folder
+    def __init__(self, data_folder_paths, use_depth_input=False, use_other_inputs=False):
+        self.data_folder_paths = data_folder_paths
+        self.use_depth_input = use_depth_input
+        self.use_other_inputs = use_other_inputs
+        self.data_folders = []
+        for folder_path in self.data_folder_paths:
+            self.data_folders.append(Data_Folder(folder_path, use_depth_input=self.use_depth_input, use_other_inputs=self.use_other_inputs, expend_svo=True))
+        self.len_data_fodlers = len(self.data_folders)
+        self.lenght = 0
+        for datas in self.data_folders:
+            self.lenght += len(datas)
+
+    def __len__(self):
+        return(self.lenght)
+
+    def __getitem__(self, index):
+        folder_index, data_index = self.calculate_index(index)
+        if self.use_other_inputs:
+            images, other_inputs, steering_label, throttle_label = self.data_folders[folder_index][data_index]
+            return images, other_inputs, steering_label, throttle_label
+        images, steering_label, throttle_label = self.data_folders[folder_index][data_index]
+        return images, steering_label, throttle_label
+
+    def calculate_index(self, index):
+        # If we use one file index will be same
+        if self.len_data_fodlers == 1:
+            return index
+        data_index = index
+        # For multiple data files we finding corresponding file no and data index
+        for folder_index, datas in enumerate(self.data_folders):
+            if data_index < len(datas):
+                return folder_index, data_index
+            data_index -= len(datas)
+
+
+class Data_Folder():
+    def __init__(self, data_folder_path, use_depth_input=False, use_other_inputs=False, expend_svo=False):
+        self.data_folder_path = data_folder_path
         self.use_depth_input = use_depth_input
         self.use_other_inputs = use_other_inputs
         self.changes = None
         self.expend_svo = expend_svo
 
         # Constructing paths
-        self.config_file_path = os.path.join(self.data_folder, "cfg.json")
-        self.changes_file_path = os.path.join(self.data_folder, "changes.json")
-        self.memory_file_path = os.path.join(self.data_folder, "memory.json")
-        self.RGB_image_path = os.path.join(self.data_folder, "big_data", "RGB_Image")
-        self.Depth_image_path = os.path.join(self.data_folder, "big_data", "Depth_Image")
+        self.config_file_path = os.path.join(self.data_folder_path , "cfg.json")
+        self.changes_file_path = os.path.join(self.data_folder_path , "changes.json")
+        self.memory_file_path = os.path.join(self.data_folder_path , "memory.json")
+        self.RGB_image_path = os.path.join(self.data_folder_path , "big_data", "RGB_Image")
+        self.Depth_image_path = os.path.join(self.data_folder_path , "big_data", "Depth_Image")
 
         # Opening and reading from files
         with open(self.config_file_path) as cfg_file:
@@ -75,18 +110,20 @@ class Load_Data(Dataset):
             for deleted_indexes in self.deleted_data_indexes:
                 self.datas= np.delete(self.datas, [range(deleted_indexes[0], deleted_indexes[1]+1)])
 
+        self.data_lenght = len(self.datas)
+
         if self.cfg["SVO_COMPRESSION_MODE"]:
             # If we recorded the data to SVO file but want fast training
             # we converting SVO data to jpg and saving them then using jpg's for training
             if self.expend_svo:
-                self.RGB_image_path = os.path.join(self.data_folder, "RGB_Image")
+                self.RGB_image_path = os.path.join(self.data_folder_path , "RGB_Image")
                 if not os.path.isdir(self.RGB_image_path):
                     logger.error(f"Can't Open Folder {self.RGB_image_path}")
                     quit()
                 self.cfg["RGB_IMAGE_FORMAT"] = "jpg"
 
             else:
-                input_path = os.path.join(data_folder, "zed_record.svo")
+                input_path = os.path.join(self.data_folder_path, "zed_record.svo")
                 init_parameters = sl.InitParameters()
                 init_parameters.set_from_svo_file(input_path)
                 init_parameters.svo_real_time_mode = False
@@ -113,7 +150,7 @@ class Load_Data(Dataset):
         return np.load(path)["arr_0"]
 
     def __len__(self):
-        return(len(self.datas))
+        return(self.data_lenght)
 
     def __getitem__(self, index):
         if self.cfg["SVO_COMPRESSION_MODE"] and not self.expend_svo:
@@ -130,6 +167,7 @@ class Load_Data(Dataset):
                 logger.warning(err)
         else:
             rgb_image = self.load_RGB_image(os.path.join(self.RGB_image_path, str(self.datas[index]["Data_Id"]) + "." + self.RGB_image_format))
+            rgb_image = cv2.resize(rgb_image, (160, 120), interpolation= cv2.INTER_LINEAR)
             if self.use_depth_input:
                 Depth_array = self.load_Depth_image(os.path.join(self.Depth_image_path, str(self.datas[index]["Data_Id"]) + "." + self.Depth_image_format))
 
