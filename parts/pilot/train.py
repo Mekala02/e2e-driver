@@ -25,13 +25,13 @@ logger = logging.getLogger("train")
 def main():
     args = docopt(__doc__)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    torch.manual_seed(22)
     use_depth_input = False
     use_other_inputs = False
     if use_depth_input:
         in_channels = 4
     else:
         in_channels = 3
-    random_split_seed = 22
     test_data_percentage = 10
     learning_rate = 1e-3
     batch_size = 1024
@@ -49,11 +49,11 @@ def main():
 
     dataset = Load_Data(args["<data_dir>"], use_depth_input=use_depth_input, use_other_inputs=use_other_inputs, expend_svo=True)
     test_len = math.floor(len(dataset) * test_data_percentage / 100)
-    train_set, test_set = torch.utils.data.random_split(dataset, [len(dataset)-test_len, test_len], generator=torch.Generator().manual_seed(random_split_seed))
+    train_set, test_set = torch.utils.data.random_split(dataset, [len(dataset)-test_len, test_len])
     # We using torch.backends.cudnn.benchmark 
     # it will be slow if input size change (batch size is changing on last layer if data_set_len%batch_size!=0) so we set drop_last = True
     train_set_loader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
-    test_set_loader = DataLoader(dataset=test_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)
+    test_set_loader = DataLoader(dataset=test_set, batch_size=batch_size, num_workers=4, pin_memory=True)
     trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, test_set_loader=test_set_loader, use_other_inputs=False, patience=3, delta=0.0005)
     trainer.fit()
     # Saving the model
@@ -78,6 +78,7 @@ class Trainer:
         self.nu_of_train_batches = len(self.train_set_loader)
         if self.test_set_loader:
             self.nu_of_test_batches = len(self.test_set_loader)
+        self.not_improved_count = 0
         self.train_set_min_loss = float('inf')
         self.test_set_min_loss = float('inf')
 
@@ -133,24 +134,28 @@ class Trainer:
             else:
                 logger.info(loss_string)
             # If this model is better than previous model we saving it
-            # If we evaluate on test set we saving according to that
-            if epoch_total_loss < self.train_set_min_loss:
+            # If we have test set we desiding improvement based on that
+            self.not_improved_count += 1
+            delta_train_set_loss =  self.train_set_min_loss - epoch_total_loss
+            if delta_train_set_loss > 0:
                 self.train_set_min_loss = epoch_total_loss
-                if not self.test_set_loader:
-                    self.save_model()
+                # We counting as improvement if delta_loss > self.delta
+                if delta_train_set_loss >= self.delta and not self.test_set_loader:
+                    self.not_improved_count = 0
             if self.test_set_loader:
-                if eval_total_loss < self.test_set_min_loss:
+                delta_test_set_loss =  self.test_set_min_loss - eval_total_loss
+                if delta_test_set_loss > 0:
                     self.test_set_min_loss = eval_total_loss
-                    self.save_model()
-            # # Early stopping ()
-            # if epoch >= self.patience:
-            #     # Epoch starts from one but lists first index is zero
-            #     last_index = epoch - 1
-            #     epochs_total_losses = epoch_steering_losses + epoch_throttle_losses
-            #     # If loss improve smaller than delta for patience times stops training 
-            #     if (epochs_total_losses[last_index] - epochs_total_losses[last_index-1] < self.delta) and (epochs_total_losses[last_index-1] - epochs_total_losses[last_index-2] < self.delta):
-            #         logger.info(f"Stopped Training: Delta Loss Is Smaller Than {self.delta} For {self.patience} Times")
-            #         break
+                    if delta_test_set_loss >= self.delta:
+                        self.not_improved_count = 0
+            # saving the model if improved
+            if self.not_improved_count == 0:
+                self.save_model()
+            # Early stopping
+            # If loss improve smaller than delta for patience times stops training 
+            if (self.not_improved_count >= self.patience):
+                logger.info(f"Stopped Training: Delta Loss Is Smaller Than {self.delta} For {self.patience} Times")
+                break
 
     def evaluate(self):
         logger.info("Evaluation Mode")
