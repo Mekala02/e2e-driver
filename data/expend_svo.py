@@ -51,10 +51,11 @@ def main():
                 # rgb_image = cv2.resize(rgb_image, (160, 120), interpolation= cv2.INTER_LINEAR)
                 cv2.imwrite(os.path.join(rgb_data_path, str(index)+"." + "jpg"), rgb_image)
             elif(err == sl.ERROR_CODE.END_OF_SVOFILE_REACHED):
-                print("SVO end has been reached. Looping back to first frame")
+                print("SVO end has been reached.")
                 return
             else:
                 print(err)
+                return
             index += 1
 
 if __name__ == "__main__":
