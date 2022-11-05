@@ -69,7 +69,7 @@ class Pilot:
         self.pilot_mode = self.memory.memory["Pilot_Mode"]
         self.image = self.memory.big_memory["RGB_Image"]
         if self.model_path:
-            if self.steering_prediction > cfg["STEERING_MAX_PWM"]: self.steering_prediction=cfg["STEERING_FULL_RIGHT_PWM"]
+            if self.steering_prediction > cfg["STEERING_MAX_PWM"]: self.steering_prediction=cfg["STEERING_MAX_PWM"]
             if self.steering_prediction < cfg["STEERING_MIN_PWM"]: self.steering_prediction=cfg["STEERING_MIN_PWM"]
             if self.pilot_mode == "Angle":
                 self.memory.memory["Steering"] = self.steering_prediction
