@@ -20,22 +20,20 @@ class Data_Logger:
         self.outputs = {"Data_Id": 0, "Timestamp": 0}
         self.index = 0
         new_folder_name = datetime.datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
-        data_folder = os.path.join("data", new_folder_name)
-        os.mkdir(data_folder)
-        memory.untracked["Data_Folder"] = data_folder
-        with open(os.path.join(data_folder, "cfg.json"), "w+") as config_log:
+        self.data_folder = os.path.join("data", new_folder_name)
+        os.mkdir(self.data_folder)
+        memory.untracked["Data_Folder"] = self.data_folder
+        with open(os.path.join(self.data_folder, "cfg.json"), "w+") as config_log:
             json.dump(cfg, config_log)
         # If we saving data in svo file don't creating folders
         if cfg["SVO_COMPRESSION_MODE"] is None:
-            self.big_folder = os.path.join(data_folder, "big_data")
-            os.mkdir(self.big_folder)
-            os.mkdir(os.path.join(self.big_folder, "Depth_Image"))
-            os.mkdir(os.path.join(self.big_folder, "RGB_Image"))
-            os.mkdir(os.path.join(self.big_folder, "Object_Detection"))
-        self.file = open(os.path.join(data_folder, "memory.json"), "w+")
+            os.mkdir(os.path.join(self.data_folder, "RGB_Image"))
+            os.mkdir(os.path.join(self.data_folder, "Depth_Image"))
+            os.mkdir(os.path.join(self.data_folder, "Object_Detection"))
+        self.file = open(os.path.join(self.data_folder, "memory.json"), "w+")
         self.file.write("[")
         logger.info("Successfully Added")
-        logger.info(f"Data_Folder: {data_folder}")
+        logger.info(f"Data_Folder: {self.data_folder}")
 
     def save_to_file(self, img_format, path, name, data):
         if img_format == "npy":
@@ -45,7 +43,7 @@ class Data_Logger:
         elif img_format == "jpg" or img_format == "jpeg" or img_format == "png":
             cv2.imwrite(os.path.join(path, name+"." + img_format), data)
         else:
-            logger.warning("Unknown Image Format For Saving")
+            logger.warning("Unknown Image Format")
     
     def save_json(self, opened_file, data):
         json.dump(data, opened_file)
@@ -59,11 +57,11 @@ class Data_Logger:
             self.save_json(self.file, self.memory.memory)
             if cfg["SVO_COMPRESSION_MODE"] is None:
                 threading.Thread(target=self.save_to_file,
-                    args=([cfg["RGB_IMAGE_FORMAT"], os.path.join(self.big_folder, "RGB_Image"), str(self.index), self.memory.big_memory["RGB_Image"]]),
+                    args=([cfg["RGB_IMAGE_FORMAT"], os.path.join(self.data_folder, "RGB_Image"), str(self.index), self.memory.big_memory["RGB_Image"]]),
                     daemon=True,
                     name="Rgb_Image").start()
                 threading.Thread(target=self.save_to_file,
-                    args=([cfg["DEPTH_IMAGE_FORMAT"], os.path.join(self.big_folder, "Depth_Image"), str(self.index), self.memory.big_memory["Depth_Array"]]),
+                    args=([cfg["DEPTH_IMAGE_FORMAT"], os.path.join(self.data_folder, "Depth_Image"), str(self.index), self.memory.big_memory["Depth_Array"]]),
                     daemon=True,
                     name="Depth_Array").start()
             self.index += 1
