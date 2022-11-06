@@ -48,11 +48,11 @@ class Pilot:
         rgb_image = rgb_image.view(1, 3, 160, 120)
         # start_time = time.time()
         with torch.no_grad():
-            steering_prediction, throttle_prediction = self.model(rgb_image)
+            self.steering_prediction, self.throttle_prediction = self.model(rgb_image)
         # logger.info(f"Prediction: {time.time() - start_time}")
         # We made data between -1, 1 when trainig so unpacking thoose to pwm value
-        self.steering_prediction = int(steering_prediction * 600 + 1500)
-        self.throttle_prediction = int(throttle_prediction * 600 + 1500)
+        # self.steering_prediction = int(steering_prediction * 600 + 1500)
+        # self.throttle_prediction = int(throttle_prediction * 600 + 1500)
 
     def start_thread(self):
         logger.info("Starting Thread")
