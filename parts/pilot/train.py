@@ -7,6 +7,7 @@ Options:
 """
 
 from networks import Linear
+from networks import Linear_With_Others
 from data_loader import Load_Data
 
 from torch.utils.data import DataLoader
@@ -55,7 +56,7 @@ def main():
     # it will be slow if input size change (batch size is changing on last layer if data_set_len%batch_size!=0) so we set drop_last = True
     train_set_loader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
     test_set_loader = DataLoader(dataset=test_set, batch_size=batch_size, num_workers=4, pin_memory=True)
-    trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, test_set_loader=test_set_loader, use_other_inputs=False, patience=5, delta=0.00005)
+    trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, test_set_loader=test_set_loader, use_other_inputs=use_other_inputs, patience=5, delta=0.00005)
     trainer.fit()
     # Saving the model
     # trainer.save_model()
@@ -119,7 +120,7 @@ class Trainer:
                 batch_steering_losses.append(batch_steering_loss.item())
                 batch_throttle_losses.append(batch_throttle_loss.item())
                 batch_losses.append(batch_loss.item())
-                logger.info(f"\nBatch[{batch_no}/{self.nu_of_train_batches}] Loss: {batch_loss:.2e}, Steering Loss: {batch_steering_loss:.2e}, Throttle Loss: {batch_throttle_loss:.2e}")
+                logger.info(f"\nBatch[{batch_no}/{self.nu_of_train_batches}] Loss: {batch_loss:.4f}, Steering Loss: {batch_steering_loss:.4f}, Throttle Loss: {batch_throttle_loss:.4f}")
                 batch_loss.backward()
                 # Gradient clipping
                 # torch.nn.utils.clip_grad_norm_(self.model.parameters(), 5)
@@ -132,12 +133,13 @@ class Trainer:
             epoch_steering_losses.append(epoch_steering_loss)
             epoch_throttle_losses.append(epoch_throttle_loss)
             epoch_losses.append(epoch_loss)
-            loss_string = f"For Epoch {epoch} --> Loss: {epoch_loss:.2e}, Steering Loss: {epoch_steering_loss:.2e}, Throttle Loss: {epoch_throttle_loss:.2e}"
+            loss_string = f"For Epoch {epoch} --> Loss: {epoch_loss:.4f}, Steering Loss: {epoch_steering_loss:.4f}, Throttle Loss: {epoch_throttle_loss:.4f}"
             if self.test_set_loader:
                 logger.info("\nEvaluating on test set ...")
                 eval_loss, eval_steering_loss, eval_throttle_loss = self.evaluate()
-                val_loss_string = f"Val Loss: {eval_loss:.2e} Steering Val Loss: {eval_steering_loss:.2e}, Throttle Val Loss: {eval_throttle_loss:.2e}"
-                logger.info(val_loss_string + " - " + loss_string + '\n')
+                val_loss_string = f"Val Loss: {eval_loss:.4f} Steering Val Loss: {eval_steering_loss:.4f}, Throttle Val Loss: {eval_throttle_loss:.4f}"
+                logger.info(val_loss_string + " - " + loss_string)
+                logger.info(f"PWM Differance: +-{math.sqrt(eval_loss)}\n")
             else:
                 logger.info(loss_string + '\n')
             # If this model is better than previous model we saving it
