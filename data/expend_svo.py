@@ -49,7 +49,8 @@ def main():
                 rgba_image = zed_RGB_Image.get_data()
                 rgb_image = cv2.cvtColor(rgba_image, cv2.COLOR_RGBA2RGB)
                 # rgb_image = cv2.resize(rgb_image, (160, 120), interpolation= cv2.INTER_LINEAR)
-                cv2.imwrite(os.path.join(rgb_data_path, str(index)+"." + "jpg"), rgb_image)
+                # Giving data name according to memory.json Zed_Data_Id (not the zed_camera )
+                cv2.imwrite(os.path.join(rgb_data_path, str(datas[index]["Data_Id"])+"." + "jpg"), rgb_image)
             elif(err == sl.ERROR_CODE.END_OF_SVOFILE_REACHED):
                 print("SVO end has been reached.")
                 return
