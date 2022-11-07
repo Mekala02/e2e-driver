@@ -27,10 +27,10 @@ class Pilot:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         logger.info(f"Torch Device: {self.device}")
         if "Model_Folder_Path" in  memory.untracked.keys():
-            # self.model = Linear(in_channels=3).to(self.device)
-            # self.model.load_state_dict(torch.load(self.model_path))
             self.model_path = memory.untracked["Model_Folder_Path"]
-            self.model = torch.jit.load(self.model_path)
+            self.model = Linear(in_channels=3).to(self.device)
+            self.model.load_state_dict(torch.load(self.model_path))
+            # self.model = torch.jit.load(self.model_path)
             self.model.eval()
             logger.info(f"Successfully Loaded Model At {self.model_path}")  
         logger.info("Successfully Added")  
@@ -45,7 +45,7 @@ class Pilot:
         # start_time = time.time()
         rgb_image = rgb_image.to(self.device, non_blocking=True) / 255.0
         # logger.info(f"To device: {time.time() - start_time}")
-        rgb_image = rgb_image.view(1, 3, 160, 120)
+        rgb_image = rgb_image.view(1, 3, 120, 160)
         # start_time = time.time()
         with torch.no_grad():
             steering_prediction, throttle_prediction = self.model(rgb_image)
