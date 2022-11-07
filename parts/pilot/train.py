@@ -1,6 +1,6 @@
 """
 Usage:
-    train.py  <data_dirs>... [--model=None]
+    train.py  <data_dirs>... [--model=None] [--save_name=None]
 
 Options:
   -h --help     Show this screen.
@@ -25,10 +25,15 @@ logger = logging.getLogger("train")
 
 def main():
     args = docopt(__doc__)
+    data_dirs = args["<data_dirs>"]
+    model_path = args["--model"]
+    model_save_name = args["--save_name"]
+    if not model_save_name:
+        model_save_name = "model"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     torch.manual_seed(22)
     use_depth_input = False
-    use_other_inputs = False
+    use_other_inputs = True
     if use_depth_input:
         in_channels = 4
     else:
@@ -42,34 +47,34 @@ def main():
     # Our input size is not changing so we can use cudnn's optimization
     torch.backends.cudnn.benchmark = True
 
-    model_path = args["--model"]
-    model = Linear(in_channels=in_channels).to(device)
+    model = Linear_With_Others(in_channels=in_channels).to(device)
     if model_path:
         model.load_state_dict(torch.load(model_path))
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     criterion = torch.nn.MSELoss()
 
-    dataset = Load_Data(args["<data_dirs>"], use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
+    dataset = Load_Data(data_dirs, use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
     test_len = math.floor(len(dataset) * test_data_percentage / 100)
     train_set, test_set = torch.utils.data.random_split(dataset, [len(dataset)-test_len, test_len])
     # We using torch.backends.cudnn.benchmark 
     # it will be slow if input size change (batch size is changing on last layer if data_set_len%batch_size!=0) so we set drop_last = True
     train_set_loader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
     test_set_loader = DataLoader(dataset=test_set, batch_size=batch_size, num_workers=4, pin_memory=True)
-    trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, test_set_loader=test_set_loader, use_other_inputs=use_other_inputs, patience=5, delta=0.00005)
+    trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, test_set_loader=test_set_loader, model_name=model_save_name, use_other_inputs=use_other_inputs, patience=5, delta=0.00005)
     trainer.fit()
     # Saving the model
     # trainer.save_model()
 
 
 class Trainer:
-    def __init__(self, model, criterion, optimizer, device, num_epochs, train_set_loader, test_set_loader=None, use_other_inputs=False, patience=3, delta=0.0005):
+    def __init__(self, model, criterion, optimizer, device, num_epochs, train_set_loader, test_set_loader=None, model_name="model", use_other_inputs=False, patience=3, delta=0.0005):
         self.model = model
         self.criterion = criterion
         self.optimizer = optimizer
         self.device = device
         self.train_set_loader = train_set_loader
         self.test_set_loader = test_set_loader
+        self.model_name = model_name
         self.use_other_inputs = use_other_inputs
         self.num_epochs = num_epochs
         # Delta: Minimum change to qualify as an improvement.
@@ -198,9 +203,9 @@ class Trainer:
 
     def save_model(self):
         model_save_path = os.path.join(os.path.expanduser('~'), "e2e-driver", "models")
-        torch.save(self.model.state_dict(), os.path.join(model_save_path, "model.pt"))
+        torch.save(self.model.state_dict(), os.path.join(model_save_path, self.model_name + ".pt"))
         script_cell = torch.jit.script(self.model)
-        torch.jit.save(script_cell, os.path.join(model_save_path, "model_jit.pt"))
+        torch.jit.save(script_cell, os.path.join(model_save_path, self.model_name + "_jit.pt"))
         logger.info(f"Saved the model to {model_save_path}\n")
 
 
