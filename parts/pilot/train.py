@@ -33,12 +33,12 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     torch.manual_seed(22)
     use_depth_input = False
-    use_other_inputs = True
+    use_other_inputs = False
     if use_depth_input:
         in_channels = 4
     else:
         in_channels = 3
-    test_data_percentage = 10
+    test_data_percentage = 20
     #2e-3 for startup then reduce to 1e-3
     learning_rate = 2e-3
     batch_size = 1024
@@ -47,7 +47,7 @@ def main():
     # Our input size is not changing so we can use cudnn's optimization
     torch.backends.cudnn.benchmark = True
 
-    model = Linear_With_Others(in_channels=in_channels).to(device)
+    model = Linear(in_channels=in_channels).to(device)
     if model_path:
         model.load_state_dict(torch.load(model_path))
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -55,6 +55,8 @@ def main():
 
     dataset = Load_Data(data_dirs, use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
     test_len = math.floor(len(dataset) * test_data_percentage / 100)
+    # train_set = torch.utils.data.Subset(dataset, range(len(dataset)-test_len))
+    # test_set = torch.utils.data.Subset(dataset, range(len(dataset)-test_len, len(dataset)))
     train_set, test_set = torch.utils.data.random_split(dataset, [len(dataset)-test_len, test_len])
     # We using torch.backends.cudnn.benchmark 
     # it will be slow if input size change (batch size is changing on last layer if data_set_len%batch_size!=0) so we set drop_last = True
