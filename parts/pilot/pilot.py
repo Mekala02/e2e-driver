@@ -6,7 +6,6 @@ import time
 import torch
 import logging
 import torchvision.transforms as transforms
-import cv2
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +27,9 @@ class Pilot:
         logger.info(f"Torch Device: {self.device}")
         if "Model_Folder_Path" in  memory.untracked.keys():
             self.model_path = memory.untracked["Model_Folder_Path"]
-            self.model = Linear(in_channels=3).to(self.device)
-            self.model.load_state_dict(torch.load(self.model_path))
-            # self.model = torch.jit.load(self.model_path)
+            # self.model = Linear(in_channels=3).to(self.device)
+            # self.model.load_state_dict(torch.load(self.model_path))
+            self.model = torch.jit.load(self.model_path)
             self.model.eval()
             logger.info(f"Successfully Loaded Model At {self.model_path}")  
         logger.info("Successfully Added")  
@@ -38,8 +37,7 @@ class Pilot:
     
     def predict(self):
         # start_time = time.time()
-        rgb_image = cv2.resize(self.image, (160, 120), interpolation= cv2.INTER_LINEAR)
-        rgb_image = rgb_image.transpose(2, 0, 1)
+        rgb_image = self.image.transpose(2, 0, 1)
         rgb_image = torch.from_numpy(rgb_image)
         # logger.info(f"Transform to tensor: {time.time() - start_time}")
         # start_time = time.time()

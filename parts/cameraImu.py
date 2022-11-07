@@ -71,7 +71,8 @@ class Camera_IMU:
             self.Zed_Timestamp = self.zed.get_timestamp(sl.TIME_REFERENCE.IMAGE).get_nanoseconds()
 
             self.zed.retrieve_image(self.zed_RGBA_Image, sl.VIEW.LEFT)
-            self.RGB_Image = cv2.cvtColor(self.zed_RGBA_Image.get_data(), cv2.COLOR_RGBA2RGB)
+            RGB_Image = cv2.cvtColor(self.zed_RGBA_Image.get_data(), cv2.COLOR_RGBA2RGB)
+            self.RGB_Image = cv2.resize(RGB_Image, (160, 120), interpolation= cv2.INTER_LINEAR)
 
             self.zed.retrieve_measure(self.zed_depth_map, sl.MEASURE.DEPTH)
             self.Depth_array = self.zed_depth_map.get_data()
