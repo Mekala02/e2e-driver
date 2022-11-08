@@ -203,8 +203,8 @@ class Data_Folder():
             other_inputs = torch.from_numpy(other_inputs)
 
         # Making pwm data between -1, 1
-        steering_label = self.datas[index]["Steering"]
-        throttle_label = self.datas[index]["Throttle"]
+        steering_label = (self.datas[index]["Steering"] - 1500) / 500
+        throttle_label = (self.datas[index]["Throttle"] - 1500) / 500
         steering_label = torch.tensor([steering_label], dtype=torch.float)
         throttle_label = torch.tensor([throttle_label], dtype=torch.float)
 

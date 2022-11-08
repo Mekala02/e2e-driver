@@ -55,9 +55,9 @@ def main():
 
     dataset = Load_Data(data_dirs, use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
     test_len = math.floor(len(dataset) * test_data_percentage / 100)
-    # train_set = torch.utils.data.Subset(dataset, range(len(dataset)-test_len))
-    # test_set = torch.utils.data.Subset(dataset, range(len(dataset)-test_len, len(dataset)))
     train_set, test_set = torch.utils.data.random_split(dataset, [len(dataset)-test_len, test_len])
+    # train_set = torch.utils.data.Subset(train_set, range(int(len(train_set)/2)))
+    # test_set = torch.utils.data.Subset(dataset, range(len(dataset)-test_len, len(dataset)))
     # We using torch.backends.cudnn.benchmark 
     # it will be slow if input size change (batch size is changing on last layer if data_set_len%batch_size!=0) so we set drop_last = True
     train_set_loader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
@@ -146,7 +146,7 @@ class Trainer:
                 eval_loss, eval_steering_loss, eval_throttle_loss = self.evaluate()
                 val_loss_string = f"Val Loss: {eval_loss:.4f} Steering Val Loss: {eval_steering_loss:.4f}, Throttle Val Loss: {eval_throttle_loss:.4f}"
                 logger.info(val_loss_string + " - " + loss_string)
-                logger.info(f"PWM Differance: +-{math.sqrt(eval_loss)}\n")
+                logger.info(f"PWM Differance: +-{math.sqrt(eval_loss) * 500}\n")
             else:
                 logger.info(loss_string + '\n')
             # If this model is better than previous model we saving it
