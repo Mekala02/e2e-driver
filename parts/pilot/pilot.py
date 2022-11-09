@@ -1,89 +1,86 @@
 from parts.pilot.networks import Linear
 from config import config as cfg
 
-import math
 import time
 import torch
 import logging
-import torchvision.transforms as transforms
 
 logger = logging.getLogger(__name__)
 
 class Pilot:
     def __init__(self, memory):
         self.memory = memory
-        self.threaded = True
+        self.thread = None
         self.run = True
         self.outputs = {"Steering": 0, "Throttle": 0}
-
-        self.model_path = None
         self.pilot_mode = 0
-        self.image = 0
-        self.transform_image = transforms.ToTensor()
-        self.steering_prediction = 0
-        self.throttle_prediction = 0
+        self.model_path = None
 
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        logger.info(f"Torch Device: {self.device}")
+        # Shared memory for multiprocessing
         if "Model_Folder_Path" in  memory.untracked.keys():
+            self.thread = "Multi"
             self.model_path = memory.untracked["Model_Folder_Path"]
-            # self.model = Linear(in_channels=3).to(self.device)
-            # self.model.load_state_dict(torch.load(self.model_path))
-            self.model = torch.jit.load(self.model_path)
-            self.model.eval()
-            logger.info(f"Successfully Loaded Model At {self.model_path}")  
-        logger.info("Successfully Added")  
-        self.i = 0
+            manager = torch.multiprocessing.Manager()
+            self.shared_dict = manager.dict()
+            self.shared_dict["run"] = True
+            self.shared_dict["pilot_mode"] = 0
+            self.shared_dict["cpu_image"] = 0
+            self.shared_dict["steering"] = 0
+            self.shared_dict["throttle"] = 0
+        
+        self.steering = 0
+        self.throttle = 0
+        
+        logger.info("Successfully Added")
     
-    def predict(self):
-        # start_time = time.time()
-        rgb_image = self.image.transpose(2, 0, 1)
-        rgb_image = torch.from_numpy(rgb_image)
-        # logger.info(f"Transform to tensor: {time.time() - start_time}")
-        # start_time = time.time()
-        rgb_image = rgb_image.to(self.device, non_blocking=True) / 255.0
-        # logger.info(f"To device: {time.time() - start_time}")
-        rgb_image = rgb_image.view(1, 3, 120, 160)
-        # start_time = time.time()
+    def start_process(self):
+        # Since it is a new procces we need to reconfigure the logger
+        logging.basicConfig(level=logging.INFO, format="%(levelname)s: @ %(name)s %(message)s")
+        logger.info("Starting Process")
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        logger.info(f"Device: {device}")
+        model = torch.jit.load(self.model_path).to(device)
+        logger.info(f"Successfully Loaded Model From {self.model_path}")
+        model.eval()
+        # First pass is slow so we are warming up
+        logger.info("Warming Up The Model...")
         with torch.no_grad():
-            steering_prediction, throttle_prediction = self.model(rgb_image)
-        self.steering_prediction = int(steering_prediction)
-        self.throttle_prediction = int(throttle_prediction)
-        # logger.info(f"Prediction: {time.time() - start_time}")
-        # We made data between -1, 1 when trainig so unpacking thoose to pwm value
-        # self.steering_prediction = int(steering_prediction * 600 + 1500)
-        # self.throttle_prediction = int(throttle_prediction * 600 + 1500)
-
-    def start_thread(self):
-        logger.info("Starting Thread")
-        while self.run:
+            model(torch.ones((1, 3, 120, 160), device=device))
+        logger.info("Warmup Done")
+        while self.shared_dict["run"]:
             start_time = time.time()
-            if self.pilot_mode == "Angle" or self.pilot_mode == "Full_Auto":
-                self.predict()
-            sleep_time = 1.0 / cfg["CAMERA_FPS"] - (time.time() - start_time)
+            if self.shared_dict["pilot_mode"] == "Angle" or self.shared_dict["pilot_mode"] == "Full_Auto":
+                rgb_image = torch.from_numpy(self.shared_dict["cpu_image"].transpose(2, 0, 1)) / 255
+                rgb_image = rgb_image.to(device, non_blocking=True)
+                gpu_image = rgb_image.view(1, 3, 120, 160)
+                with torch.no_grad():
+                    steering, throttle = model(gpu_image)
+                # We made data between -1, 1 when trainig so unpacking thoose to pwm value
+                self.shared_dict["steering"] = int(steering * 500 + 1500)
+                self.shared_dict["throttle"] = int(throttle * 500 + 1500)
+            # Inferancing @100fps
+            sleep_time = 1.0 / 100 - (time.time() - start_time)
             if sleep_time > 0.0:
                 time.sleep(sleep_time)
-            # logger.info(1.0 / (time.time() - start_time))
 
     def update(self):
-        self.pilot_mode = self.memory.memory["Pilot_Mode"]
-        self.image = self.memory.big_memory["RGB_Image"]
+        # If we have pilot (neurl network)
         if self.model_path:
-            if self.steering_prediction > cfg["STEERING_MAX_PWM"]: self.steering_prediction=cfg["STEERING_MAX_PWM"]
-            if self.steering_prediction < cfg["STEERING_MIN_PWM"]: self.steering_prediction=cfg["STEERING_MIN_PWM"]
-            if self.pilot_mode == "Angle":
-                self.memory.memory["Steering"] = self.steering_prediction
-            elif self.pilot_mode == "Full_Auto":
-                self.memory.memory["Steering"] = self.steering_prediction
-                self.memory.memory["Throttle"] = self.throttle_prediction
-        else:
-            # Sin vave for testing web server
-            if self.memory.memory["Pilot_Mode"] == "Angle":
-                self.memory.memory["Steering"] = int(1500 + math.sin(time.time()) * 600)
-            elif self.memory.memory["Pilot_Mode"] == "Full_Auto":
-                self.memory.memory["Throttle"] = int(1500 + math.sin(time.time() + 2) * 600)
-                self.memory.memory["Steering"] = int(1500 + math.sin(time.time()) * 600)
+            self.pilot_mode = self.memory.memory["Pilot_Mode"]
+            self.shared_dict["pilot_mode"] = self.pilot_mode
+            self.shared_dict["cpu_image"] = self.memory.big_memory["RGB_Image"]
+            if self.pilot_mode == "Angle" or self.pilot_mode == "Full_Auto":
+                self.steering = self.shared_dict["steering"]
+                self.throttle = self.shared_dict["throttle"]
+                if self.steering > cfg["STEERING_MAX_PWM"]: self.steering=cfg["STEERING_MAX_PWM"]
+                if self.steering < cfg["STEERING_MIN_PWM"]: self.steering=cfg["STEERING_MIN_PWM"]
+                if self.pilot_mode == "Angle":
+                    self.memory.memory["Steering"] = self.steering
+                elif self.pilot_mode == "Full_Auto":
+                    self.memory.memory["Steering"] = self.steering
+                    self.memory.memory["Throttle"] = self.throttle
 
     def shut_down(self):
         self.run = False
+        self.shared_dict["run"] = False
         logger.info("Stopped")
