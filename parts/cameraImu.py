@@ -49,7 +49,7 @@ class Camera_IMU:
                 logger.error(repr(err))
         self.runtime_parameters = sl.RuntimeParameters()
         self.zed_RGBA_Image = sl.Mat()
-        self.zed_depth_Image = sl.Mat()
+        self.zed_Depth_Image = sl.Mat()
         self.zed_sensors_data = sl.SensorsData()
         self.zed_depth_map = sl.Mat()
         logger.info("Successfully Added")
@@ -70,8 +70,8 @@ class Camera_IMU:
             self.RGB_Image = cv2.resize(RGB_Image, (160, 120), interpolation= cv2.INTER_LINEAR)
 
             # Depth Map As Image
-            self.zed.retrieve_image(self.zed_depth_Image, sl.VIEW.DEPTH)
-            Depth_Image = cv2.cvtColor(self.zed_depth_Image.get_data(), cv2.COLOR_RGBA2RGB)
+            self.zed.retrieve_image(self.zed_Depth_Image, sl.VIEW.DEPTH)
+            Depth_Image = cv2.cvtColor(self.zed_Depth_Image.get_data(), cv2.COLOR_RGBA2RGB)
             self.Depth_Image = cv2.resize(Depth_Image, (160, 120), interpolation= cv2.INTER_LINEAR)
 
             self.zed.retrieve_measure(self.zed_depth_map, sl.MEASURE.DEPTH)
