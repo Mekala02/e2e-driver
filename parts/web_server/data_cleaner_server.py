@@ -1,6 +1,6 @@
 """
 Usage:
-    data_cleaner_app.py  <data_dir> [(--c|--copy) <copy_dir>]
+    data_cleaner_app.py  <data_dir> [--changes]
 
 Options:
   -h --help     Show this screen.
@@ -168,17 +168,6 @@ if __name__=="__main__":
     args = docopt(__doc__)
     data_folder = args["<data_dir>"]
     folder_name = os.path.basename(data_folder)
-    # Make it os based this is too slow
-    # if args["--c"] or args["--copy"]:
-    #     from distutils.dir_util import copy_tree
-    #     if args["<copy_dir>"]:
-    #         copy_folder = args["<copy_dir>"]
-    #     else:
-    #         copy_folder = os.path.join(os.path.split(data_folder)[0], folder_name+"_copy")    
-    #     os.mkdir(copy_folder)
-    #     copy_tree(data_folder, copy_folder)
-    #     data_folder = copy_folder
-    #     folder_name = os.path.basename(data_folder)
     logger = logging.getLogger(__name__)
     json_path = os.path.join(data_folder, "memory.json")
     cfg_path = os.path.join(data_folder, "cfg.json")
@@ -189,6 +178,10 @@ if __name__=="__main__":
     # Default values for server startup
     client_outputs = {"Data_Lenght": len(datas), "Data_Index": 0, "Data_Folder": folder_name,
     "Left_Marker": 0, "Right_Marker": 0, "Select_List": [], "Camera_Mode": "RGB_Image", "Graph1_Mode": ["Steering"]}
+    if args["--changes"]:
+        changes_path = os.path.join(data_folder, "changes.json")
+        with open(changes_path) as changes_file:
+            client_outputs["Select_List"] = json.load(changes_file)
     if cfg["SVO_COMPRESSION_MODE"]:
         import pyzed.sl as sl
         input_path = os.path.join(data_folder, "zed_record.svo")
