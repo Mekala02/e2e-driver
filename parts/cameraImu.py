@@ -72,16 +72,15 @@ class Camera_IMU:
             RGB_Image = cv2.cvtColor(self.zed_RGBA_Image.get_data(), cv2.COLOR_RGBA2RGB)
             self.RGB_Image = cv2.resize(RGB_Image, (160, 120), interpolation= cv2.INTER_LINEAR)
 
+            # Depth Map As Image
+            self.zed.retrieve_image(self.zed_depth_Image, sl.VIEW.DEPTH)
+            Depth_Image = cv2.cvtColor(self.zed_depth_Image.get_data(), cv2.COLOR_RGBA2RGB)
+            self.Depth_Image = cv2.resize(Depth_Image, (160, 120), interpolation= cv2.INTER_LINEAR)
+
             self.zed.retrieve_measure(self.zed_depth_map, sl.MEASURE.DEPTH)
             self.Depth_array = self.zed_depth_map.get_data()
             
-            # This is only for web server depth image display
-            self.zed.retrieve_image(self.zed_depth_Image, sl.VIEW.DEPTH)
-            self.Depth_Image = self.zed_depth_Image.get_data()
-
-
             self.zed.get_sensors_data(self.zed_sensors_data, sl.TIME_REFERENCE.IMAGE)
-
             imu_data = self.zed_sensors_data.get_imu_data()
 
             linear_acceleration = imu_data.get_linear_acceleration()
