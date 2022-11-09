@@ -179,10 +179,12 @@ class Data_Folder():
         rgb_image = cv2.resize(rgb_image, (160, 120), interpolation= cv2.INTER_LINEAR)
         images = rgb_image
         if self.use_depth_input:
-            Depth_array = self.load_Depth_image(self.Depth_image_path, index)
-            Depth_array = Depth_array.reshape(rgb_image.shape[0], rgb_image.shape[1], 1)
-            np.nan_to_num(Depth_array, copy=False)
-            images = np.concatenate((rgb_image, Depth_array), axis=2)
+            depth_image = self.load_Depth_image(self.Depth_image_path, index)
+            depth_image = cv2.resize(depth_image, (160, 120), interpolation= cv2.INTER_LINEAR)
+            depth_array = cv2.cvtColor(depth_image, cv2.COLOR_BGR2GRAY)
+            depth_array = depth_array.reshape(rgb_image.shape[0], rgb_image.shape[1], 1)
+            # np.nan_to_num(depth_array, copy=False)
+            images = np.concatenate((rgb_image, depth_array), axis=2)
         # (H x W x C) to (C x H x W)
         images = images.transpose(2, 0, 1)
         # Making image contiguous on memory
@@ -217,8 +219,8 @@ if __name__ == "__main__":
     from docopt import docopt
     args = docopt(__doc__)
     data_folders = args["<data_dir>"]
-    test = Load_Data(data_folders, use_other_inputs=True)
-    images, other_inputs, steering_label, throttle_label = test[60000]
+    test = Load_Data(data_folders, use_other_inputs=True, use_depth_input=True)
+    images, other_inputs, steering_label, throttle_label = test[600]
     print(images.shape)
     print(other_inputs.shape)
     print(steering_label.shape)
