@@ -22,16 +22,20 @@ camera = {"Is_New": False}
 
 web_special = {"Camera_Mode": "RGB_Image", "Graph1_Mode": ["Steering"], "Graph2_Mode": ["Throttle"]}
 
+image_refresh_rate = 60
 def generate_frames():
     while True:
+        start_time = time.time()
         if camera["Is_New"]:
             frame = camera["frame"]
             ret, buffer = cv2.imencode('.jpg', frame)
             frame=buffer.tobytes()
             yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             camera["Is_New"] = False
-        # While loop is too fast we need to slow down (100fps)
-        time.sleep(0.01)
+        # While loop is too fast we need to slow down
+        sleep_time = 1.0 / image_refresh_rate - (time.time() - start_time)
+        if sleep_time > 0.0:
+            time.sleep(sleep_time)
 
 @app.route('/')
 def index():
@@ -80,7 +84,7 @@ class Web_Server:
 
     def start_thread(self):
         logger.info("Starting Thread")
-        serve(app, host="0.0.0.0", port=8080)
+        serve(app, host="0.0.0.0", port=8080, threads=6)
         
     def update(self):
         self.update_vehicle_memory()
