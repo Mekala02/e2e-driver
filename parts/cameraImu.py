@@ -55,9 +55,7 @@ class Camera_IMU:
         self.zed_depth_Image = sl.Mat()
         self.zed_sensors_data = sl.SensorsData()
         self.zed_depth_map = sl.Mat()
-        time.sleep(1)
         logger.info("Successfully Added")
-
 
     def grab_data(self):
         if cfg["SVO_COMPRESSION_MODE"]:
