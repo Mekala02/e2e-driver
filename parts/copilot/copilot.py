@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 class Copilot:
     def __init__(self, memory):
         self.memory = memory
-        self.threaded = False
+        self.thread = None
         self.run = True
         self.outputs = {"Stop": 0, "Taxi": 0, "Direction": "Right", "Lane": "Right"}
 

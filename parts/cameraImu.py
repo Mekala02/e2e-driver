@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class Camera_IMU:
     def __init__(self, memory=0):
         self.memory = memory
-        self.threaded = True
+        self.thread = "Single"
         self.run = True
         self.outputs = {"Zed_Timestamp": 0, "Zed_Data_Id": 0, "IMU_Accel_X": 0, "IMU_Accel_Y": 0, "IMU_Accel_Z": 0, "IMU_Gyro_X": 0, "IMU_Gyro_Y": 0, "IMU_Gyro_Z": 0}
         self.big_outputs = {"RGB_Image": 0, "Depth_Image": 0, "Object_Detection_Image": 0}

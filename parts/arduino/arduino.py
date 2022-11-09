@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class Arduino:
     def __init__(self, memory):
         self.memory = memory
-        self.threaded = True
+        self.thread = "Single"
         self.run = True
         self.outputs = {"Speed": 0}
         self.Steering = 0

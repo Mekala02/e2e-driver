@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class Data_Logger:
     def __init__(self, memory):
         self.memory = memory
-        self.threaded = False
+        self.thread = None
         self.run = True
         self.outputs = {"Data_Id": 0, "Timestamp": 0}
         self.index = 0

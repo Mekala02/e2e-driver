@@ -60,7 +60,7 @@ def send_inputs():
 class Web_Server:
     def __init__(self, memory):
         self.memory = memory
-        self.threaded = True
+        self.thread = "Single"
         self.run = True
         self.outputs = outputs
         logger.info("Successfully Added")
