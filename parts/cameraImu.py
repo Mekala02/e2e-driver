@@ -48,10 +48,7 @@ class Camera_IMU:
             else:
                 logger.error(repr(err))
         self.runtime_parameters = sl.RuntimeParameters()
-        self.zed_RGBA_Image = sl.Mat(self.zed.get_camera_information().camera_resolution.width,
-            self.zed.get_camera_information().camera_resolution.height,
-            sl.MAT_TYPE.U8_C4,
-            sl.MEM.CPU)
+        self.zed_RGBA_Image = sl.Mat()
         self.zed_depth_Image = sl.Mat()
         self.zed_sensors_data = sl.SensorsData()
         self.zed_depth_map = sl.Mat()
