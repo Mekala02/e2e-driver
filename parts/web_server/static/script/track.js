@@ -271,12 +271,16 @@ class Main_Track {
     // so hey have to take same amount of arguments
     Update_Record(mode=undefined, synchronize=0){
         if (synchronize == 0){
-            if (this.outputs["Record"] == 0)
-                this.outputs["Record"] = 1
-            else if (this.outputs["Record"] == 1)
-                this.outputs["Record"] = 0
-                this.send_data({Record: this.outputs["Record"]})
-                // console.log("Record:", this.outputs["Record"])
+            if (mode == undefined){
+                if (this.outputs["Record"] == 0)
+                    this.outputs["Record"] = 1
+                else if (this.outputs["Record"] == 1)
+                    this.outputs["Record"] = 0
+                }
+            else
+                this.outputs["Record"] = mode
+            this.send_data({Record: this.outputs["Record"]})
+            // console.log("Record:", this.outputs["Record"])
         }
         this.record_style_change(this.outputs["Record"])
     }
@@ -287,8 +291,8 @@ class Main_Track {
                 this.outputs["Motor_Power"] = 0
             else if (this.outputs["Motor_Power"] == 0)
                 this.outputs["Motor_Power"] = 1
-                this.send_data({Motor_Power: this.outputs["Motor_Power"]})
-                // console.log("Motor_Power:", this.outputs["motor_power"])
+            this.send_data({Motor_Power: this.outputs["Motor_Power"]})
+            // console.log("Motor_Power:", this.outputs["motor_power"])
         }
         if (this.outputs["Motor_Power"] == 1)
             this.activated_color("Go", "red")
