@@ -18,7 +18,7 @@ Servo steering;
 
 String pyserial_data;
 int pyserial_throttle, pyserial_steering;
-int steering_value, throttle_value;
+int steering_value, throttle_value, ch3_value, mode_button;
 
 unsigned long current_time;
 unsigned long serialOut_last_time;
@@ -74,6 +74,14 @@ void loop() {
     // else
     //     throttle_value = THROTTLE_STOPPED_PWM // not tested
 
+    ch3_value = readChannel(CH3_PIN, 0);
+    if (ch3_value > 500 && ch3_value < 1500)
+        mode_button = 1;
+    else if (ch3_value > 1500 && ch3_value < 2100)
+        mode_button = 2;
+    else
+        mode_button = 0;
+
     steering.writeMicroseconds(steering_value);
     throttle.writeMicroseconds(throttle_value);
 
@@ -86,7 +94,7 @@ void loop() {
 
     // Sending data 200fps
     if (current_time - serialOut_last_time > 5){
-        Serial.println("s" + String(steering_value) + "t" + String(throttle_value) + "v" + String(dpulses) + "e");
+        Serial.println("s" + String(steering_value) + "t" + String(throttle_value) + "m" + String(mode_button) + "v" + String(dpulses) + "e");
         serialOut_last_time = current_time;
     }
 }

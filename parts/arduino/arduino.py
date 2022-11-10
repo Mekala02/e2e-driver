@@ -14,9 +14,10 @@ class Arduino:
         self.memory = memory
         self.thread = "Single"
         self.run = True
-        self.outputs = {"Speed": 0}
+        self.outputs = {"Speed": 0, "Mode_Button": 0}
         self.Steering = 0
         self.Throttle = 0
+        self.mode_button = 0
         self.Speed = 0
         # If pilot = manuel self.outputs = {"speed": 0, "steering": 0, "throttle": 0}
         self.arduino = serial.Serial(port='/dev/ttyUSB0', baudrate=115200, timeout=0.006, write_timeout=0.006)
@@ -31,11 +32,13 @@ class Arduino:
         # Looking if data is right format
         if buffer and buffer[0] == "s":
             # re.search(r"t\d+.\d+s\d+.\d+v\d+.\d+e", data) // todo
-            data_array = re.split(r's|t|v|e', buffer)
+            data_array = re.split(r's|t|m|v|e', buffer)
             self.Steering = int(data_array[1])
             self.Throttle = int(data_array[2])
+            # if radio turned off 0 and we have mode 1 and mode 2 according to ch3 button
+            self.mode_button = int(data_array[3])
             # data_array[3] sends ticks/sec we convert it to cm/sec
-            self.Speed = float(data_array[3]) / cfg["TICKS_PER_CM"]
+            self.Speed = float(data_array[4]) / cfg["TICKS_PER_CM"]
 
     def start_thread(self):
         logger.info("Starting Thread")
@@ -50,6 +53,7 @@ class Arduino:
         # self.Throttle, self.Steering and self.Speed values comes from arduino
         # We writing or not writing those values to memory acording to driving mode
         pilot_mode_string = self.memory.memory["Pilot_Mode"]
+        self.memory.memory["Mode_Button"] = self.mode_button
         self.memory.memory["Speed"] = self.Speed
         if pilot_mode_string == "Angle":
             self.memory.memory["Throttle"] = self.Throttle
@@ -80,6 +84,6 @@ class Arduino:
         self.run = False
         # If we reading from arduino and close the port that
         # will cause error so we waiting to finish reading then close
-        time.sleep(0.04)
+        time.sleep(0.05)
         self.arduino.close()
         logger.info("Stopped")
