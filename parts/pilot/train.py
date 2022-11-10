@@ -87,7 +87,8 @@ class Trainer:
         self.nu_of_train_batches = len(self.train_set_loader)
         if self.test_set_loader:
             self.nu_of_test_batches = len(self.test_set_loader)
-        self.not_improved_count = 0
+        self.train_not_improved_count = 0
+        self.test_not_improved_count = 0
         self.train_set_min_loss = float('inf')
         self.test_set_min_loss = float('inf')
         self.steering_weight = 0.9
@@ -149,27 +150,31 @@ class Trainer:
                 logger.info(f"PWM Differance: +-{math.sqrt(eval_loss) * 500}\n")
             else:
                 logger.info(loss_string + '\n')
-            # If this model is better than previous model we saving it
-            # If we have test set we desiding improvement based on that
-            self.not_improved_count += 1
+
+            # Checking if there is an improvement
+            # We counting as improvement if delta_loss > self.delta
             delta_train_set_loss =  self.train_set_min_loss - epoch_loss
             if delta_train_set_loss > 0:
                 self.train_set_min_loss = epoch_loss
-                # We counting as improvement if delta_loss > self.delta
-                if delta_train_set_loss >= self.delta and not self.test_set_loader:
-                    self.not_improved_count = 0
+                if delta_train_set_loss >= self.delta:
+                    self.train_not_improved_count = 0
+                else:
+                    self.train_not_improved_count += 1
             if self.test_set_loader:
                 delta_test_set_loss =  self.test_set_min_loss - eval_loss
                 if delta_test_set_loss > 0:
                     self.test_set_min_loss = eval_loss
                     if delta_test_set_loss >= self.delta:
-                        self.not_improved_count = 0
-            # saving the model if improved
-            if self.not_improved_count == 0:
+                        self.test_not_improved_count = 0
+                    else:
+                        self.test_not_improved_count += 1
+
+            # If this model is better than previous model we saving it
+            if delta_test_set_loss > 0:
                 self.save_model()
             # Early stopping
             # If loss improve smaller than delta for patience times stops training 
-            if (self.not_improved_count >= self.patience):
+            if (self.train_not_improved_count >= self.patience):
                 logger.info(f"Stopped Training: Delta Loss Is Smaller Than {self.delta} For {self.patience} Times")
                 break
 
