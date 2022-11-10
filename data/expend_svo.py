@@ -35,22 +35,25 @@ def expand(data_folder, start, stop, rgb=False, depth=False):
 
     print("Procces Started")
     while(index < stop):
-        zed.set_svo_position(datas[index]["Zed_Data_Id"])
-        if (err:=zed.grab()) == sl.ERROR_CODE.SUCCESS:
-            if(rgb):
-                zed.retrieve_image(zed_RGB_Image, sl.VIEW.LEFT)
-                rgb_image = cv2.cvtColor(zed_RGB_Image.get_data(), cv2.COLOR_RGBA2RGB)
-                rgb_image = cv2.resize(rgb_image, (160, 120), interpolation= cv2.INTER_LINEAR)
-                # Giving data name according to memory.json Zed_Data_Id (not the zed_camera )
-                cv2.imwrite(os.path.join(rgb_data_path, str(datas[index]["Data_Id"])+"." + "jpg"), rgb_image)
-            if(depth):
-                zed.retrieve_image(zed_Depth_Image, sl.VIEW.DEPTH)
-                depth_image = cv2.cvtColor(zed_Depth_Image.get_data(), cv2.COLOR_RGBA2RGB)
-                depth_image = cv2.resize(depth_image, (160, 120), interpolation= cv2.INTER_LINEAR)
-                cv2.imwrite(os.path.join(depth_data_path, str(datas[index]["Data_Id"])+"." + "jpg"), depth_image)
-        else:
-            print(err)
-            return
+        rgb_image_file = os.path.join(rgb_data_path, str(datas[index]["Data_Id"])+"." + "jpg")
+        depth_image_file = os.path.join(depth_data_path, str(datas[index]["Data_Id"])+"." + "jpg")
+        if (rgb and not os.path.isfile(rgb_image_file)) or (depth and not os.path.isfile(depth_image_file)):
+            zed.set_svo_position(datas[index]["Zed_Data_Id"])
+            if (err:=zed.grab()) == sl.ERROR_CODE.SUCCESS:
+                if(rgb):
+                    zed.retrieve_image(zed_RGB_Image, sl.VIEW.LEFT)
+                    rgb_image = cv2.cvtColor(zed_RGB_Image.get_data(), cv2.COLOR_RGBA2RGB)
+                    rgb_image = cv2.resize(rgb_image, (160, 120), interpolation= cv2.INTER_LINEAR)
+                    # Giving data name according to memory.json Zed_Data_Id (not the zed_camera )
+                    cv2.imwrite(rgb_image_file, rgb_image)
+                if(depth):
+                    zed.retrieve_image(zed_Depth_Image, sl.VIEW.DEPTH)
+                    depth_image = cv2.cvtColor(zed_Depth_Image.get_data(), cv2.COLOR_RGBA2RGB)
+                    depth_image = cv2.resize(depth_image, (160, 120), interpolation= cv2.INTER_LINEAR)
+                    cv2.imwrite(depth_image_file, depth_image)
+            else:
+                print(err)
+                return
         index += 1
     print("This Process Is Compleated")
 
