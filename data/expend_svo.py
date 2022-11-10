@@ -84,13 +84,13 @@ if __name__ == "__main__":
     start = 0
     stop = quotient
     for i in range(1, process_count+1):
+        # If we have rmainder last one process do extra work
+        if i == process_count:
+            stop += remainder
         p = mp.Process(target=expand, args=(data_folder, start, stop, rgb, depth), daemon=True, name=i)
         processes.append(p)
         start +=  quotient
         stop = start + quotient
-        # If we have rmainder last one process do extra work
-        if i == process_count:
-            stop += remainder
 
     for process in processes:
         process.start()
