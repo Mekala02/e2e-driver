@@ -10,36 +10,43 @@ We setting interval for updating client side indicators according to data we rec
 */
 
 function load_parameters(outputs){
-  for (const [key, value] of Object.entries(outputs)) {
-      track.outputs[key] = value
-      console.log(key, value);
+    for (const [key, value] of Object.entries(outputs)) {
+        track.outputs[key] = value
+        console.log(key, value);
     }
     update_client_side()
     setInterval(function() {update_indicators()}, update_interval)
 }
 
 function update_client_side(){
-  for (const key in track.outputs){
-      eval(`track.Update_${key}(undefined, 1)`)
-  }
+    for (const key in track.outputs){
+        eval(`track.Update_${key}(undefined, 1)`)
+    }
 }
 
 function update_indicators(){
-  fetch("inputs")
-  .then(response => response.json())
-  .then(inputs => {
-      track.Update_Stop(inputs["Stop"])
-      track.Update_Taxi(inputs["Taxi"])
-      track.Update_Direction(inputs["Direction"])
-      track.Update_Lane(inputs["Lane"])
-      track.Update_Steering(inputs["Steering"])
-      track.Update_Throttle(inputs["Throttle"])
-      track.Update_Speed(inputs["Speed"])
-      track.Update_FPS(inputs["Fps"])
-      for (const key in track.graph) {
-        track.graph[key].push(inputs[key])
-      }
-  })
+    fetch("inputs")
+    .then(response => response.json())
+    .then(inputs => {
+        track.Update_Stop(inputs["Stop"])
+        track.Update_Taxi(inputs["Taxi"])
+        track.Update_Direction(inputs["Direction"])
+        track.Update_Lane(inputs["Lane"])
+        track.Update_Steering(inputs["Steering"])
+        track.Update_Throttle(inputs["Throttle"])
+        track.Update_Speed(inputs["Speed"])
+        track.Update_FPS(inputs["Fps"])
+        for (const key in track.graph) {
+            track.graph[key].push(inputs[key])
+        }
+        // If there is overwrite, Overwrites the outputs then updates
+        for (const key in inputs["overwrite"]){
+            value = inputs["overwrite"][key]
+            // If overwrite value different then our value overwriting
+            if (track.outputs[key] != value)
+                eval(`track.Update_${key}("${value}")`)
+        }
+    })
 }
 
 setInterval(function(){track.update_graph(1)}, update_interval)
