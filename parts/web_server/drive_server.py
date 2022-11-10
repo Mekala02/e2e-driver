@@ -77,8 +77,13 @@ class Web_Server:
 
     def update_local_memory(self):
         # Updates Inputs(to web server) coming from vehicle
+        inputs["overwrite"] = {}
         for key in self.memory.memory:
             inputs[key] = self.memory.memory[key]
+        for key in self.memory.overwrite.copy():
+            # If we have overwrites, sending adding them to dict o send web server jss
+            if key in self.outputs:
+                inputs["overwrite"][key] = self.memory.overwrite.pop(key)["value"]
         camera["frame"] = self.memory.big_memory[web_special["Camera_Mode"]]
         camera["Is_New"] = True
 
