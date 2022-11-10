@@ -1,11 +1,11 @@
 config = dict(
-    USE_OBJECT_DETECTION = True,
-    USE_COPILOT = True,
+    USE_OBJECT_DETECTION = False,
+    USE_DAGGER = True,
 
     # If SVO_COMPRESSION_MODE != None other formats will be overwritten
     SVO_COMPRESSION_MODE = "H264",
     RGB_IMAGE_FORMAT = "jpg",
-    DEPTH_IMAGE_FORMAT = "npz",
+    DEPTH_IMAGE_FORMAT = "jpg",
     OBJECT_DETECTION_FORMAT = "npy",
 
     CAMERA_RESOLUTION = "VGA",
