@@ -14,7 +14,8 @@ import json
 import cv2
 import os
 
-def expand(data_folder, start, stop, rgb=False, depth=False):
+
+def write(data_folder, start, stop, rgb=False, depth=False):
     index = start
     svo_path = os.path.join(data_folder, "zed_record.svo")
     memory_file_path = os.path.join(data_folder, "memory.json")
@@ -58,17 +59,11 @@ def expand(data_folder, start, stop, rgb=False, depth=False):
     print("This Process Is Compleated")
 
 
-if __name__ == "__main__":
-    args = docopt(__doc__)
-    data_folder = args["<data_dir>"]
-    rgb = args["--r"]
-    depth = args["--d"]
-
+def expand(data_folder, datas, rgb=False, depth=False, num_workers=6):
     rgb_data_path = os.path.join(data_folder, "RGB_Image")
+    depth_data_path = os.path.join(data_folder, "Depth_Image")
     if not os.path.isdir(rgb_data_path):
         os.mkdir(rgb_data_path)
-
-    depth_data_path = os.path.join(data_folder, "Depth_Image")
     if not os.path.isdir(depth_data_path):
         os.mkdir(depth_data_path)
 
@@ -76,27 +71,30 @@ if __name__ == "__main__":
     # with open(config_file_path) as cfg_file:
     #     cfg = json.load(cfg_file)
 
-    process_count = 7
-
-    with open(os.path.join(data_folder, "memory.json")) as data_file:
-        datas = json.load(data_file)
-    
-    quotient, remainder = divmod(len(datas), process_count)
-    
+    quotient, remainder = divmod(len(datas), num_workers)
     processes = []
     start = 0
     stop = quotient
-    for i in range(1, process_count+1):
+    for i in range(1, num_workers+1):
         # If we have rmainder last one process do extra work
-        if i == process_count:
+        if i == num_workers:
             stop += remainder
-        p = mp.Process(target=expand, args=(data_folder, start, stop, rgb, depth), daemon=True, name=i)
+        p = mp.Process(target=write, args=(data_folder, start, stop, rgb, depth), daemon=True, name=i)
         processes.append(p)
         start +=  quotient
         stop = start + quotient
-
     for process in processes:
         process.start()
     for process in processes:
         process.join()
+
+
+if __name__ == "__main__":
+    args = docopt(__doc__)
+    data_folder = args["<data_dir>"]
+    rgb = args["--r"]
+    depth = args["--d"]
+    with open(os.path.join(data_folder, "memory.json")) as data_file:
+        datas = json.load(data_file)
+    expand(data_folder, datas, rgb=rgb, depth=depth, num_workers=7)
     

@@ -6,12 +6,12 @@ Options:
   -h --help     Show this screen.
 """
 
-import json
-import torch
 from torch.utils.data import Dataset
 import pyzed.sl as sl
-import logging
 import numpy as np
+import logging
+import torch
+import json
 import cv2
 import os
 
@@ -123,11 +123,16 @@ class Data_Folder():
                 if (err:=self.zed.open(init_parameters)) != sl.ERROR_CODE.SUCCESS:
                     logger.error(err)
             else:
-                if not os.path.isdir(self.RGB_image_path):
-                    logger.error(f"Can't Open Folder {self.RGB_image_path}")
-                    quit()
+                # If our mode is expand_svo but we not expanded svo, we expanding it.
+                if not os.path.isdir(self.RGB_image_path) or (self.use_depth_input and not os.path.isdir(self.Depth_image_path)):
+                    pass # ToDo
+                    # import sys
+                    # sys.path.append("~/e2e-driver/data/")
+                    # from data.expend_svo import expand
+                    # expand(self.data_folder_path, self.datas, rgb=True, depth=use_depth_input, num_workers=7)
                 # Overwriting the config data
                 self.cfg["RGB_IMAGE_FORMAT"] = "jpg"
+                self.cfg["DEPTH_IMAGE_FORMAT"] = "jpg"
 
         self.RGB_image_format = self.cfg["RGB_IMAGE_FORMAT"]
         self.Depth_image_format = self.cfg["DEPTH_IMAGE_FORMAT"]
