@@ -15,6 +15,7 @@ class Arduino:
         self.thread = "Single"
         self.run = True
         self.outputs = {"Speed": 0, "Mode_Button": 0}
+        # Also It can output Record and drive mode acoording to mode button 
         self.Steering = 0
         self.Throttle = 0
         self.mode_button = 0
@@ -35,7 +36,7 @@ class Arduino:
             data_array = re.split(r's|t|m|v|e', buffer)
             self.Steering = int(data_array[1])
             self.Throttle = int(data_array[2])
-            # if radio turned off 0 and we have mode 1 and mode 2 according to ch3 button
+            # if 0 --> radio turned off, elif 1 --> mode 1, elif 2 --> mode 2
             self.mode_button = int(data_array[3])
             # data_array[3] sends ticks/sec we convert it to cm/sec
             self.Speed = float(data_array[4]) / cfg["TICKS_PER_CM"]
@@ -53,27 +54,27 @@ class Arduino:
         # self.Throttle, self.Steering and self.Speed values comes from arduino
         # We writing or not writing those values to memory acording to driving mode
         pilot_mode_string = self.memory.memory["Pilot_Mode"]
-        self.memory.memory["Mode_Button"] = self.mode_button
-        self.memory.memory["Speed"] = self.Speed
         if pilot_mode_string == "Angle":
             self.memory.memory["Throttle"] = self.Throttle
         elif pilot_mode_string == "Manuel":
             self.memory.memory["Throttle"] = self.Throttle
             self.memory.memory["Steering"] = self.Steering
+        self.memory.memory["Speed"] = self.Speed
+        self.memory.memory["Mode_Button"] = self.mode_button
         # We want to send the data as fast as we can so we are only sending 2 int as string, those
         # strings encode motor power and drive mode parameters to throttle and steering values
-        # If char is 900 < char < 2100 arduino will use that value to drive motors
-        # If char is = 10000 arduino won't use that values for controlling the motors
+        # If char is 1000 < char < 2000 arduino will use that value to drive motors
+        # If char is = 0 arduino won't use that values for controlling the motors
         motor_power = self.memory.memory["Motor_Power"]
         if pilot_mode_string == "Manuel":
-            throttle = 0
             steering = 0
-        elif pilot_mode_string == "Angle":
             throttle = 0
+        elif pilot_mode_string == "Angle":
             steering = self.memory.memory["Steering"]
+            throttle = 0
         elif pilot_mode_string == "Full_Auto":
-            throttle = self.memory.memory["Throttle"] * motor_power
             steering = self.memory.memory["Steering"]
+            throttle = self.memory.memory["Throttle"] * motor_power
         # s is for stating start of throttle value t is for steering and e is for end, \r for read ending
         formatted_data = "s" + str(steering) + "t" + str(throttle) + 'e' + '\r'
         try: self.arduino.write(formatted_data.encode())
