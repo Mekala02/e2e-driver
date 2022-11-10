@@ -18,13 +18,14 @@ import os
 logger = logging.getLogger(__name__)
 
 class Load_Data(Dataset):
-    def __init__(self, data_folder_paths, use_depth_input=False, use_other_inputs=False):
+    def __init__(self, data_folder_paths, reduce_fps=False, use_depth_input=False, use_other_inputs=False):
         self.data_folder_paths = data_folder_paths
+        self.reduce_fps = reduce_fps
         self.use_depth_input = use_depth_input
         self.use_other_inputs = use_other_inputs
         self.data_folders = []
         for folder_path in self.data_folder_paths:
-            self.data_folders.append(Data_Folder(folder_path, use_depth_input=self.use_depth_input, use_other_inputs=self.use_other_inputs, expend_svo=True))
+            self.data_folders.append(Data_Folder(folder_path, reduce_fps=self.reduce_fps, use_depth_input=self.use_depth_input, use_other_inputs=self.use_other_inputs, expend_svo=True))
         self.len_data_fodlers = len(self.data_folders)
         self.lenght = 0
         for datas in self.data_folders:
@@ -54,11 +55,12 @@ class Load_Data(Dataset):
 
 
 class Data_Folder():
-    def __init__(self, data_folder_path, use_depth_input=False, use_other_inputs=False, expend_svo=False):
+    def __init__(self, data_folder_path, reduce_fps=False, use_depth_input=False, use_other_inputs=False, expend_svo=False):
         self.data_folder_path = data_folder_path
         self.use_depth_input = use_depth_input
         self.use_other_inputs = use_other_inputs
         self.expend_svo = expend_svo
+        self.reduce_fps = reduce_fps
         self.changes = None
 
         # Constructing paths
@@ -91,6 +93,19 @@ class Data_Folder():
             self.other_changes_indexes = np.array(self.other_changes_indexes)
             for deleted_indexes in self.deleted_data_indexes:
                 self.datas= np.delete(self.datas, [range(deleted_indexes[0], deleted_indexes[1]+1)])
+
+        if self.reduce_fps:
+            # Sampling data according to fps (deleting unnecesary datapoints)
+            # Converting nanosecond to second and finding how much time we want
+            delta = 1e+9 / self.reduce_fps
+            timestamp = 0
+            delete_indexes = []
+            for index, row in enumerate(self.datas):
+                if row["Timestamp"] - timestamp < delta:
+                    delete_indexes.append(index)
+                else:
+                    timestamp = row["Timestamp"]
+            self.datas= np.delete(self.datas, delete_indexes)
 
         self.data_lenght = len(self.datas)
 

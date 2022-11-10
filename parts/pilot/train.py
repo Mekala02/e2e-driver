@@ -32,6 +32,9 @@ def main():
         model_save_name = "model"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     torch.manual_seed(22)
+    # If set to value like 30 it will make training data ~30fps 
+    # It wont work great if datasets fps is close to reduce_fps
+    reduce_fps = False
     use_depth_input = False
     use_other_inputs = False
     if use_depth_input:
@@ -53,7 +56,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     criterion = torch.nn.MSELoss()
 
-    dataset = Load_Data(data_dirs, use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
+    dataset = Load_Data(data_dirs, reduce_fps=reduce_fps, use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
     test_len = math.floor(len(dataset) * test_data_percentage / 100)
     train_set, test_set = torch.utils.data.random_split(dataset, [len(dataset)-test_len, test_len])
     # train_set = torch.utils.data.Subset(train_set, range(int(len(train_set)/2)))
