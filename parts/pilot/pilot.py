@@ -50,9 +50,9 @@ class Pilot:
         while self.shared_dict["run"]:
             start_time = time.time()
             if self.shared_dict["pilot_mode"] == "Angle" or self.shared_dict["pilot_mode"] == "Full_Auto":
-                rgb_image = torch.from_numpy(self.shared_dict["cpu_image"].transpose(2, 0, 1)) / 255
-                rgb_image = rgb_image.to(device, non_blocking=True)
-                gpu_image = rgb_image.view(1, 3, 120, 160)
+                bgr_image = torch.from_numpy(self.shared_dict["cpu_image"].transpose(2, 0, 1)) / 255
+                bgr_image = bgr_image.to(device, non_blocking=True)
+                gpu_image = bgr_image.view(1, 3, 120, 160)
                 with torch.no_grad():
                     steering, throttle = model(gpu_image)
                 # We made data between -1, 1 when trainig so unpacking thoose to pwm value
@@ -68,7 +68,7 @@ class Pilot:
         if self.model_path:
             self.pilot_mode = self.memory.memory["Pilot_Mode"]
             self.shared_dict["pilot_mode"] = self.pilot_mode
-            self.shared_dict["cpu_image"] = self.memory.big_memory["RGB_Image"]
+            self.shared_dict["cpu_image"] = self.memory.big_memory["BGR_Image"]
             if self.pilot_mode == "Angle" or self.pilot_mode == "Full_Auto":
                 self.steering = self.shared_dict["steering"]
                 self.throttle = self.shared_dict["throttle"]

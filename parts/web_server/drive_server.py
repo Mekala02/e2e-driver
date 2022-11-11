@@ -16,11 +16,11 @@ outputs = {"Pilot_Mode": "Manuel", "Route_Mode": "Manuel", "Motor_Power": 0, "Re
 # Servers memory
 inputs = {}
 
-# It contains latest image like rgb, depth, yolo and new is for
+# It contains latest image like bgr, depth, yolo and new is for
 # tracking if there is new image on it
 camera = {"Is_New": False}
 
-web_special = {"Camera_Mode": "RGB_Image", "Graph1_Mode": ["Steering"], "Graph2_Mode": ["Throttle"]}
+web_special = {"Camera_Mode": "BGR_Image", "Graph1_Mode": ["Steering"], "Graph2_Mode": ["Throttle"]}
 
 image_refresh_rate = 60
 def generate_frames():

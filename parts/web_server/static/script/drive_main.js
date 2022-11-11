@@ -54,7 +54,7 @@ setInterval(function(){track.update_graph(2)}, update_interval)
 
 document.getElementById("Emergency_Button").addEventListener("click", function() {track.Emergency_Stop()})
 
-document.getElementById('C_RGB_Image').addEventListener("click", function() {track.Update_Camera_Mode("RGB_Image")});
+document.getElementById('C_BGR_Image').addEventListener("click", function() {track.Update_Camera_Mode("BGR_Image")});
 document.getElementById('C_Depth_Image').addEventListener("click", function() {track.Update_Camera_Mode("Depth_Image")});
 document.getElementById('C_Object_Detection_Image').addEventListener("click", function() {track.Update_Camera_Mode("Object_Detection_Image")});
 
