@@ -15,9 +15,10 @@ class Camera_IMU:
         self.thread = "Single"
         self.run = True
         self.outputs = {"Zed_Timestamp": 0, "Zed_Data_Id": 0, "IMU_Accel_X": 0, "IMU_Accel_Y": 0, "IMU_Accel_Z": 0, "IMU_Gyro_X": 0, "IMU_Gyro_Y": 0, "IMU_Gyro_Z": 0}
-        self.big_outputs = {"BGR_Image": 0, "Depth_Image": 0, "Object_Detection_Image": 0}
-        self.BGR_Image = 0
+        self.big_outputs = {"Color_Image": 0, "Depth_Image": 0, "Object_Detection_Image": 0}
+        self.Color_Image = 0
         self.Depth_Image = 0
+        self.Depth_Array = 0
         self.Zed_Timestamp = 0
         self.Zed_Data_Id = 0
         self.IMU_Accel_X = 0
@@ -48,7 +49,7 @@ class Camera_IMU:
             else:
                 logger.error(repr(err))
         self.runtime_parameters = sl.RuntimeParameters()
-        self.zed_BGRA_Image = sl.Mat()
+        self.zed_Color_Image = sl.Mat()
         self.zed_Depth_Image = sl.Mat()
         self.zed_sensors_data = sl.SensorsData()
         self.zed_depth_map = sl.Mat()
@@ -65,9 +66,9 @@ class Camera_IMU:
                 self.Zed_Data_Id += 1
             self.Zed_Timestamp = self.zed.get_timestamp(sl.TIME_REFERENCE.IMAGE).get_nanoseconds()
 
-            self.zed.retrieve_image(self.zed_BGRA_Image, sl.VIEW.LEFT)
-            BGR_Image = cv2.cvtColor(self.zed_BGRA_Image.get_data(), cv2.COLOR_BGRA2BGR)
-            self.BGR_Image = cv2.resize(BGR_Image, (160, 120), interpolation= cv2.INTER_LINEAR)
+            self.zed.retrieve_image(self.zed_Color_Image, sl.VIEW.LEFT)
+            Color_Image = cv2.cvtColor(self.zed_Color_Image.get_data(), cv2.COLOR_BGRA2BGR)
+            self.Color_Image = cv2.resize(Color_Image, (160, 120), interpolation= cv2.INTER_LINEAR)
 
             # Depth Map As Image
             self.zed.retrieve_image(self.zed_Depth_Image, sl.VIEW.DEPTH)
@@ -75,7 +76,7 @@ class Camera_IMU:
             self.Depth_Image = cv2.resize(Depth_Image, (160, 120), interpolation= cv2.INTER_LINEAR)
 
             self.zed.retrieve_measure(self.zed_depth_map, sl.MEASURE.DEPTH)
-            self.Depth_array = self.zed_depth_map.get_data()
+            self.Depth_Array = self.zed_depth_map.get_data()
             
             self.zed.get_sensors_data(self.zed_sensors_data, sl.TIME_REFERENCE.IMAGE)
             imu_data = self.zed_sensors_data.get_imu_data()
@@ -116,11 +117,11 @@ class Camera_IMU:
         self.memory.memory["IMU_Gyro_Y"] = self.IMU_Gyro_Y
         self.memory.memory["IMU_Gyro_Z"] = self.IMU_Gyro_Z
         
-        self.memory.big_memory["BGR_Image"] = self.BGR_Image
+        self.memory.big_memory["Color_Image"] = self.Color_Image
         self.memory.big_memory["Depth_Image"] = self.Depth_Image
         self.memory.big_memory["Object_Detection_Image"] = 0
 
-        self.memory.big_memory["Depth_Array"] = self.Depth_array
+        self.memory.big_memory["Depth_Array"] = self.Depth_Array
 
         self.record = self.memory.memory["Record"]
 

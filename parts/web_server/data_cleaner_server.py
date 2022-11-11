@@ -26,7 +26,7 @@ def generate_frames():
     while True:
         # Geeting img id according to our data index (cursor on the bar)
         data_id = datas[client_outputs["Data_Index"]]["Data_Id"]
-        # Getting camera mode (BGR, Depth, Object_Detection)
+        # Getting camera mode (Color, Depth, Object_Detection)
         camera_mode = client_outputs["Camera_Mode"]
         if cfg["SVO_COMPRESSION_MODE"] == None:
             frame_path = os.path.join(data_folder, "big_data", camera_mode)
@@ -44,9 +44,9 @@ def generate_frames():
             # Becouse sometimes on is slover than other so we need to synchronize svo and json
             zed.set_svo_position(datas[client_outputs["Data_Index"]]["Zed_Data_Id"])
             if (err:=zed.grab()) == sl.ERROR_CODE.SUCCESS:
-                if camera_mode == "BGR_Image":
-                    zed.retrieve_image(zed_BGR_Image, sl.VIEW.LEFT)
-                    frame = zed_BGR_Image.get_data()
+                if camera_mode == "Color_Image":
+                    zed.retrieve_image(zed_Color_Image, sl.VIEW.LEFT)
+                    frame = zed_Color_Image.get_data()
                 elif camera_mode == "Depth_Image":
                     zed.retrieve_image(zed_Depth_Image, sl.VIEW.DEPTH)
                     frame = zed_Depth_Image.get_data()
@@ -177,7 +177,7 @@ if __name__=="__main__":
         datas = json.load(data_file)
     # Default values for server startup
     client_outputs = {"Data_Lenght": len(datas), "Data_Index": 0, "Data_Folder": folder_name,
-    "Left_Marker": 0, "Right_Marker": 0, "Select_List": [], "Camera_Mode": "BGR_Image", "Graph1_Mode": ["Steering"]}
+    "Left_Marker": 0, "Right_Marker": 0, "Select_List": [], "Camera_Mode": "Color_Image", "Graph1_Mode": ["Steering"]}
     if args["--changes"]:
         changes_path = os.path.join(data_folder, "changes.json")
         with open(changes_path) as changes_file:
@@ -188,7 +188,7 @@ if __name__=="__main__":
         init_parameters = sl.InitParameters()
         init_parameters.set_from_svo_file(input_path)
         zed = sl.Camera()
-        zed_BGR_Image = sl.Mat()
+        zed_Color_Image = sl.Mat()
         zed_Depth_Image = sl.Mat()
         if (err:=zed.open(init_parameters)) != sl.ERROR_CODE.SUCCESS:
             logger.error(err)

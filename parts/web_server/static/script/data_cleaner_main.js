@@ -64,7 +64,7 @@ document.getElementById("Left_Lane").addEventListener("click", function() {data_
 document.getElementById("Right_Lane").addEventListener("click", function() {data_clear_track.Update_Select_List(["Right_Lane"])})
 document.getElementById("Emergency_Button").addEventListener("click", function() {data_clear_track.Emergency_Stop()})
 
-document.getElementById('C_BGR_Image').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("BGR_Image")})
+document.getElementById('C_Color_Image').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("Color_Image")})
 document.getElementById('C_Depth_Image').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("Depth_Image")})
 document.getElementById('C_Object_Detection_Image').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("Object_Detection_Image")})
 
