@@ -165,7 +165,8 @@ class Data_Folder():
             img_format = self.RGB_image_format
         elif base_name == "Depth_Image":
             img_format = self.Depth_image_format
-        return cv2.imread(os.path.join(path, str(self.datas[index]["Data_Id"]) + "." + img_format))
+        # [:,:,::-1] converts BGR to RGB
+        return cv2.imread(os.path.join(path, str(self.datas[index]["Data_Id"]) + "." + img_format))[:,:,::-1]
 
     def load_npz(self, path, index):
         base_name = os.path.basename(path)
