@@ -118,7 +118,7 @@ class Data_Folder():
                 init_parameters.set_from_svo_file(input_path)
                 init_parameters.svo_real_time_mode = False
                 self.zed = sl.Camera()
-                self.zed_BGR_Image = sl.Mat()
+                self.zed_Color_Image = sl.Mat()
                 self.zed_Depth_Map = sl.Mat()
                 if (err:=self.zed.open(init_parameters)) != sl.ERROR_CODE.SUCCESS:
                     logger.error(err)
@@ -183,10 +183,10 @@ class Data_Folder():
             logger.warning(err)
         else:
             if base_name == "RGB_Image":
-                self.zed.retrieve_image(self.zed_BGR_Image, sl.VIEW.LEFT)
+                self.zed.retrieve_image(self.zed_Color_Image, sl.VIEW.LEFT)
                 bgra_image = self.zed_BGR_Image.get_data()
-                bgr_image = cv2.cvtColor(bgra_image, cv2.COLOR_BGRA2BGR)
-                return bgr_image
+                color_image = cv2.cvtColor(bgra_image, cv2.COLOR_BGRA2BGR)
+                return color_image
             elif base_name == "Depth_Image":
                 self.zed.retrieve_measure(self.zed_Depth_Map, sl.MEASURE.DEPTH)
                 depth_array = self.zed_Depth_Map.get_data()
@@ -196,16 +196,16 @@ class Data_Folder():
         return(self.data_lenght)
 
     def __getitem__(self, index):
-        bgr_image = self.load_RGB_image(self.RGB_image_path, index)
-        bgr_image = cv2.resize(bgr_image, (160, 120), interpolation= cv2.INTER_LINEAR)
-        images = bgr_image
+        color_image = self.load_RGB_image(self.RGB_image_path, index)
+        color_image = cv2.resize(color_image, (160, 120), interpolation= cv2.INTER_LINEAR)
+        images = color_image
         if self.use_depth_input:
             depth_image = self.load_Depth_image(self.Depth_image_path, index)
             depth_image = cv2.resize(depth_image, (160, 120), interpolation= cv2.INTER_LINEAR)
             depth_array = cv2.cvtColor(depth_image, cv2.COLOR_BGR2GRAY)
-            depth_array = depth_array.reshape(bgr_image.shape[0], bgr_image.shape[1], 1)
+            depth_array = depth_array.reshape(color_image.shape[0], color_image.shape[1], 1)
             # np.nan_to_num(depth_array, copy=False)
-            images = np.concatenate((bgr_image, depth_array), axis=2)
+            images = np.concatenate((color_image, depth_array), axis=2)
         # (H x W x C) to (C x H x W)
         images = images.transpose(2, 0, 1)
         # Making image contiguous on memory
