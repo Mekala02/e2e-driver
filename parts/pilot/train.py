@@ -76,12 +76,13 @@ def main():
     if detailed_tensorboard:
         # Adding first batches of train and test images to tensorboard
         data = next(iter(train_set_loader))
-        images = data[0]
+        # Our image format is BGR so we converting it to RGB with flip on channel dimension
+        images = torch.flip(data[0], [1])
         grid = torchvision.utils.make_grid(images)
         writer.add_image(f"Train Set First Batch", grid, 0)
-        if test_set_loader:
+        if test_data_percentage:
             data = next(iter(test_set_loader))
-            images = data[0]
+            images = torch.flip(data[0], [1])
             grid = torchvision.utils.make_grid(images)
             writer.add_image(f"Test Set First Batch", grid, 0)
 
