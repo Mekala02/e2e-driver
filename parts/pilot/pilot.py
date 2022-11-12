@@ -1,6 +1,7 @@
 from parts.pilot.networks import Linear
 from config import config as cfg
 
+import os
 import time
 import torch
 import logging
@@ -39,7 +40,14 @@ class Pilot:
         logger.info("Starting Process")
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         logger.info(f"Device: {device}")
-        model = torch.jit.load(self.model_path).to(device)
+        # Getting model extension
+        model_extension = os.path.splitext(os.path.split(self.model_path)[1])[1]
+        if model_extension == ".jit":
+            model = torch.jit.load(self.model_path).to(device)
+        if model_extension == ".trt":
+            from torch2trt import TRTModule
+            model = TRTModule()
+            model.load_state_dict(torch.load(self.model_path))
         logger.info(f"Successfully Loaded Model From {self.model_path}")
         model.eval()
         # First pass is slow so we are warming up
