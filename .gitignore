@@ -156,3 +156,6 @@ cython_debug/
 *.css.map
 *.sass.map
 *.scss.map
+
+# Tensorboard Log File
+tb_logs
