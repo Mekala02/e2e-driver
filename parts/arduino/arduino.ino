@@ -108,8 +108,8 @@ void loop() {
         encoder_last_time = current_time;
     }
 
-    // Sending data 200fps
-    if (current_time - serialOut_last_time > 0){
+    // Sending data 100fps
+    if (current_time - serialOut_last_time > 10){
         Serial.println("s" + String(steering_value) + "t" + String(throttle_value) + "m" + String(mode_button) + "v" + String(dpulses) + "e");
         serialOut_last_time = current_time;
     }
