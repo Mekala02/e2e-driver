@@ -248,7 +248,7 @@ class Trainer:
         model_save_path = os.path.join(os.path.expanduser('~'), "e2e-driver", "models")
         torch.save(self.model.state_dict(), os.path.join(model_save_path, self.model_name + ".pt"))
         script_cell = torch.jit.script(self.model)
-        torch.jit.save(script_cell, os.path.join(model_save_path, self.model_name + "_jit.pt"))
+        torch.jit.save(script_cell, os.path.join(model_save_path, self.model_name + ".jit"))
         logger.info(f"Saved the model to {model_save_path}\n")
 
 
