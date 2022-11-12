@@ -1,6 +1,6 @@
 """
 Usage:
-    train.py  <data_dirs>... [--model=None] [--save_name=None]
+    train.py  <data_dirs>... [--model=None] [--name=None]
 
 Options:
   -h --help     Show this screen.
@@ -40,7 +40,7 @@ def main():
     args = docopt(__doc__)
     data_dirs = args["<data_dirs>"]
     model_path = args["--model"]
-    model_save_name = args["--save_name"]
+    model_save_name = args["--name"]
     if not model_save_name:
         model_save_name = "model"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -60,7 +60,7 @@ def main():
         model.load_state_dict(torch.load(model_path))
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     criterion = torch.nn.MSELoss()
-    writer = SummaryWriter("tensorboard")
+    writer = SummaryWriter(f"tb_logs/{model_save_name}")
     writer.add_graph(model, input_to_model=torch.ones((1, 3, 120, 160), device=device), verbose=False, use_strict_trace=True)
 
     dataset = Load_Data(data_dirs, reduce_fps=reduce_fps, use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
