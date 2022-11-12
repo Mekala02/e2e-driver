@@ -100,7 +100,7 @@ class Camera_IMU:
             self.grab_data()
             # Thread is too fast we limiting the run speed othervise other threads will be slow
             # inverse of elapsed time in 1 seond = fps we limiting according to inverse of time, not fps
-            sleep_time = 1.0 / cfg["CAMERA_FPS"] - (time.time() - start_time)
+            sleep_time = 1.0 / cfg["DRIVE_LOOP_HZ"] - (time.time() - start_time)
             if sleep_time > 0.0:
                 time.sleep(sleep_time)
 

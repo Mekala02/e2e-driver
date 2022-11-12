@@ -65,8 +65,8 @@ class Pilot:
                 # We made data between -1, 1 when trainig so unpacking thoose to pwm value
                 self.shared_dict["steering"] = int(steering * 500 + 1500)
                 self.shared_dict["throttle"] = int(throttle * 500 + 1500)
-            # Inferancing @100fps
-            sleep_time = 1.0 / 100 - (time.time() - start_time)
+            # Inferancing @DRIVE_LOOP_HZ
+            sleep_time = 1.0 / cfg["DRIVE_LOOP_HZ"] - (time.time() - start_time)
             if sleep_time > 0.0:
                 time.sleep(sleep_time)
 

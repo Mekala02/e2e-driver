@@ -46,7 +46,7 @@ class Arduino:
         while self.run:
             start_time = time.time()
             self.grab_data()
-            sleep_time = 1.0 / cfg["CAMERA_FPS"] - (time.time() - start_time)
+            sleep_time = 1.0 / cfg["DRIVE_LOOP_HZ"] - (time.time() - start_time)
             if sleep_time > 0.0:
                 time.sleep(sleep_time)
 

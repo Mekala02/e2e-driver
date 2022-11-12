@@ -22,7 +22,7 @@ camera = {"Is_New": False}
 
 web_special = {"Camera_Mode": "Color_Image", "Graph1_Mode": ["Steering"], "Graph2_Mode": ["Throttle"]}
 
-image_refresh_rate = 60
+image_refresh_rate = 30
 def generate_frames():
     while True:
         start_time = time.time()
