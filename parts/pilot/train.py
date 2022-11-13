@@ -33,7 +33,7 @@ def main():
     #2e-3 for startup then reduce to 1e-3
     learning_rate = 2e-3
     batch_size = 1024
-    num_epochs = 100
+    num_epochs = 250
     test_data_percentage = 20
     detailed_tensorboard = False
 
@@ -86,7 +86,7 @@ def main():
             grid = torchvision.utils.make_grid(images)
             writer.add_image(f"Test Set First Batch", grid, 0)
 
-    trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, writer=writer, test_set_loader=test_set_loader, model_name=model_save_name, use_other_inputs=use_other_inputs, patience=5, delta=0.00005)
+    trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, writer=writer, test_set_loader=test_set_loader, model_name=model_save_name, use_other_inputs=use_other_inputs, patience=3, delta=0.0005)
     trainer.fit()
     writer.close()
     # Saving the model
