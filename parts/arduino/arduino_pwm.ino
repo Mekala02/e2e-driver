@@ -2,7 +2,7 @@
     When pulseIn command is waiting for input main loop is blocked hence our loop will be slow.
     We can use interrupts for faster loop (interrupts are non blocking).
     But arduino Nano only supports 2 pin for interrupts (2, 3). Since we have 3 channels + 1 channel for encoder = 4 we have to use
-    pulseIn. If ypu want to get true 100+ fps you have to use Arduino Micro it has 5 interrupt usable pin.
+    pulseIn. If you want to get true 100+ fps you have to use ppm.
 
 */
 
