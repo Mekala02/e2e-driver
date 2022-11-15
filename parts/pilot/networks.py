@@ -6,7 +6,7 @@ import torch.nn.functional as F
 class Linear(nn.Module):
     def __init__(self, in_channels=3):
         super(Linear, self).__init__()
-        self.drop = nn.Dropout(p=0.0)
+        self.drop = nn.Dropout(p=0.1)
         self.flatten = nn.Flatten()
         self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels =24, kernel_size =(5, 5), stride=(2, 2))
         self.conv2 = nn.Conv2d(in_channels=24, out_channels=32, kernel_size=(5, 5), stride=(2, 2))
@@ -45,7 +45,7 @@ class Linear(nn.Module):
 class Linear_With_Others(nn.Module):
     def __init__(self, in_channels=3):
         super(Linear_With_Others, self).__init__()
-        self.drop = nn.Dropout(p=0.0)
+        self.drop = nn.Dropout(p=0.1)
         self.flatten = nn.Flatten()
         self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels =24, kernel_size =(5, 5), stride=(2, 2))
         self.conv2 = nn.Conv2d(in_channels=24, out_channels=32, kernel_size=(5, 5), stride=(2, 2))
