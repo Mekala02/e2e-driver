@@ -27,7 +27,7 @@ class Data_Logger:
             json.dump(cfg, config_log)
         # If we saving data in svo file don't creating folders
         if cfg["SVO_COMPRESSION_MODE"] is None:
-            os.mkdir(os.path.join(self.data_folder, "RGB_Image"))
+            os.mkdir(os.path.join(self.data_folder, "Color_Image"))
             os.mkdir(os.path.join(self.data_folder, "Depth_Image"))
             os.mkdir(os.path.join(self.data_folder, "Object_Detection"))
         self.file = open(os.path.join(self.data_folder, "memory.json"), "w+")
@@ -57,7 +57,7 @@ class Data_Logger:
             self.save_json(self.file, self.memory.memory)
             if cfg["SVO_COMPRESSION_MODE"] is None:
                 threading.Thread(target=self.save_to_file,
-                    args=([cfg["RGB_IMAGE_FORMAT"], os.path.join(self.data_folder, "RGB_Image"), str(self.index), self.memory.big_memory["RGB_Image"]]),
+                    args=([cfg["COLOR_IMAGE_FORMAT"], os.path.join(self.data_folder, "Color_Image"), str(self.index), self.memory.big_memory["RGB_Image"]]),
                     daemon=True,
                     name="Rgb_Image").start()
                 threading.Thread(target=self.save_to_file,

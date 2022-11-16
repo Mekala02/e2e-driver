@@ -1,10 +1,10 @@
 """
 Usage:
-    expend_svo.py  <data_dir> (--r | --d | --r --d)
+    expend_svo.py  <data_dir> (--c | --d | --c --d)
 
 Options:
   -h --help     Show this screen.
-  --r            Expands Rgb Image.
+  --c            Expands Color Image.
   --d            Expands Depth Image.
 """
 
@@ -15,11 +15,11 @@ import cv2
 import os
 
 
-def write(data_folder, start, stop, rgb=False, depth=False):
+def write(data_folder, start, stop, color=False, depth=False):
     index = start
     svo_path = os.path.join(data_folder, "zed_record.svo")
     memory_file_path = os.path.join(data_folder, "memory.json")
-    rgb_data_path = os.path.join(data_folder, "RGB_Image")
+    color_data_path = os.path.join(data_folder, "Color_Image")
     depth_data_path = os.path.join(data_folder, "Depth_Image")
     with open(memory_file_path) as data_file:
         datas = json.load(data_file)
@@ -28,7 +28,7 @@ def write(data_folder, start, stop, rgb=False, depth=False):
     init_parameters.set_from_svo_file(svo_path)
     init_parameters.svo_real_time_mode = False
     zed = sl.Camera()
-    zed_RGB_Image = sl.Mat()
+    zed_Color_Image = sl.Mat()
     zed_Depth_Image = sl.Mat()
     if (err:=zed.open(init_parameters)) != sl.ERROR_CODE.SUCCESS:
         print(err)
@@ -36,17 +36,17 @@ def write(data_folder, start, stop, rgb=False, depth=False):
 
     print("Procces Started")
     while(index < stop):
-        rgb_image_file = os.path.join(rgb_data_path, str(datas[index]["Data_Id"])+"." + "jpg")
+        color_image_file = os.path.join(color_data_path, str(datas[index]["Data_Id"])+"." + "jpg")
         depth_image_file = os.path.join(depth_data_path, str(datas[index]["Data_Id"])+"." + "jpg")
-        if (rgb and not os.path.isfile(rgb_image_file)) or (depth and not os.path.isfile(depth_image_file)):
+        if (color and not os.path.isfile(color_image_file)) or (depth and not os.path.isfile(depth_image_file)):
             zed.set_svo_position(datas[index]["Zed_Data_Id"])
             if (err:=zed.grab()) == sl.ERROR_CODE.SUCCESS:
-                if(rgb):
-                    zed.retrieve_image(zed_RGB_Image, sl.VIEW.LEFT)
-                    rgb_image = cv2.cvtColor(zed_RGB_Image.get_data(), cv2.COLOR_RGBA2RGB)
-                    rgb_image = cv2.resize(rgb_image, (160, 120), interpolation= cv2.INTER_LINEAR)
+                if(color):
+                    zed.retrieve_image(zed_Color_Image, sl.VIEW.LEFT)
+                    color_image = cv2.cvtColor(zed_Color_Image.get_data(), cv2.COLOR_RGBA2RGB)
+                    color_image = cv2.resize(color_image, (160, 120), interpolation= cv2.INTER_LINEAR)
                     # Giving data name according to memory.json Zed_Data_Id (not the zed_camera )
-                    cv2.imwrite(rgb_image_file, rgb_image)
+                    cv2.imwrite(color_image_file, color_image)
                 if(depth):
                     zed.retrieve_image(zed_Depth_Image, sl.VIEW.DEPTH)
                     depth_image = cv2.cvtColor(zed_Depth_Image.get_data(), cv2.COLOR_RGBA2RGB)
@@ -59,11 +59,11 @@ def write(data_folder, start, stop, rgb=False, depth=False):
     print("This Process Is Compleated")
 
 
-def expand(data_folder, datas, rgb=False, depth=False, num_workers=6):
-    rgb_data_path = os.path.join(data_folder, "RGB_Image")
+def expand(data_folder, datas, color=False, depth=False, num_workers=6):
+    color_data_path = os.path.join(data_folder, "Color_Image")
     depth_data_path = os.path.join(data_folder, "Depth_Image")
-    if not os.path.isdir(rgb_data_path):
-        os.mkdir(rgb_data_path)
+    if not os.path.isdir(color_data_path):
+        os.mkdir(color_data_path)
     if not os.path.isdir(depth_data_path):
         os.mkdir(depth_data_path)
 
@@ -79,7 +79,7 @@ def expand(data_folder, datas, rgb=False, depth=False, num_workers=6):
         # If we have rmainder last one process do extra work
         if i == num_workers:
             stop += remainder
-        p = mp.Process(target=write, args=(data_folder, start, stop, rgb, depth), daemon=True, name=i)
+        p = mp.Process(target=write, args=(data_folder, start, stop, color, depth), daemon=True, name=i)
         processes.append(p)
         start +=  quotient
         stop = start + quotient
@@ -92,9 +92,9 @@ def expand(data_folder, datas, rgb=False, depth=False, num_workers=6):
 if __name__ == "__main__":
     args = docopt(__doc__)
     data_folder = args["<data_dir>"]
-    rgb = args["--r"]
+    color = args["--c"]
     depth = args["--d"]
     with open(os.path.join(data_folder, "memory.json")) as data_file:
         datas = json.load(data_file)
-    expand(data_folder, datas, rgb=rgb, depth=depth, num_workers=7)
+    expand(data_folder, datas, color=color, depth=depth, num_workers=7)
     

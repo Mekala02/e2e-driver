@@ -17,7 +17,7 @@ config = dict(
     # H264, H264_LOSSLESS
     SVO_COMPRESSION_MODE = "H264",
     # jpg, jpeg, png, npy, npz
-    RGB_IMAGE_FORMAT = "jpg",
+    COLOR_IMAGE_FORMAT = "jpg",
     DEPTH_IMAGE_FORMAT = "jpg",
     OBJECT_DETECTION_FORMAT = "npy",
 
