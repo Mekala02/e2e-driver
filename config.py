@@ -1,17 +1,22 @@
 config = dict(
-    DRIVE_LOOP_HZ = 60,
+    DRIVE_LOOP_HZ = 120,
     USE_OBJECT_DETECTION = False,
     USE_DAGGER = True,
+    # None or (Width, High), if None Zed resolutio will be used
+    CAMERA_RESOLUTION = (160, 120),
 
-    CAMERA_RESOLUTION = "VGA",
-    CAMERA_FPS = 60,
+    ZED_RESOLUTION = "VGA",
+    CAMERA_FPS = 100,
     CAMERA_IMAGE_FLIP = "ON",
-    DEPTH_MODE = "ULTRA",
+    # NONE, PERFORMANCE, QUALITY, ULTRA
+    DEPTH_MODE = "NONE",
     COORDINATE_UNITS = "CENTIMETER",
     COORDINATE_SYSTEM = "RIGHT_HANDED_Z_UP",
 
     # If SVO_COMPRESSION_MODE != None other formats will be overwritten
+    # H264, H264_LOSSLESS
     SVO_COMPRESSION_MODE = "H264",
+    # jpg, jpeg, png, npy, npz
     RGB_IMAGE_FORMAT = "jpg",
     DEPTH_IMAGE_FORMAT = "jpg",
     OBJECT_DETECTION_FORMAT = "npy",

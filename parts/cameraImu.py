@@ -31,7 +31,7 @@ class Camera_IMU:
 
         self.zed = sl.Camera()
         self.init_params = sl.InitParameters(
-            camera_resolution=getattr(sl.RESOLUTION, cfg["CAMERA_RESOLUTION"]),
+            camera_resolution=getattr(sl.RESOLUTION, cfg["ZED_RESOLUTION"]),
             camera_fps=cfg["CAMERA_FPS"],
             camera_image_flip=getattr(sl.FLIP_MODE, cfg["CAMERA_IMAGE_FLIP"]),
             depth_mode=getattr(sl.DEPTH_MODE, cfg["DEPTH_MODE"]),
@@ -69,15 +69,21 @@ class Camera_IMU:
 
             self.zed.retrieve_image(self.zed_Color_Image, sl.VIEW.LEFT)
             Color_Image = cv2.cvtColor(self.zed_Color_Image.get_data(), cv2.COLOR_BGRA2BGR)
-            self.Color_Image = cv2.resize(Color_Image, (160, 120), interpolation= cv2.INTER_LINEAR)
+            if cfg["CAMERA_RESOLUTION"]:
+                Color_Image = cv2.resize(Color_Image, (cfg["CAMERA_RESOLUTION"]), interpolation= cv2.INTER_LINEAR)
+            self.Color_Image = Color_Image
 
-            # Depth Map As Image
-            self.zed.retrieve_image(self.zed_Depth_Image, sl.VIEW.DEPTH)
-            Depth_Image = cv2.cvtColor(self.zed_Depth_Image.get_data(), cv2.COLOR_BGRA2BGR)
-            self.Depth_Image = cv2.resize(Depth_Image, (160, 120), interpolation= cv2.INTER_LINEAR)
+            # If we calculating depth
+            if not cfg["DEPTH_MODE"] == "NONE":
+                # Depth Map As Image
+                self.zed.retrieve_image(self.zed_Depth_Image, sl.VIEW.DEPTH)
+                Depth_Image = cv2.cvtColor(self.zed_Depth_Image.get_data(), cv2.COLOR_BGRA2BGR)
+                if cfg["CAMERA_RESOLUTION"]:
+                    Depth_Image = cv2.resize(Depth_Image, (cfg["CAMERA_RESOLUTION"]), interpolation= cv2.INTER_LINEAR)
+                self.Depth_Image = Depth_Image
 
-            self.zed.retrieve_measure(self.zed_depth_map, sl.MEASURE.DEPTH)
-            self.Depth_Array = self.zed_depth_map.get_data()
+                self.zed.retrieve_measure(self.zed_depth_map, sl.MEASURE.DEPTH)
+                self.Depth_Array = self.zed_depth_map.get_data()
             
             self.zed.get_sensors_data(self.zed_sensors_data, sl.TIME_REFERENCE.IMAGE)
             imu_data = self.zed_sensors_data.get_imu_data()
