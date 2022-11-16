@@ -13,7 +13,9 @@ class DAgger:
         logger.info("Successfully Added")
 
     def update(self):
-        if self.memory.memory["Mode_Button"] == 1:
+        # If mode == 1 web server is compleate control
+        # Self driving in angle mode
+        if self.memory.memory["Mode1"] == 2:
             # If our importance is higher then other overwrite writing the value
             if not("Record" in self.memory.overwrite and self.overwrite_importance < self.memory.overwrite["Record"]["importance"]):
                 self.memory.memory["Record"] = 0
@@ -21,8 +23,8 @@ class DAgger:
             if not("Pilot_Mode" in self.memory.overwrite and self.overwrite_importance < self.memory.overwrite["Pilot_Mode"]["importance"]):
                 self.memory.memory["Pilot_Mode"] = "Angle"
                 self.memory.overwrite["Pilot_Mode"] = {"importance": self.overwrite_importance, "value": "Angle"}
-
-        elif self.memory.memory["Mode_Button"] == 2:
+        # Manuel driving and recording
+        elif self.memory.memory["Mode1"] == 3:
             if not("Record" in self.memory.overwrite and self.overwrite_importance < self.memory.overwrite["Record"]["importance"]):
                 self.memory.memory["Record"] = 1
                 self.memory.overwrite["Record"] = {"importance": self.overwrite_importance, "value": 1}
