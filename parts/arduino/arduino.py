@@ -14,11 +14,12 @@ class Arduino:
         self.memory = memory
         self.thread = "Single"
         self.run = True
-        self.outputs = {"Speed": 0, "Mode_Button": 0}
+        self.outputs = {"Speed": 0, "Mode1": 0, "Mode2": 0}
         # Also It can output Record and drive mode acoording to mode button 
         self.Steering = 0
         self.Throttle = 0
-        self.mode_button = 0
+        self.Mode1 = 0
+        self.Mode2 = 0
         self.Speed = 0
         # If pilot = manuel self.outputs = {"speed": 0, "steering": 0, "throttle": 0}
         self.arduino = serial.Serial(port='/dev/ttyUSB0', baudrate=115200, timeout=0.006, write_timeout=0.006)
@@ -33,13 +34,14 @@ class Arduino:
         # Looking if data is right format
         if buffer and buffer[0] == "s":
             # re.search(r"t\d+.\d+s\d+.\d+v\d+.\d+e", data) // todo
-            data_array = re.split(r's|t|m|v|e', buffer)
+            data_array = re.split(r's|t|m|m|v|e', buffer)
             self.Steering = int(data_array[1])
             self.Throttle = int(data_array[2])
             # if 0 --> radio turned off, elif 1 --> mode 1, elif 2 --> mode 2
-            self.mode_button = int(data_array[3])
+            self.Mode1 = int(data_array[3])
+            self.Mode2 = int(data_array[4])
             # data_array[3] sends ticks/sec we convert it to cm/sec
-            self.Speed = float(data_array[4]) / cfg["TICKS_PER_CM"]
+            self.Speed = float(data_array[5]) / cfg["TICKS_PER_CM"]
 
     def start_thread(self):
         logger.info("Starting Thread")
@@ -60,7 +62,8 @@ class Arduino:
             self.memory.memory["Throttle"] = self.Throttle
             self.memory.memory["Steering"] = self.Steering
         self.memory.memory["Speed"] = self.Speed
-        self.memory.memory["Mode_Button"] = self.mode_button
+        self.memory.memory["Mode1"] = self.Mode1
+        self.memory.memory["Mode2"] = self.Mode2
         # We want to send the data as fast as we can so we are only sending 2 int as string, those
         # strings encode motor power and drive mode parameters to throttle and steering values
         # If char is 1000 < char < 2000 arduino will use that value to drive motors
