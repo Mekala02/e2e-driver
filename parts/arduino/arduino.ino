@@ -14,7 +14,7 @@ Servo SERVO;
 
 String pyserial_data;
 int pyserial_throttle, pyserial_steering;
-int steering, throttle, mode_button;
+int steering, throttle, mod1, mod2;
 
 // current time, previous time, channel no, time differance
 unsigned long int t, tp, c, d = 0;
@@ -27,6 +27,7 @@ unsigned int pulses = 0;
 float dpulses = 0;
 
 void Read_Channels();
+int mode(int pwm);
 
 void setup() {
     pinMode(PPM_PIN, INPUT_PULLUP);
@@ -73,15 +74,15 @@ void loop() {
     // else
     //     throttle = 1500 // not tested
 
-    if (ch[3] > 500 && ch[3] < 1500)
-        mode_button = 1;
-    else if (ch[3] > 1500 && ch[3] < 2100)
-        mode_button = 2;
-    else
-        mode_button = 0;
+    mod1 = mode(ch[5]);
+    mod2 = mode(ch[6]);
 
+    // Arming the esc according to ch7
     SERVO.writeMicroseconds(steering);
-    ESC.writeMicroseconds(throttle);
+    if (ch[7] > 1900 && ch[7] < 2100)
+        ESC.writeMicroseconds(throttle);
+    else
+        ESC.writeMicroseconds(1500);
 
     // Calculating speed at certain rate
     if (current_time - encoder_last_time > 10){
@@ -92,7 +93,7 @@ void loop() {
 
     // Sending data 100fps
     if (current_time - serialOut_last_time > 10){
-        Serial.println("s" + String(steering) + "t" + String(throttle) + "m" + String(mode_button) + "v" + String(dpulses) + "e");
+        Serial.println("s" + String(steering) + "t" + String(throttle) + "m" + String(mod1) + "m" + String(mod2) + "v" + String(dpulses) + "e");
         serialOut_last_time = current_time;
     }
 }
@@ -106,4 +107,15 @@ void Read_Channels(){
     ch[c] = d;
     c ++;
     tp = t;
+}
+
+int mode(int pwm){
+    if (pwm > 900 && pwm < 1100)
+        return 1;
+    else if (pwm > 1400 && pwm < 1600)
+        return 2;
+    else if (pwm > 1900 && pwm < 2100)
+        return 3;
+    else
+        return 0;
 }
