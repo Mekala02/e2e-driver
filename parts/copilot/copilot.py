@@ -1,5 +1,5 @@
 import logging
-import random
+from config import config as cfg
 
 logger = logging.getLogger(__name__)
 
@@ -11,14 +11,34 @@ class Copilot:
         self.outputs = {"Stop": 0, "Taxi": 0, "Direction": "Right", "Lane": "Right"}
         logger.info("Successfully Added")
 
+        self.direction = "Right"
+        self.cancel_turn_signal = cfg["CANCEL_TURN_SIGNAL"]
+        self.left_threshold = cfg["LEFT_THRESHOLD"]
+        self.right_threshold = cfg["RIGHT_THRESHOLD"]
+        self.prev_steering = 0
+        self.current_mode = 0
+
     def update(self):
         mode = self.memory.memory["Mode2"]
-        if mode == 1:
-            self.memory.memory["Direction"] = "Left"
-        if mode == 2:
-            self.memory.memory["Direction"] = "Forward"
-        if mode == 3:
-            self.memory.memory["Direction"] = "Right"
+        if not mode == self.current_mode:
+            if mode == 1:
+                self.direction = "Left"
+            if mode == 2:
+                self.direction = "Forward"
+            if mode == 3:
+                self.direction = "Right"
+            self.current_mode = mode
+
+        # Automatickly turns off the signal after we made the turn(like real car)
+        if self.cancel_turn_signal:
+            steering = self.memory.memory["Steering"]
+            if self.direction == "Left" and self.prev_steering > self.left_threshold and steering < self.left_threshold:
+                self.direction = None
+            if self.direction == "Right" and self.prev_steering < self.right_threshold and steering > self.right_threshold:
+                self.direction = None
+            self.prev_steering = steering
+
+        self.memory.memory["Direction"] = self.direction
 
     def shut_down(self):
         self.run = False

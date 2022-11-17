@@ -31,5 +31,11 @@ config = dict(
     STEERING_MAX_PWM = 1900,
     ENCODER_UNITS = "cm/s",
     ENCODER_TICKS = 600,
-    TICKS_PER_CM = 11.7
+    TICKS_PER_CM = 11.7,
+
+    # Copilot
+    # Thresholds for turning off turn signals (pwm)
+    CANCEL_TURN_SIGNAL = True,
+    LEFT_THRESHOLD = 1850,
+    RIGHT_THRESHOLD = 1260
 )
