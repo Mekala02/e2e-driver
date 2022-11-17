@@ -113,8 +113,9 @@ class Main_Track {
 
     Update_Lane(lane){
         try{document.getElementById(this.Lane+"_Lane").style.visibility = "hidden"} catch{}
+        if (lane == "Left" || lane == "Right")
+        document.getElementById(lane+"_Lane").style.visibility = "visible"
         this.Lane = lane
-        document.getElementById(this.Lane+"_Lane").style.visibility = "visible"
         // console.log("Lane:", this.lane)
     }
 
