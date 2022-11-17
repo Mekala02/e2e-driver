@@ -57,9 +57,14 @@ function update_indicators(){
 
 document.getElementById("Stop").addEventListener("click", function() {data_clear_track.Update_Select_List(["Stop"])})
 document.getElementById("Taxi").addEventListener("click", function() {data_clear_track.Update_Select_List(["Taxi"])})
+
+// If double click to arrow container direction will be none
+document.getElementById("Arrow_Container").addEventListener("dblclick", function() {data_clear_track.Update_Select_List(["None_Direction"])})
+
 document.getElementById("Left_Arrow").addEventListener("click", function() {data_clear_track.Update_Select_List(["Left_Direction"])})
 document.getElementById("Forward_Arrow").addEventListener("click", function() {data_clear_track.Update_Select_List(["Forward_Direction"])})
 document.getElementById("Right_Arrow").addEventListener("click", function() {data_clear_track.Update_Select_List(["Right_Direction"])})
+
 document.getElementById("Left_Lane").addEventListener("click", function() {data_clear_track.Update_Select_List(["Left_Lane"])})
 document.getElementById("Right_Lane").addEventListener("click", function() {data_clear_track.Update_Select_List(["Right_Lane"])})
 document.getElementById("Emergency_Button").addEventListener("click", function() {data_clear_track.Emergency_Stop()})
