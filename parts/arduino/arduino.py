@@ -3,6 +3,7 @@ from config import config as cfg
 import threading
 import logging
 import serial
+import io
 import time
 import re
 
@@ -28,9 +29,8 @@ class Arduino:
 
     def grab_data(self):
         buffer = False
-        while (self.arduino.in_waiting > 0):
-            try: buffer = self.arduino.readline().decode('utf-8') 
-            except Exception as e: pass
+        try: buffer = self.arduino.read(self.arduino.in_waiting).decode('utf-8') 
+        except Exception as e: pass
         # Looking if data is right format
         if buffer and buffer[0] == "s":
             # re.search(r"t\d+.\d+s\d+.\d+v\d+.\d+e", data) // todo
@@ -48,7 +48,8 @@ class Arduino:
         while self.run:
             start_time = time.time()
             self.grab_data()
-            sleep_time = 1.0 / cfg["DRIVE_LOOP_HZ"] - (time.time() - start_time)
+            # Arduino sends data @100 fps so we receiving it @120fps
+            sleep_time = 1.0 / 120 - (time.time() - start_time)
             if sleep_time > 0.0:
                 time.sleep(sleep_time)
 
