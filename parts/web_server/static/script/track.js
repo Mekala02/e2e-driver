@@ -104,7 +104,7 @@ class Main_Track {
                 document.getElementById(direction+"_Arrow").style.borderColor = "#ffb700"
                 document.getElementById(direction+"_Arrow_Stick").style.backgroundColor = "#ffb700"
             }
-            else
+            else if (direction == "Left" || direction == "Right")
                 this.turn_signal_interval = setInterval(this.turn_signal, 500, direction)
         }
         this.Direction = direction
