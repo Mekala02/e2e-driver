@@ -124,16 +124,12 @@ class Trainer:
         # torch.autograd.set_detect_anomaly(True)
         # logger.info(self.model)
         logger.info(f"Trainig on {self.device}...")
+        epoch_losses = dict(steering=[], throttle=[], loss=[])
         for epoch in range(1, self.num_epochs+1):
-            epoch_steering_losses = []
-            epoch_throttle_losses = []
-            epoch_losses = []
             self.model.train()
             pbar = tqdm(self.train_set_loader, desc=f"Epoch: {epoch} ", file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}')
+            batch_losses = dict(steering=[], throttle=[], loss=[])
             for batch_no, data in enumerate(pbar, 1):
-                batch_steering_losses = []
-                batch_throttle_losses = []
-                batch_losses = []
                 for param in self.model.parameters():
                     param.grad = None
                 if self.use_other_inputs:
@@ -151,22 +147,21 @@ class Trainer:
                 batch_steering_loss = self.criterion(steering_prediction, steering_labels)
                 batch_throttle_loss = self.criterion(throttle_prediction, throttle_labels)
                 batch_loss = self.steering_weight * batch_steering_loss + self.throttle_weight * batch_throttle_loss
-                batch_steering_losses.append(batch_steering_loss.item())
-                batch_throttle_losses.append(batch_throttle_loss.item())
-                batch_losses.append(batch_loss.item())
+                batch_losses["steering"].append(batch_steering_loss.item())
+                batch_losses["throttle"].append(batch_throttle_loss.item())
+                batch_losses["loss"].append(batch_loss.item())
                 logger.info(f"\nBatch[{batch_no}/{self.nu_of_train_batches}] Loss: {batch_loss:.4f}, Steering Loss: {batch_steering_loss:.4f}, Throttle Loss: {batch_throttle_loss:.4f}")
                 batch_loss.backward()
                 # Gradient clipping
                 # torch.nn.utils.clip_grad_norm_(self.model.parameters(), 5)
                 self.optimizer.step()
-            
             # After finishing epoch we evaluating the model
-            epoch_steering_loss = sum(batch_steering_losses) / len(batch_steering_losses)
-            epoch_throttle_loss = sum(batch_throttle_losses) / len(batch_throttle_losses)
-            epoch_loss = sum(batch_losses) / len(batch_losses)
-            epoch_steering_losses.append(epoch_steering_loss)
-            epoch_throttle_losses.append(epoch_throttle_loss)
-            epoch_losses.append(epoch_loss)
+            epoch_steering_loss = sum(batch_losses["steering"]) / batch_no
+            epoch_throttle_loss = sum(batch_losses["throttle"]) / batch_no
+            epoch_loss = sum(batch_losses["loss"]) / batch_no
+            epoch_losses["steering"].append(epoch_steering_loss)
+            epoch_losses["throttle"].append(epoch_throttle_loss)
+            epoch_losses["loss"].append(epoch_loss)
             loss_string = f"For Epoch {epoch} --> Loss: {epoch_loss:.4f}, Steering Loss: {epoch_steering_loss:.4f}, Throttle Loss: {epoch_throttle_loss:.4f}"
             if self.writer:
                 self.writer.add_scalar('Train/Loss', epoch_loss, epoch)
@@ -216,9 +211,7 @@ class Trainer:
 
     def evaluate(self):
         self.model.eval()
-        steering_losses = []
-        throttle_losses = []
-        losses = []
+        losses = dict(steering=[], throttle=[], loss=[])
         with torch.no_grad():
             for batch_no, data in enumerate(tqdm(self.test_set_loader, file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}'), 1):
                 if self.use_other_inputs:
@@ -235,13 +228,13 @@ class Trainer:
                     steering_prediction, throttle_prediction = self.model(images)
                 steering_loss, throttle_loss = self.criterion(steering_prediction, steering_labels), self.criterion(throttle_prediction, throttle_labels)
                 loss = self.steering_weight * steering_loss + self.throttle_weight * throttle_loss
-                steering_losses.append(steering_loss)
-                throttle_losses.append(throttle_loss)
-                losses.append(loss)
+                losses["steering"].append(steering_loss)
+                losses["throttle"].append(throttle_loss)
+                losses["loss"].append(loss)
                 # logger.info(f"\nTest Set--> Batch[{batch_no}/{self.nu_of_test_batches}] Loss: {loss:.2e}, Steering Loss: {steering_loss:.2e}, Throttle Loss: {throttle_loss:.2e}")
-        eval_steering_loss = sum(steering_losses) / len(steering_losses)
-        eval_throttle_loss = sum(throttle_losses) / len(throttle_losses)
-        eval_loss = sum(losses) / len(losses)
+        eval_steering_loss = sum(losses["steering"]) / batch_no
+        eval_throttle_loss = sum(losses["throttle"]) / batch_no
+        eval_loss = sum(losses["loss"]) / batch_no
         return eval_loss, eval_steering_loss, eval_throttle_loss
 
     def save_model(self):
