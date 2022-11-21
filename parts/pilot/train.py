@@ -180,6 +180,9 @@ class Trainer:
             else:
                 logger.info(loss_string + '\n')
 
+            if self.writer:
+                self.writer.flush()
+
             # Checking if there is an improvement
             # We counting as improvement if delta_loss > self.delta
             delta_train_set_loss =  self.train_set_min_loss - epoch_loss
@@ -206,8 +209,6 @@ class Trainer:
             if (self.train_not_improved_count >= self.patience):
                 logger.info(f"Stopped Training: Delta Loss Is Smaller Than {self.delta} For {self.patience} Times")
                 break
-            if self.writer:
-                self.writer.flush()
 
     def evaluate(self):
         self.model.eval()
