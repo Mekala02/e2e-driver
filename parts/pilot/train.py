@@ -86,7 +86,7 @@ def main():
             grid = torchvision.utils.make_grid(images)
             writer.add_image(f"Test Set First Batch", grid, 0)
 
-    trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, writer=writer, test_set_loader=test_set_loader, model_name=model_save_name, use_other_inputs=use_other_inputs, patience=3, delta=0.0005)
+    trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, writer=writer, test_set_loader=test_set_loader, model_name=model_save_name, use_other_inputs=use_other_inputs, patience=5, delta=0.00005)
     trainer.fit()
     writer.close()
     # Saving the model
@@ -94,7 +94,7 @@ def main():
 
 
 class Trainer:
-    def __init__(self, model, criterion, optimizer, device, num_epochs, train_set_loader, writer=None, test_set_loader=None, model_name="model", use_other_inputs=False, patience=3, delta=0.0005):
+    def __init__(self, model, criterion, optimizer, device, num_epochs, train_set_loader, writer=None, test_set_loader=None, model_name="model", use_other_inputs=False, patience=5, delta=0.00005):
         self.model = model
         self.criterion = criterion
         self.optimizer = optimizer
