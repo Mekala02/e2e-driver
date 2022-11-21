@@ -13,7 +13,7 @@ class Pilot:
         self.memory = memory
         self.thread = None
         self.run = True
-        self.outputs = {"Steering": 0, "Throttle": 0}
+        self.outputs = {"Steering": 1500, "Throttle": 1500}
         self.pilot_mode = 0
         self.model_path = None
 
@@ -26,11 +26,11 @@ class Pilot:
             self.shared_dict["run"] = True
             self.shared_dict["pilot_mode"] = 0
             self.shared_dict["cpu_image"] = 0
-            self.shared_dict["steering"] = 0
-            self.shared_dict["throttle"] = 0
+            self.shared_dict["steering"] = 1500
+            self.shared_dict["throttle"] = 1500
         
-        self.steering = 0
-        self.throttle = 0
+        self.steering = 1500
+        self.throttle = 1500
         
         logger.info("Successfully Added")
     
