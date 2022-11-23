@@ -125,11 +125,14 @@ class Data_Folder():
             else:
                 # If our mode is expand_svo but we not expanded svo, we expanding it.
                 if not os.path.isdir(self.Color_Image_path) or (self.use_depth_input and not os.path.isdir(self.Depth_image_path)):
-                    pass # ToDo
+                    logger.warning("First you have to expand the svo file")
+                    quit()
+                    # ToDo: Multiproccesing quits when runned in there, fix it
                     # import sys
-                    # sys.path.append("~/e2e-driver/data/")
-                    # from data.expend_svo import expand
-                    # expand(self.data_folder_path, self.datas, rgb=True, depth=use_depth_input, num_workers=7)
+                    # sys.path.append(os.path.join(os.path.expanduser('~'), "e2e-driver", "data"))
+                    # from expend_svo import expand
+                    # logger.info("Expanding Svo ...")
+                    # expand(self.data_folder_path, self.datas, color=True, depth=use_depth_input, num_workers=6)
                 # Overwriting the config data
                 self.cfg["COLOR_IMAGE_FORMAT"] = "jpg"
                 self.cfg["DEPTH_IMAGE_FORMAT"] = "jpg"
