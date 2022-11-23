@@ -19,10 +19,16 @@ class Data_Logger:
         self.run = True
         self.outputs = {"Data_Id": 0, "Timestamp": 0}
         self.index = 0
-        new_folder_name = datetime.datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
-        self.data_folder = os.path.join("data", new_folder_name)
+
+        # If user not specified data folder it will named according to date
+        if not "Data_Folder" in self.memory.untracked:
+            new_folder_name = datetime.datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
+            data_folder = os.path.join("data", new_folder_name)  
+            memory.untracked["Data_Folder"] = data_folder
+
+        self.data_folder = memory.untracked["Data_Folder"]
         os.mkdir(self.data_folder)
-        memory.untracked["Data_Folder"] = self.data_folder
+
         with open(os.path.join(self.data_folder, "cfg.json"), "w+") as config_log:
             json.dump(cfg, config_log)
         # If we saving data in svo file don't creating folders

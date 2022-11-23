@@ -1,6 +1,6 @@
 """
 Usage:
-    drive.py  [--model=None]
+    drive.py  [--model=None] [--data_folder=None]
 
 Options:
   -h --help     Show this screen.
@@ -21,8 +21,9 @@ from parts.mode_selector import Mode_Selector
 
 from docopt import docopt
 import logging
-import sys
 import time
+import sys
+import os
 
 if __name__ == '__main__':
     args = docopt(__doc__)
@@ -35,6 +36,10 @@ if __name__ == '__main__':
     model_folder_path = args["--model"]
     if model_folder_path:
         vehicle_memory.untracked["Model_Folder_Path"] = model_folder_path
+
+    save_folder_name = args["--data_folder"]
+    if save_folder_name:
+        vehicle_memory.untracked["Data_Folder"] = os.path.join("data", save_folder_name)    
 
     logger.info("Adding parts to vehicle ... \n")
     vehicle.add(Data_Logger(vehicle_memory))
