@@ -1,6 +1,6 @@
 """
 Usage:
-    drive.py  [<model>]
+    drive.py  [--model=None]
 
 Options:
   -h --help     Show this screen.
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     vehicle_memory = Memory()
     vehicle = Vehicle(vehicle_memory)
 
-    model_folder_path = args["<model>"]
+    model_folder_path = args["--model"]
     if model_folder_path:
         vehicle_memory.untracked["Model_Folder_Path"] = model_folder_path
 
