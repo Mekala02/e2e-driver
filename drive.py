@@ -33,9 +33,9 @@ if __name__ == '__main__':
     vehicle_memory = Memory()
     vehicle = Vehicle(vehicle_memory)
 
-    model_folder_path = args["--model"]
-    if model_folder_path:
-        vehicle_memory.untracked["Model_Folder_Path"] = model_folder_path
+    model_path = args["--model"]
+    if model_path:
+        vehicle_memory.untracked["Model_Path"] = model_path
 
     save_folder_name = args["--data_folder"]
     if save_folder_name:
