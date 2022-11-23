@@ -17,7 +17,7 @@ from parts.arduino.arduino import Arduino
 from parts.data_logger import Data_Logger
 from parts.web_server.drive_server import Web_Server
 from parts.fps_counter import FPS_Counter
-from parts.DAgger import DAgger
+from parts.mode_selector import Mode_Selector
 
 from docopt import docopt
 import logging
@@ -45,9 +45,7 @@ if __name__ == '__main__':
     vehicle.add(Pilot(vehicle_memory))
     vehicle.add(Arduino(vehicle_memory))
     vehicle.add(Web_Server(vehicle_memory))
-    # We can't use dagger if we dont have a model to inferance
-    if model_folder_path and cfg["USE_DAGGER"]:
-        vehicle.add(DAgger(vehicle_memory))
+    vehicle.add(Mode_Selector(vehicle_memory))
     vehicle.add(FPS_Counter(vehicle_memory))
 
     vehicle.start()
