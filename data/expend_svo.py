@@ -15,14 +15,11 @@ import cv2
 import os
 
 
-def write(data_folder, start, stop, color=False, depth=False):
+def write(data_folder, datas, start, stop, color=False, depth=False):
     index = start
     svo_path = os.path.join(data_folder, "zed_record.svo")
-    memory_file_path = os.path.join(data_folder, "memory.json")
     color_data_path = os.path.join(data_folder, "Color_Image")
     depth_data_path = os.path.join(data_folder, "Depth_Image")
-    with open(memory_file_path) as data_file:
-        datas = json.load(data_file)
     import pyzed.sl as sl
     init_parameters = sl.InitParameters()
     init_parameters.set_from_svo_file(svo_path)
@@ -64,7 +61,7 @@ def expand(data_folder, datas, color=False, depth=False, num_workers=6):
     depth_data_path = os.path.join(data_folder, "Depth_Image")
     if not os.path.isdir(color_data_path):
         os.mkdir(color_data_path)
-    if not os.path.isdir(depth_data_path):
+    if depth and not os.path.isdir(depth_data_path):
         os.mkdir(depth_data_path)
 
     # config_file_path = os.path.join(data_folder, "cfg.json")
@@ -76,10 +73,10 @@ def expand(data_folder, datas, color=False, depth=False, num_workers=6):
     start = 0
     stop = quotient
     for i in range(1, num_workers+1):
-        # If we have rmainder last one process do extra work
+        # If we have remainder last one process do extra work
         if i == num_workers:
             stop += remainder
-        p = mp.Process(target=write, args=(data_folder, start, stop, color, depth), daemon=True, name=i)
+        p = mp.Process(target=write, args=(data_folder, datas, start, stop, color, depth), daemon=True, name=i)
         processes.append(p)
         start +=  quotient
         stop = start + quotient
