@@ -256,7 +256,8 @@ class Main_Track {
     record_style_change(style){
         if (style == 0){
             document.getElementById("Record").style = this.not_record_style
-            document.getElementById("Record_Timer").style.visibility = "hidden"
+            // If you want timer to disappear when paused uncomment this
+            // document.getElementById("Record_Timer").style.visibility = "hidden"
             clearInterval(this.print_record_time_interval)
         }
         else if (style == 1){
