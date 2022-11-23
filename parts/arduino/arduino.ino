@@ -36,6 +36,9 @@ void setup() {
     SERVO.attach(Servo_PIN);
     attachInterrupt(digitalPinToInterrupt(PPM_PIN), Read_Channels, FALLING);
     attachInterrupt(digitalPinToInterrupt(ENCODER_PIN), []{pulses++;}, FALLING);
+    // Default values for steering and throttle
+    ch[1] = 1500;
+    ch[3] = 1500;
     Serial.begin(115200);
 }
 
