@@ -1,11 +1,11 @@
 """
 Usage:
-    expend_svo.py  <data_dir> (--c | --d | --c --d)
+    expend_svo.py  <data_dir> (-c | -d | -c -d)
 
 Options:
   -h --help     Show this screen.
-  --c            Expands Color Image.
-  --d            Expands Depth Image.
+  -c            Expands Color Image.
+  -d            Expands Depth Image.
 """
 
 import multiprocessing as mp
@@ -89,8 +89,8 @@ def expand(data_folder, datas, color=False, depth=False, num_workers=6):
 if __name__ == "__main__":
     args = docopt(__doc__)
     data_folder = args["<data_dir>"]
-    color = args["--c"]
-    depth = args["--d"]
+    color = args["-c"]
+    depth = args["-d"]
     with open(os.path.join(data_folder, "memory.json")) as data_file:
         datas = json.load(data_file)
     expand(data_folder, datas, color=color, depth=depth, num_workers=7)
