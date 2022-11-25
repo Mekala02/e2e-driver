@@ -11,8 +11,11 @@ For pulling docker image:
 sudo docker pull mekala02/e2e-driver
 ```
 
-Current Features:
-&nbsp;
+<h1>Features</h1>
+
+Easy to use modular architecture.<br/>
+High speed, all parts can run min @100 FPS.<br/>
+Web interface.<br/>
 
 Web Interface For Live Data:
 
