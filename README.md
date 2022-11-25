@@ -1,9 +1,9 @@
 # E2E Driver
-End To End Autonomous Driving Car
+End To End Self Driving Car
+
+<img src="https://github.com/Mekala02/e2e-driver/blob/main/docs/car_1.jpg" title="Web_Interface" alt="Web_Interface"/>&nbsp;
 
 This is a ongoing project!
-
-My objective is making autonomous driving car with end to end learning.
 
 Using Jetson Xavier JetPack 5.0.2 --- r35.1.0</br>
 For pulling docker image:
