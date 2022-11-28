@@ -6,9 +6,13 @@ End To End Self Driving Car
 This is a ongoing project!
 
 Using Jetson Xavier JetPack 5.0.2 --- r35.1.0</br>
-For pulling docker image:
+Pull docker image:
 ```bash
-sudo docker pull mekala02/e2e-driver
+sudo docker pull mekala02/e2e-driver:developer
+```
+Run docker image:
+```
+nvidia-docker run -it --rm --privileged --network host --ipc=host -v $(pwd):/root mekala02/e2e-driver:developer
 ```
 
 <h1>Features</h1>
