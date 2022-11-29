@@ -2,8 +2,6 @@ class Memory:
     def __init__(self):
         # Stores small data like imu steering ...
         self.memory = {}
-        # Stores data like save folder name
-        self.untracked = {}
         # If some part wants to change value but that value is not its output we add
         # that change to overwrite then when owner that value see the overwrite value
         # It will change the value accordingly

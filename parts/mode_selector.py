@@ -13,7 +13,7 @@ class Mode_Selector:
         self.overwrite_importance = 1
         self.overwrites = {"Record", "Pilot_Mode"}
 
-        self.use_DAgger = True if "Model_Path" in self.memory.untracked and cfg["USE_DAGGER"] else False
+        self.use_DAgger = True if "Model_Path" in self.memory.memory and cfg["USE_DAGGER"] else False
         logger.info("Successfully Added")
 
     def update(self):

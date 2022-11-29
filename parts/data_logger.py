@@ -23,12 +23,12 @@ class Data_Logger:
         "Stop", "Taxi", "Direction", "Lane", "Pilot_Mode", "Route_Mode", "Motor_Power", "Record", "Speed_Factor", "Fps"}
 
         # If user not specified data folder it will named according to date
-        if not "Data_Folder" in self.memory.untracked:
+        if not "Data_Folder" in self.memory.memory:
             new_folder_name = datetime.datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
             data_folder = os.path.join("data", new_folder_name)  
-            memory.untracked["Data_Folder"] = data_folder
+            memory.memory["Data_Folder"] = data_folder
 
-        self.data_folder = memory.untracked["Data_Folder"]
+        self.data_folder = memory.memory["Data_Folder"]
         os.mkdir(self.data_folder)
 
         with open(os.path.join(self.data_folder, "cfg.json"), "w+") as config_log:

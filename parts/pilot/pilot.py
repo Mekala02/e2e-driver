@@ -18,9 +18,9 @@ class Pilot:
         self.model_path = None
 
         # Shared memory for multiprocessing
-        if "Model_Path" in  memory.untracked.keys():
+        if "Model_Path" in  memory.memory.keys():
             self.thread = "Multi"
-            self.model_path = memory.untracked["Model_Path"]
+            self.model_path = memory.memory["Model_Path"]
             manager = torch.multiprocessing.Manager()
             self.shared_dict = manager.dict()
             self.shared_dict["run"] = True

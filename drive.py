@@ -35,11 +35,11 @@ if __name__ == '__main__':
 
     model_path = args["--model"]
     if model_path:
-        vehicle_memory.untracked["Model_Path"] = model_path
+        vehicle_memory.memory["Model_Path"] = model_path
 
     save_folder_name = args["--data_folder"]
     if save_folder_name:
-        vehicle_memory.untracked["Data_Folder"] = os.path.join("data", save_folder_name)    
+        vehicle_memory.memory["Data_Folder"] = os.path.join("data", save_folder_name)    
 
     logger.info("Adding parts to vehicle ... \n")
     vehicle.add(Data_Logger(vehicle_memory))

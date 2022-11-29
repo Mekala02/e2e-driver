@@ -41,7 +41,7 @@ class Camera_IMU:
             logger.error(err)
         # If we save data in svo format we opening svo file and activating recording
         if cfg["SVO_COMPRESSION_MODE"]:
-            svo_path = os.path.join(memory.untracked["Data_Folder"], "zed_record.svo")
+            svo_path = os.path.join(self.memory.memory["Data_Folder"], "zed_record.svo")
             recording_param = sl.RecordingParameters(svo_path, getattr(sl.SVO_COMPRESSION_MODE, cfg["SVO_COMPRESSION_MODE"]))
             if ((err:=self.zed.enable_recording(recording_param)) == sl.ERROR_CODE.SUCCESS):
                 self.zed.pause_recording(True)
