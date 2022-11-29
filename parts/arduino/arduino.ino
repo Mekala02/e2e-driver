@@ -16,8 +16,10 @@ String pyserial_data;
 int pyserial_throttle, pyserial_steering;
 int steering, throttle, mod1, mod2;
 
-// current time, previous time, channel no, time differance
-unsigned long int t, tp, c, d = 0;
+// current time, previous time
+unsigned long int t, pt = 0;
+// channel no, time differance
+int c, d = 0;
 int ch[15];
 
 unsigned long current_time;
@@ -63,7 +65,7 @@ void loop() {
         }
     }
 
-    // If value equals to 0 that means we are in manuel mode
+    // If value equals to 0 we are in manuel mode
     if (pyserial_steering == 0 && ch[1] < 2000)
         steering = ch[1];
     else if (1000 < pyserial_steering && pyserial_steering < 2000)
@@ -94,22 +96,22 @@ void loop() {
         encoder_last_time = current_time;
     }
 
-    // Sending data 100fps
+    // Sending data 100 times per second
     if (current_time - serialOut_last_time > 10){
         Serial.println("s" + String(steering) + "t" + String(throttle) + "m" + String(mod1) + "m" + String(mod2) + "v" + String(dpulses) + "e");
         serialOut_last_time = current_time;
     }
 }
 
-// For reading ppm signal
+// Reading ppm signal
 void Read_Channels(){
     t = micros();
-    d = t - tp;
+    d = t - pt;
     if (d > 3000)
         c = 0;
     ch[c] = d;
     c ++;
-    tp = t;
+    pt = t;
 }
 
 int mode(int pwm){
