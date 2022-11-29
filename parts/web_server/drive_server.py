@@ -79,12 +79,13 @@ class Web_Server:
         # Updates Inputs(to web server) coming from vehicle
         inputs["overwrite"] = {}
         for key in self.memory.memory:
-            inputs[key] = self.memory.memory[key]
+            if key!="Color_Image" and key!="Depth_Image" and key!="Object_Detection_Image" and key!="Depth_Array":
+                inputs[key] = self.memory.memory[key]
         for key in self.memory.overwrite.copy():
             # If we have overwrites, sending adding them to dict o send web server jss
             if key in self.outputs:
                 inputs["overwrite"][key] = self.memory.overwrite.pop(key)["value"]
-        camera["frame"] = self.memory.big_memory[web_special["Camera_Mode"]]
+        camera["frame"] = self.memory.memory[web_special["Camera_Mode"]]
         camera["Is_New"] = True
 
     def start_thread(self):

@@ -25,9 +25,6 @@ class Vehicle:
             # Adding parts output to the memory
             for output, value in part.outputs.items():
                 self.memory.add(output, value)
-            if hasattr(part, "big_outputs"):
-                for big_output, value in part.big_outputs.items():
-                    self.memory.add_big(big_output, value)
             if part.thread == "Single":
                 t = Thread(target=part.start_thread, args=(), daemon=True, name=part.__class__.__name__)
                 t.start()

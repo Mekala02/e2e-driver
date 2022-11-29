@@ -19,6 +19,8 @@ class Data_Logger:
         self.run = True
         self.outputs = {"Data_Id": 0, "Timestamp": 0}
         self.index = 0
+        self.save_it = {"Data_Id", "Zed_Data_Id", "Timestamp", "Zed_Timestamp", "Steering", "Throttle", "Speed", "Mode1", "Mode2", "IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z",
+        "Stop", "Taxi", "Direction", "Lane", "Pilot_Mode", "Route_Mode", "Motor_Power", "Record", "Speed_Factor", "Fps"}
 
         # If user not specified data folder it will named according to date
         if not "Data_Folder" in self.memory.untracked:
@@ -60,7 +62,8 @@ class Data_Logger:
         self.memory.memory["Data_Id"] = self.index
         self.memory.memory["Timestamp"] = int(time.time_ns())
         if self.memory.memory["Record"]:
-            self.save_json(self.file, self.memory.memory)
+            data = {key:self.memory.memory[key] for key in self.save_it}
+            self.save_json(self.file, data)
             if cfg["SVO_COMPRESSION_MODE"] is None:
                 threading.Thread(target=self.save_to_file,
                     args=([cfg["COLOR_IMAGE_FORMAT"], os.path.join(self.data_folder, "Color_Image"), str(self.index), self.memory.big_memory["RGB_Image"]]),

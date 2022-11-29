@@ -14,8 +14,7 @@ class Camera_IMU:
         self.memory = memory
         self.thread = "Single"
         self.run = True
-        self.outputs = {"Zed_Timestamp": 0, "Zed_Data_Id": 0, "IMU_Accel_X": 0, "IMU_Accel_Y": 0, "IMU_Accel_Z": 0, "IMU_Gyro_X": 0, "IMU_Gyro_Y": 0, "IMU_Gyro_Z": 0}
-        self.big_outputs = {"Color_Image": 0, "Depth_Image": 0, "Object_Detection_Image": 0}
+        self.outputs = {"Color_Image": 0, "Depth_Image": 0, "Object_Detection_Image": 0, "Depth_Array":0, "Zed_Timestamp": 0, "Zed_Data_Id": 0, "IMU_Accel_X": 0, "IMU_Accel_Y": 0, "IMU_Accel_Z": 0, "IMU_Gyro_X": 0, "IMU_Gyro_Y": 0, "IMU_Gyro_Z": 0}
         self.Color_Image = 0
         self.Depth_Image = 0
         self.Depth_Array = 0
@@ -124,11 +123,10 @@ class Camera_IMU:
         self.memory.memory["IMU_Gyro_Y"] = self.IMU_Gyro_Y
         self.memory.memory["IMU_Gyro_Z"] = self.IMU_Gyro_Z
         
-        self.memory.big_memory["Color_Image"] = self.Color_Image
-        self.memory.big_memory["Depth_Image"] = self.Depth_Image
-        self.memory.big_memory["Object_Detection_Image"] = 0
-
-        self.memory.big_memory["Depth_Array"] = self.Depth_Array
+        self.memory.memory["Color_Image"] = self.Color_Image
+        self.memory.memory["Depth_Image"] = self.Depth_Image
+        self.memory.memory["Object_Detection_Image"] = 0
+        self.memory.memory["Depth_Array"] = self.Depth_Array
 
         self.record = self.memory.memory["Record"]
 
