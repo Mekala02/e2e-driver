@@ -17,43 +17,45 @@ class Mode_Selector:
         logger.info("Successfully Added")
 
     def update(self):
+        # If our importance is higher then current overwrite giving permission to overwrite
+        overwrite_record = "Record" not in self.memory.memory["Overwrites"] or self.overwrite_importance >= self.memory.memory["Overwrites"]["Record"]["importance"]
+        overwrite_pilot_mode = "Pilot_Mode" not in self.memory.memory["Overwrites"] or self.overwrite_importance >= self.memory.memory["Overwrites"]["Pilot_Mode"]["importance"]
         if self.use_DAgger:
             # Not recording and manuel mode
             if self.memory.memory["Mode1"] == 1:
-                if not("Record" in self.memory.memory["Overwrites"] and self.overwrite_importance < self.memory.memory["Overwrites"]["Record"]["importance"]):
+                if overwrite_record:
                     self.memory.memory["Record"] = 0
-                    self.memory.memory["Overwrites"]["Record"] = {"importance": self.overwrite_importance, "value": 0}
-                if not ("Pilot_Mode" in self.memory.memory["Overwrites"] and self.overwrite_importance < self.memory.memory["Overwrites"]["Pilot_Mode"]["importance"]):
+                    self.memory.memory["Overwrites"]["Record"] = {"value": 0, "importance": self.overwrite_importance}
+                if overwrite_pilot_mode:
                     self.memory.memory["Pilot_Mode"] = "Manuel"
-                    self.memory.memory["Overwrites"]["Pilot_Mode"] = {"importance": self.overwrite_importance, "value": "Manuel"}
-            # Not recording and self driving in angle mode
+                    self.memory.memory["Overwrites"]["Pilot_Mode"] = {"value": "Manuel", "importance": self.overwrite_importance}
+            # Not recording and angle mode
             elif self.memory.memory["Mode1"] == 2:
-                # If our importance is higher then other overwrite writing the value
-                if not("Record" in self.memory.memory["Overwrites"] and self.overwrite_importance < self.memory.memory["Overwrites"]["Record"]["importance"]):
+                if overwrite_record:
                     self.memory.memory["Record"] = 0
-                    self.memory.memory["Overwrites"]["Record"] = {"importance": self.overwrite_importance, "value": 0}
-                if not("Pilot_Mode" in self.memory.memory["Overwrites"] and self.overwrite_importance < self.memory.memory["Overwrites"]["Pilot_Mode"]["importance"]):
+                    self.memory.memory["Overwrites"]["Record"] = {"value": 0, "importance": self.overwrite_importance}
+                if overwrite_pilot_mode:
                     self.memory.memory["Pilot_Mode"] = "Angle"
-                    self.memory.memory["Overwrites"]["Pilot_Mode"] = {"importance": self.overwrite_importance, "value": "Angle"}
-            # Recording and manuel driving
+                    self.memory.memory["Overwrites"]["Pilot_Mode"] = {"value": "Angle", "importance": self.overwrite_importance}
+            # Recording and manuel mode
             elif self.memory.memory["Mode1"] == 3:
-                if not("Record" in self.memory.memory["Overwrites"] and self.overwrite_importance < self.memory.memory["Overwrites"]["Record"]["importance"]):
+                if overwrite_record:
                     self.memory.memory["Record"] = 1
-                    self.memory.memory["Overwrites"]["Record"] = {"importance": self.overwrite_importance, "value": 1}
-                if not ("Pilot_Mode" in self.memory.memory["Overwrites"] and self.overwrite_importance < self.memory.memory["Overwrites"]["Pilot_Mode"]["importance"]):
+                    self.memory.memory["Overwrites"]["Record"] = {"value": 1, "importance": self.overwrite_importance}
+                if overwrite_pilot_mode:
                     self.memory.memory["Pilot_Mode"] = "Manuel"
-                    self.memory.memory["Overwrites"]["Pilot_Mode"] = {"importance": self.overwrite_importance, "value": "Manuel"}
+                    self.memory.memory["Overwrites"]["Pilot_Mode"] = {"value": "Manuel", "importance": self.overwrite_importance}
         else:
             # Not Recording
             if self.memory.memory["Mode1"] == 2:
-                if not("Record" in self.memory.memory["Overwrites"] and self.overwrite_importance < self.memory.memory["Overwrites"]["Record"]["importance"]):
+                if overwrite_record:
                     self.memory.memory["Record"] = 0
-                    self.memory.memory["Overwrites"]["Record"] = {"importance": self.overwrite_importance, "value": 0}
+                    self.memory.memory["Overwrites"]["Record"] = {"value": 0, "importance": self.overwrite_importance}
             # Recording
             elif self.memory.memory["Mode1"] == 3:
-                if not("Record" in self.memory.memory["Overwrites"] and self.overwrite_importance < self.memory.memory["Overwrites"]["Record"]["importance"]):
+                if overwrite_record:
                     self.memory.memory["Record"] = 1
-                    self.memory.memory["Overwrites"]["Record"] = {"importance": self.overwrite_importance, "value": 1}
+                    self.memory.memory["Overwrites"]["Record"] = {"value": 1, "importance": self.overwrite_importance}
 
     def shut_down(self):
         self.run = False
