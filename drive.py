@@ -7,17 +7,16 @@ Options:
 """
 
 from config import config as cfg
-from vehicle import Vehicle
 from parts.memory import Memory
+from vehicle import Vehicle
+from parts.data_logger import Data_Logger
 from parts.cameraImu import Camera_IMU
-from parts.object_detection.yolo import Yolo
 from parts.copilot.copilot import Copilot
 from parts.pilot.pilot import Pilot
 from parts.arduino.arduino import Arduino
-from parts.data_logger import Data_Logger
 from parts.web_server.drive_server import Web_Server
-from parts.fps_counter import FPS_Counter
 from parts.mode_selector import Mode_Selector
+from parts.fps_counter import FPS_Counter
 
 from docopt import docopt
 import logging
@@ -45,6 +44,7 @@ if __name__ == '__main__':
     vehicle.add(Data_Logger(vehicle_memory))
     vehicle.add(Camera_IMU(vehicle_memory))
     if cfg["USE_OBJECT_DETECTION"]:
+        from parts.object_detection.yolo import Yolo
         vehicle.add(Yolo(vehicle_memory))
     vehicle.add(Copilot(vehicle_memory))
     vehicle.add(Pilot(vehicle_memory))
