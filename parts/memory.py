@@ -12,5 +12,5 @@ class Memory:
     def add(self, name, value=0):
         self.memory[name] = value
 
-    def print_memory(self):
-        print(self.memory)
+    def __repr__(self) :
+        return str(self.memory)
