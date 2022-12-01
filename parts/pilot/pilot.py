@@ -75,7 +75,7 @@ class Pilot:
         if self.model_path:
             self.pilot_mode = self.memory.memory["Pilot_Mode"]
             self.shared_dict["pilot_mode"] = self.pilot_mode
-            self.shared_dict["cpu_image"] = self.memory.big_memory["Color_Image"]
+            self.shared_dict["cpu_image"] = self.memory.memory["Color_Image"]
             if self.pilot_mode == "Angle" or self.pilot_mode == "Full_Auto":
                 self.steering = self.shared_dict["steering"]
                 self.throttle = self.shared_dict["throttle"]
