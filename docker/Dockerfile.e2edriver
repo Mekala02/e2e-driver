@@ -109,20 +109,25 @@ RUN pip3 install --no-cache-dir --verbose pandas
 RUN pip3 install --no-cache-dir --verbose pycuda
 RUN pip3 install --no-cache-dir --verbose numba
 RUN pip3 install --no-cache-dir --verbose flask
+RUN pip3 install --no-cache-dir --verbose waitress
+RUN pip3 install --no-cache-dir --verbose docopt
+RUN pip3 install --no-cache-dir --verbose pyserial
+RUN pip3 install --no-cache-dir --verbose tqdm
+RUN pip3 install --no-cache-dir --verbose cupy-cuda11x -f https://pip.cupy.dev/aarch64
 
 
 #
 # CuPy
 #
-ARG CUPY_VERSION=v10.2.0
-ARG CUPY_NVCC_GENERATE_CODE="arch=compute_53,code=sm_53;arch=compute_62,code=sm_62;arch=compute_72,code=sm_72;arch=compute_87,code=sm_87"
+# ARG CUPY_VERSION=v10.2.0
+# ARG CUPY_NVCC_GENERATE_CODE="arch=compute_53,code=sm_53;arch=compute_62,code=sm_62;arch=compute_72,code=sm_72;arch=compute_87,code=sm_87"
 
-RUN git clone -b ${CUPY_VERSION} --recursive https://github.com/cupy/cupy cupy && \
-    cd cupy && \
-    pip3 install --no-cache-dir fastrlock && \
-    python3 setup.py install --verbose && \
-    cd ../ && \
-    rm -rf cupy
+# RUN git clone -b ${CUPY_VERSION} --recursive https://github.com/cupy/cupy cupy && \
+#     cd cupy && \
+#     pip3 install --no-cache-dir fastrlock && \
+#     python3 setup.py install --verbose && \
+#     cd ../ && \
+#     rm -rf cupy
 
 
 #
@@ -139,7 +144,9 @@ ARG OPENCV_URL=https://nvidia.box.com/shared/static/5v89u6g5rb62fpz4lh0rz531ajo2
 ARG OPENCV_DEB=OpenCV-4.5.0-aarch64.tar.gz
 
 COPY scripts/opencv_install.sh /tmp/opencv_install.sh
-RUN cd /tmp && bash opencv_install.sh ${OPENCV_URL} ${OPENCV_DEB}
+RUN cd /tmp && \
+	bash opencv_install.sh ${OPENCV_URL} ${OPENCV_DEB} && \
+	cd ../
 
 
 #
@@ -160,28 +167,26 @@ RUN ln -sf /usr/lib/aarch64-linux-gnu/tegra/libv4l2.so.0 /usr/lib/aarch64-linux-
 
 
 #
-# Arduino Cli
-#(opencv cd s /tmp when you edit change add it cd .. and Arduino cli cd into /tmp again)
-RUN wget https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARM64.tar.gz && \
-	tar -xvf arduino-cli_latest_Linux_ARM64.tar.gz && \
-	mv arduino-cli /usr/bin
-RUN arduino-cli core install arduino:avr
-
-#
-# In final version thoose will be in up
-#
-RUN pip3 install --no-cache-dir --verbose waitress
-RUN pip3 install --no-cache-dir --verbose docopt
-RUN pip3 install --no-cache-dir --verbose pyserial
-RUN pip3 install --no-cache-dir --verbose pip install tqdm
-
-#
 # Tensorrt
 #
-RUN git clone --recursive https://github.com/NVIDIA-AI-IOT/torch2trt torch2trt && \
+RUN cd /tmp && \
+	git clone -b v0.3.0 --recursive https://github.com/NVIDIA-AI-IOT/torch2trt torch2trt && \
 	cd torch2trt && \
 	python3 setup.py install --verbose && \
 	cd ../ && \
     rm -rf torch2trt
+
+
+#
+# Arduino Cli
+#(opencv cd s /tmp when you edit change add it cd .. and Arduino cli cd into /tmp again)
+RUN cd /tmp && \
+	wget https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARM64.tar.gz && \
+	tar -xvf arduino-cli_latest_Linux_ARM64.tar.gz && \
+	mv arduino-cli /usr/bin && \
+	cd ../
+RUN arduino-cli core install arduino:avr && \
+	arduino-cli lib install servo && \
+	arduino-cli lib install ewma
 
 WORKDIR /root
