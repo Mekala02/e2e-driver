@@ -7,7 +7,7 @@ class Yolo:
         self.memory = memory
         self.thread = None
         self.run = True
-        self.outputs = {}
+        self.outputs = {"Object_Detection_Image": 0}
         logger.info("Successfully Added")
 
     def update(self):
