@@ -1,12 +1,8 @@
 from config import config as cfg
 
-import numpy as np
-import datetime
-import threading
 import logging
 import time
 import json
-import cv2
 import os
 
 logger = logging.getLogger(__name__)
@@ -18,12 +14,14 @@ class Data_Logger:
         self.thread = None
         self.run = True
         self.outputs = {"Data_Id": 0, "Timestamp": 0}
-        self.index = 0
-        self.save_it = {"Data_Id", "Zed_Data_Id", "Timestamp", "Zed_Timestamp", "Steering", "Throttle", "Speed", "Mode1", "Mode2", "IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z",
-        "Stop", "Taxi", "Direction", "Lane", "Pilot_Mode", "Route_Mode", "Motor_Power", "Record", "Speed_Factor", "Fps"}
 
-        # If user not specified data folder it will named according to date
-        if not "Data_Folder" in self.memory.memory:
+        self.index = 0
+        self.save_it = {"Data_Id", "Zed_Data_Id", "Timestamp", "Zed_Timestamp", "Steering", "Throttle", "Speed", "Mode1", "Mode2", "IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z",
+            "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Stop", "Taxi", "Direction", "Lane", "Pilot_Mode", "Route_Mode", "Motor_Power", "Record", "Speed_Factor", "Fps"}
+
+        # If user not specified data folder name it will named according to date
+        if "Data_Folder" not in self.memory.memory:
+            import datetime
             new_folder_name = datetime.datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
             data_folder = os.path.join("data", new_folder_name)  
             memory.memory["Data_Folder"] = data_folder
@@ -31,14 +29,23 @@ class Data_Logger:
         self.data_folder = memory.memory["Data_Folder"]
         os.mkdir(self.data_folder)
 
+        # Saving the config file to the folder
         with open(os.path.join(self.data_folder, "cfg.json"), "w+") as config_log:
             json.dump(cfg, config_log)
-        # If we saving data in svo file don't creating folders
+        
+        # If we not saving image data to SVO file creating folders and importing necessary libraries accordingly
         if cfg["SVO_COMPRESSION_MODE"] is None:
+            import numpy as np
+            import threading
+            import cv2
             os.mkdir(os.path.join(self.data_folder, "Color_Image"))
-            os.mkdir(os.path.join(self.data_folder, "Depth_Image"))
-            os.mkdir(os.path.join(self.data_folder, "Object_Detection"))
+            if cfg["DEPTH_MODE"]:
+                os.mkdir(os.path.join(self.data_folder, "Depth_Image"))
+            if cfg["USE_OBJECT_DETECTION"]:
+                os.mkdir(os.path.join(self.data_folder, "Object_Detection"))
+
         self.file = open(os.path.join(self.data_folder, "memory.json"), "w+")
+        # Opening the lists square bracket
         self.file.write("[")
         logger.info("Successfully Added")
         logger.info(f"Data_Folder: {self.data_folder}")
@@ -77,20 +84,12 @@ class Data_Logger:
     
     def shut_down(self):
         self.run = False
-        # Move the pointer (similar to a cursor in a text editor) to the end of the file
+        # Closing the lists square bracket
         self.file.seek(0, os.SEEK_END)
-        # This code means the following code skips the very last character in the file -
-        # i.e. in the case the last line is null we delete the last line
-        # and the penultimate one
         pos = self.file.tell() - 1
-        # Read each character in the file one at a time from the penultimate
-        # character going backwards, searching for a newline character
-        # If we find a new line, exit the search
         while pos > 0 and self.file.read(1) != ",":
             pos -= 1
             self.file.seek(pos, os.SEEK_SET)
-        # So long as we're not at the start of the file, delete all the characters ahead
-        # of this position
         if pos > 0:
             self.file.seek(pos, os.SEEK_SET)
             self.file.truncate()
