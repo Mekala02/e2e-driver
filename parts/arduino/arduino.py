@@ -14,6 +14,7 @@ class Arduino:
     def __init__(self, memory):
         self.memory = memory
         self.thread = "Single"
+        self.thread_hz = 120
         self.run = True
         self.outputs = {"Speed": 0, "Mode1": 0, "Mode2": 0}
         # It can output steering and throttle if pilot equals to manuel
@@ -49,7 +50,7 @@ class Arduino:
             start_time = time.time()
             self.grab_data()
             # Arduino sends data @100hz we limiting the thread speed to @120hz
-            sleep_time = 1.0 / 120 - (time.time() - start_time)
+            sleep_time = 1.0 / self.thread_hz - (time.time() - start_time)
             if sleep_time > 0.0:
                 time.sleep(sleep_time)
 
