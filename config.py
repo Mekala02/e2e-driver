@@ -2,9 +2,9 @@ config = dict(
     DRIVE_LOOP_HZ = 120,
     USE_OBJECT_DETECTION = False,
     USE_DAGGER = True,
-    # If CAMERA_RESOLUTION == None ZED_RESOLUTION will be used
-    # None or (Width, High)
-    CAMERA_RESOLUTION = (160, 120),
+    # If REDUCED_CAMERA_RESOLUTION == None ZED_RESOLUTION will be used
+    # None or {"WIDTH": x, "HEIGHT": y}
+    REDUCED_CAMERA_RESOLUTION = {"HEIGHT": 120, "WIDTH": 160},
 
     ZED_RESOLUTION = "VGA",
     CAMERA_FPS = 100,
@@ -22,7 +22,7 @@ config = dict(
     DEPTH_IMAGE_FORMAT = "jpg",
     OBJECT_DETECTION_FORMAT = "npy",
 
-    THROTTLE_FORWARD_PWM = 2000,
+    THROTTLE_MAX_PWM = 1800,
     THROTTLE_STOPPED_PWM = 1500,
     THROTTLE_REVERSE_PWM = 1000,
     # Full right

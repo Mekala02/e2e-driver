@@ -17,7 +17,7 @@ class Camera_IMU:
         self.run = True
         self.use_depth = cfg["DEPTH_MODE"]
         self.svo_mode = True if cfg["SVO_COMPRESSION_MODE"] else False
-        self.camera_resolution = cfg["CAMERA_RESOLUTION"]
+        self.reduced_camera_resolution = cfg["REDUCED_CAMERA_RESOLUTION"]
         self.outputs = {"Color_Image": 0, "Zed_Timestamp": 0, "Zed_Data_Id": 0,
             "IMU_Accel_X": 0, "IMU_Accel_Y": 0, "IMU_Accel_Z": 0, "IMU_Gyro_X": 0, "IMU_Gyro_Y": 0, "IMU_Gyro_Z": 0}
         if self.use_depth:
@@ -76,8 +76,8 @@ class Camera_IMU:
             self.Zed_Timestamp = self.zed.get_timestamp(sl.TIME_REFERENCE.IMAGE).get_nanoseconds()
             self.zed.retrieve_image(self.zed_Color_Image, sl.VIEW.LEFT)
             Color_Image = cv2.cvtColor(self.zed_Color_Image.get_data(), cv2.COLOR_BGRA2BGR)
-            if self.camera_resolution:
-                Color_Image = cv2.resize(Color_Image, (self.camera_resolution), interpolation= cv2.INTER_LINEAR)
+            if self.reduced_camera_resolution:
+                Color_Image = cv2.resize(Color_Image, (self.reduced_camera_resolution["WIDTH"], self.reduced_camera_resolution["HEIGHT"]), interpolation= cv2.INTER_LINEAR)
             self.Color_Image = Color_Image
 
             # If we calculating depth
@@ -85,8 +85,8 @@ class Camera_IMU:
                 # Depth Map As Image
                 self.zed.retrieve_image(self.zed_Depth_Image, sl.VIEW.DEPTH)
                 Depth_Image = cv2.cvtColor(self.zed_Depth_Image.get_data(), cv2.COLOR_BGRA2BGR)
-                if self.camera_resolution:
-                    Depth_Image = cv2.resize(Depth_Image, (self.camera_resolution), interpolation= cv2.INTER_LINEAR)
+                if self.reduced_camera_resolution:
+                    Depth_Image = cv2.resize(Depth_Image, (self.reduced_camera_resolution["WIDTH"], self.reduced_camera_resolution["HEIGHT"]), interpolation= cv2.INTER_LINEAR)
                 self.Depth_Image = Depth_Image
                 self.zed.retrieve_measure(self.zed_depth_map, sl.MEASURE.DEPTH)
                 self.Depth_Array = self.zed_depth_map.get_data()
