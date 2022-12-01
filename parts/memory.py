@@ -1,12 +1,13 @@
 class Memory:
     def __init__(self):
-        # Stores small data like imu steering ...
+        # Vehicles memory all parts can write or read this dictinory.
         self.memory = {}
-        # If some part wants to change value but that value is not its output we add
-        # that change to overwrite then when owner that value see the overwrite value
-        # It will change the value accordingly
-        # Use pop when reading inside owner !!! Othervise it will always overwrite last overwrite value (pop deletes it)
-        self.overwrite = {}
+        # If some parts wants to change other parts output it writes to the overwrites dict
+        # When real owner sees that overwrite it changes the output accordingly
+        # Real owner uses pop to get the overwiten value (pop deletes it)
+        # Example:
+        # memory["Overwrites"]["Record"] = {"importance": self.overwrite_importance, "value": 0}
+        self.memory["Overwrites"] = {}
 
     def add(self, name, value=0):
         self.memory[name] = value
