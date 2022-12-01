@@ -17,14 +17,15 @@ import os
 logger = logging.getLogger(__name__)
 
 class Load_Data(Dataset):
-    def __init__(self, data_folder_paths, reduce_fps=False, use_depth_input=False, use_other_inputs=False):
+    def __init__(self, data_folder_paths, reduce_resolution=False, reduce_fps=False, use_depth_input=False, use_other_inputs=False):
         self.data_folder_paths = data_folder_paths
+        self.reduce_resolution = reduce_resolution
         self.reduce_fps = reduce_fps
         self.use_depth_input = use_depth_input
         self.use_other_inputs = use_other_inputs
         self.data_folders = []
         for folder_path in self.data_folder_paths:
-            self.data_folders.append(Data_Folder(folder_path, reduce_fps=self.reduce_fps, use_depth_input=self.use_depth_input, use_other_inputs=self.use_other_inputs, expend_svo=True))
+            self.data_folders.append(Data_Folder(folder_path, reduce_resolution=self.reduce_resolution, reduce_fps=self.reduce_fps, use_depth_input=self.use_depth_input, use_other_inputs=self.use_other_inputs, expend_svo=True))
         self.len_data_fodlers = len(self.data_folders)
         self.lenght = 0
         for datas in self.data_folders:
@@ -54,12 +55,13 @@ class Load_Data(Dataset):
 
 
 class Data_Folder():
-    def __init__(self, data_folder_path, reduce_fps=False, use_depth_input=False, use_other_inputs=False, expend_svo=False):
+    def __init__(self, data_folder_path, reduce_resolution=False, reduce_fps=False, use_depth_input=False, use_other_inputs=False, expend_svo=False):
         self.data_folder_path = data_folder_path
+        self.reduce_resolution = reduce_resolution
+        self.reduce_fps = reduce_fps
         self.use_depth_input = use_depth_input
         self.use_other_inputs = use_other_inputs
         self.expend_svo = expend_svo
-        self.reduce_fps = reduce_fps
         self.changes = None
 
         # Constructing paths
@@ -173,11 +175,13 @@ class Data_Folder():
 
     def __getitem__(self, index):
         color_image = self.load_Image(self.Color_Image_path, self.Color_Image_format, index)
-        color_image = cv2.resize(color_image, (160, 120), interpolation= cv2.INTER_LINEAR)
+        if self.reduce_resolution:
+            color_image = cv2.resize(color_image, (self.reduce_resolution["width"], self.reduce_resolution["height"]), interpolation= cv2.INTER_LINEAR)
         images = color_image
         if self.use_depth_input:
             depth_image = self.load_Image(self.Depth_Image_path, self.Depth_Image_format, index)
-            depth_image = cv2.resize(depth_image, (160, 120), interpolation= cv2.INTER_LINEAR)
+            if self.reduce_resolution:
+                depth_image = cv2.resize(depth_image, (self.reduce_resolution["width"], self.reduce_resolution["height"]), interpolation= cv2.INTER_LINEAR)
             depth_array = cv2.cvtColor(depth_image, cv2.COLOR_BGR2GRAY)
             depth_array = depth_array.reshape(color_image.shape[0], color_image.shape[1], 1)
             # np.nan_to_num(depth_array, copy=False)

@@ -27,6 +27,9 @@ logger = logging.getLogger("train")
 
 def main():
     # Hyperparameters
+    # If set to None not changing the images resolutions
+    # None or {"height": x, "width": y}
+    reduce_resolution = {"height": 120, "width": 160}
     reduce_fps = False
     use_depth_input = False
     use_other_inputs = False
@@ -63,7 +66,7 @@ def main():
     writer = SummaryWriter(f"tb_logs/{model_save_name}")
     writer.add_graph(model, input_to_model=torch.ones((1, 3, 120, 160), device=device), verbose=False, use_strict_trace=True)
 
-    dataset = Load_Data(data_dirs, reduce_fps=reduce_fps, use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
+    dataset = Load_Data(data_dirs, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
     test_len = math.floor(len(dataset) * test_data_percentage / 100)
     train_set, test_set = torch.utils.data.random_split(dataset, [len(dataset)-test_len, test_len])
     # train_set = torch.utils.data.Subset(train_set, range(int(len(train_set)/2)))
