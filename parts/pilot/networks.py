@@ -43,7 +43,7 @@ class Linear(nn.Module):
         return steering, throttle
 
 class Linear_With_Others(nn.Module):
-    def __init__(self, in_channels=3):
+    def __init__(self, in_channels=3, other_len=0):
         super(Linear_With_Others, self).__init__()
         self.drop = nn.Dropout(p=0.1)
         self.flatten = nn.Flatten()
@@ -55,7 +55,7 @@ class Linear_With_Others(nn.Module):
         self.fc1 = nn.Linear(6656, 100)
         self.fc2 = nn.Linear(100, 50)
 
-        self.ofc1 = nn.Linear(7, 50)
+        self.ofc1 = nn.Linear(other_len, 50)
         self.ofc2 = nn.Linear(50, 40)
         self.ofc3 = nn.Linear(40, 30)
 
