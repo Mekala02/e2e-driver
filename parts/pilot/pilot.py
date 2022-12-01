@@ -11,12 +11,17 @@ class Pilot:
     def __init__(self, memory):
         self.memory = memory
         self.thread = None
+        self.thread_hz = cfg["DRIVE_LOOP_HZ"]
         self.run = True
         self.outputs = {"Steering": 1500, "Throttle": 1500}
         self.pilot_mode = 0
         self.model_path = None
         self.steering = 1500
         self.throttle = 1500
+        self.reduced_camera_resolution = cfg["REDUCED_CAMERA_RESOLUTION"]
+        self.steering_min_pwm = cfg["STEERING_MIN_PWM"]
+        self.steering_max_pwm = cfg["STEERING_MAX_PWM"]
+        self.throttle_max_pwm = cfg["THROTTLE_MAX_PWM"]
 
         # Shared memory for multiprocessing
         if "Model_Path" in  memory.memory.keys():
@@ -51,25 +56,26 @@ class Pilot:
         # First pass is slow so we are warming up
         logger.info("Warming Up The Model...")
         with torch.no_grad():
-            model(torch.ones((1, 3, 120, 160), device=device))
+            model(torch.ones((1, 3, self.reduced_camera_resolution["HEIGHT"], self.reduced_camera_resolution["WIDTH"]), device=device))
         logger.info("Warmup Done")
         while self.shared_dict["run"]:
             start_time = time.time()
             if self.shared_dict["pilot_mode"] == "Angle" or self.shared_dict["pilot_mode"] == "Full_Auto":
+                # (H x W x C) to (C x H x W) then [0, 1]
                 color_image = torch.from_numpy(self.shared_dict["cpu_image"].transpose(2, 0, 1)) / 255
-                gpu_image = color_image.to(device, non_blocking=True).view(1, 3, 120, 160)
+                gpu_image = color_image.to(device, non_blocking=True).view(1, 3, self.reduced_camera_resolution["HEIGHT"], self.reduced_camera_resolution["WIDTH"])
                 with torch.no_grad():
                     steering, throttle = model(gpu_image)
                 # We made data between -1, 1 when trainig so unpacking thoose to pwm value
                 self.shared_dict["steering"] = int(steering * 500 + 1500)
                 self.shared_dict["throttle"] = int(throttle * 500 + 1500)
             # Inferancing @DRIVE_LOOP_HZ
-            sleep_time = 1.0 / cfg["DRIVE_LOOP_HZ"] - (time.time() - start_time)
+            sleep_time = 1.0 / self.thread_hz - (time.time() - start_time)
             if sleep_time > 0.0:
                 time.sleep(sleep_time)
 
     def update(self):
-        # If we have pilot (neurl network)
+        # If we have auto pilot
         if self.model_path:
             self.pilot_mode = self.memory.memory["Pilot_Mode"]
             self.shared_dict["pilot_mode"] = self.pilot_mode
@@ -77,12 +83,11 @@ class Pilot:
             if self.pilot_mode == "Angle" or self.pilot_mode == "Full_Auto":
                 self.steering = self.shared_dict["steering"]
                 self.throttle = self.shared_dict["throttle"]
-                if self.steering > cfg["STEERING_MAX_PWM"]: self.steering=cfg["STEERING_MAX_PWM"]
-                if self.steering < cfg["STEERING_MIN_PWM"]: self.steering=cfg["STEERING_MIN_PWM"]
-                if self.pilot_mode == "Angle":
-                    self.memory.memory["Steering"] = self.steering
-                elif self.pilot_mode == "Full_Auto":
-                    self.memory.memory["Steering"] = self.steering
+                if self.steering < self.steering_min_pwm: self.steering=self.steering_min_pwm
+                if self.steering > self.steering_max_pwm: self.steering=self.steering_max_pwm
+                if self.throttle > self.throttle_max_pwm: self.throttle=self.throttle_max_pwm
+                self.memory.memory["Steering"] = self.steering
+                if self.pilot_mode == "Full_Auto":
                     self.memory.memory["Throttle"] = self.throttle
 
     def shut_down(self):
