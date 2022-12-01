@@ -2,7 +2,8 @@ config = dict(
     DRIVE_LOOP_HZ = 120,
     USE_OBJECT_DETECTION = False,
     USE_DAGGER = True,
-    # None or (Width, High), if None Zed resolutio will be used
+    # If CAMERA_RESOLUTION == None ZED_RESOLUTION will be used
+    # None or (Width, High)
     CAMERA_RESOLUTION = (160, 120),
 
     ZED_RESOLUTION = "VGA",
@@ -13,8 +14,8 @@ config = dict(
     COORDINATE_UNITS = "CENTIMETER",
     COORDINATE_SYSTEM = "RIGHT_HANDED_Z_UP",
 
-    # If SVO_COMPRESSION_MODE != None other formats will be overwritten
-    # H264, H264_LOSSLESS
+    # If SVO_COMPRESSION_MODE != None other formats won't be used
+    # None H264, H264_LOSSLESS
     SVO_COMPRESSION_MODE = "H264",
     # jpg, jpeg, png, npy, npz
     COLOR_IMAGE_FORMAT = "jpg",
