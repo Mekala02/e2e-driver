@@ -1,10 +1,9 @@
-from parts.pilot.networks import Linear
 from config import config as cfg
 
-import os
-import time
-import torch
 import logging
+import torch
+import time
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +15,8 @@ class Pilot:
         self.outputs = {"Steering": 1500, "Throttle": 1500}
         self.pilot_mode = 0
         self.model_path = None
+        self.steering = 1500
+        self.throttle = 1500
 
         # Shared memory for multiprocessing
         if "Model_Path" in  memory.memory.keys():
@@ -28,9 +29,6 @@ class Pilot:
             self.shared_dict["cpu_image"] = 0
             self.shared_dict["steering"] = 1500
             self.shared_dict["throttle"] = 1500
-        
-        self.steering = 1500
-        self.throttle = 1500
         
         logger.info("Successfully Added")
     
@@ -89,5 +87,7 @@ class Pilot:
 
     def shut_down(self):
         self.run = False
-        self.shared_dict["run"] = False
+        if self.thread == "Multi":
+            self.shared_dict["run"] = False
+        time.sleep(0.05)
         logger.info("Stopped")
