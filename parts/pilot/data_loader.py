@@ -7,7 +7,6 @@ Options:
 """
 
 from torch.utils.data import Dataset
-import pyzed.sl as sl
 import numpy as np
 import logging
 import torch
@@ -112,17 +111,7 @@ class Data_Folder():
         if self.cfg["SVO_COMPRESSION_MODE"]:
             # If we recorded the data to SVO file but want fast training
             # we converting SVO data to jpg and saving them then using jpg's for training
-            if not self.expend_svo:
-                input_path = os.path.join(self.data_folder_path, "zed_record.svo")
-                init_parameters = sl.InitParameters()
-                init_parameters.set_from_svo_file(input_path)
-                init_parameters.svo_real_time_mode = False
-                self.zed = sl.Camera()
-                self.zed_Color_Image = sl.Mat()
-                self.zed_Depth_Map = sl.Mat()
-                if (err:=self.zed.open(init_parameters)) != sl.ERROR_CODE.SUCCESS:
-                    logger.error(err)
-            else:
+            if self.expend_svo:
                 # If our mode is expand_svo but we not expanded svo, we expanding it.
                 if not os.path.isdir(self.Color_Image_path) or (self.use_depth_input and not os.path.isdir(self.Depth_image_path)):
                     logger.warning("First you have to expand the svo file")
@@ -136,6 +125,17 @@ class Data_Folder():
                 # Overwriting the config data
                 self.cfg["COLOR_IMAGE_FORMAT"] = "jpg"
                 self.cfg["DEPTH_IMAGE_FORMAT"] = "jpg"
+            else:
+                import pyzed.sl as sl
+                input_path = os.path.join(self.data_folder_path, "zed_record.svo")
+                init_parameters = sl.InitParameters()
+                init_parameters.set_from_svo_file(input_path)
+                init_parameters.svo_real_time_mode = False
+                self.zed = sl.Camera()
+                self.zed_Color_Image = sl.Mat()
+                self.zed_Depth_Map = sl.Mat()
+                if (err:=self.zed.open(init_parameters)) != sl.ERROR_CODE.SUCCESS:
+                    logger.error(err)
 
         self.Color_Image_format = self.cfg["COLOR_IMAGE_FORMAT"]
         self.Depth_Image_format = self.cfg["DEPTH_IMAGE_FORMAT"]
