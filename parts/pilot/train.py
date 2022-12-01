@@ -31,8 +31,9 @@ def main():
     # None or {"height": x, "width": y}
     reduce_resolution = {"height": 120, "width": 160}
     reduce_fps = False
-    use_depth_input = False
-    use_other_inputs = False
+    use_depth = False
+    # False or list like ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
+    other_inputs = False
     #2e-3 for startup then reduce to 1e-3
     learning_rate = 2e-3
     batch_size = 1024
@@ -50,7 +51,7 @@ def main():
     torch.manual_seed(22)
     # If set to value like 30 it will make training data ~30fps 
     # It wont work great if datasets fps is close to reduce_fps
-    if use_depth_input:
+    if use_depth:
         in_channels = 4
     else:
         in_channels = 3
@@ -63,10 +64,14 @@ def main():
         model.load_state_dict(torch.load(model_path))
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     criterion = torch.nn.MSELoss()
-    writer = SummaryWriter(f"tb_logs/{model_save_name}")
-    writer.add_graph(model, input_to_model=torch.ones((1, 3, 120, 160), device=device), verbose=False, use_strict_trace=True)
 
-    dataset = Load_Data(data_dirs, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth_input=use_depth_input, use_other_inputs=use_other_inputs)
+    writer = SummaryWriter(f"tb_logs/{model_save_name}")
+    example_input = torch.ones((1, in_channels, reduce_resolution["height"], reduce_resolution["width"]), device=device)
+    if other_inputs:
+        example_input = (example_input, torch.ones(1, (len(other_inputs)), device=device))
+    writer.add_graph(model, input_to_model=example_input, verbose=False, use_strict_trace=True)
+
+    dataset = Load_Data(data_dirs, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
     test_len = math.floor(len(dataset) * test_data_percentage / 100)
     train_set, test_set = torch.utils.data.random_split(dataset, [len(dataset)-test_len, test_len])
     # train_set = torch.utils.data.Subset(train_set, range(int(len(train_set)/2)))
@@ -89,7 +94,7 @@ def main():
             grid = torchvision.utils.make_grid(images)
             writer.add_image(f"Test Set First Batch", grid, 0)
 
-    trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, writer=writer, test_set_loader=test_set_loader, model_name=model_save_name, use_other_inputs=use_other_inputs, patience=5, delta=0.00005)
+    trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, writer=writer, test_set_loader=test_set_loader, model_name=model_save_name, other_inputs=other_inputs, patience=5, delta=0.00005)
     trainer.fit()
     writer.close()
     # Saving the model
@@ -97,7 +102,7 @@ def main():
 
 
 class Trainer:
-    def __init__(self, model, criterion, optimizer, device, num_epochs, train_set_loader, writer=None, test_set_loader=None, model_name="model", use_other_inputs=False, patience=5, delta=0.00005):
+    def __init__(self, model, criterion, optimizer, device, num_epochs, train_set_loader, writer=None, test_set_loader=None, model_name="model", other_inputs=False, patience=5, delta=0.00005):
         self.model = model
         self.criterion = criterion
         self.optimizer = optimizer
@@ -106,7 +111,7 @@ class Trainer:
         self.writer = writer
         self.test_set_loader = test_set_loader
         self.model_name = model_name
-        self.use_other_inputs = use_other_inputs
+        self.other_inputs = other_inputs
         self.num_epochs = num_epochs
         # Delta: Minimum change to qualify as an improvement.
         # Patience:  How many times we wait for change < delta before stop training.
@@ -135,7 +140,7 @@ class Trainer:
             for batch_no, data in enumerate(pbar, 1):
                 for param in self.model.parameters():
                     param.grad = None
-                if self.use_other_inputs:
+                if self.other_inputs:
                     images, other_inputs, steering_labels, throttle_labels = data
                     other_inputs = other_inputs.to(self.device)
                 else:
@@ -143,7 +148,7 @@ class Trainer:
                 images = images.to(self.device, non_blocking=True) / 255.0
                 steering_labels = steering_labels.to(self.device)
                 throttle_labels = throttle_labels.to(self.device)
-                if self.use_other_inputs:
+                if self.other_inputs:
                     steering_prediction, throttle_prediction = self.model(images, other_inputs)
                 else:
                     steering_prediction, throttle_prediction = self.model(images)
@@ -218,7 +223,7 @@ class Trainer:
         losses = dict(steering=[], throttle=[], loss=[])
         with torch.no_grad():
             for batch_no, data in enumerate(tqdm(self.test_set_loader, file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}'), 1):
-                if self.use_other_inputs:
+                if self.other_inputs:
                     images, other_inputs, steering_labels, throttle_labels = data
                     other_inputs = other_inputs.to(self.device)
                 else:
@@ -226,7 +231,7 @@ class Trainer:
                 images = images.to(self.device, non_blocking=True) / 255.0
                 steering_labels = steering_labels.to(self.device)
                 throttle_labels = throttle_labels.to(self.device)
-                if self.use_other_inputs:  
+                if self.other_inputs:  
                     steering_prediction, throttle_prediction = self.model(images, other_inputs)
                 else:
                     steering_prediction, throttle_prediction = self.model(images)

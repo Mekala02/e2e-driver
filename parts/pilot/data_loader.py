@@ -17,15 +17,15 @@ import os
 logger = logging.getLogger(__name__)
 
 class Load_Data(Dataset):
-    def __init__(self, data_folder_paths, reduce_resolution=False, reduce_fps=False, use_depth_input=False, use_other_inputs=False):
+    def __init__(self, data_folder_paths, reduce_resolution=False, reduce_fps=False, use_depth=False, other_inputs=False):
         self.data_folder_paths = data_folder_paths
         self.reduce_resolution = reduce_resolution
         self.reduce_fps = reduce_fps
-        self.use_depth_input = use_depth_input
-        self.use_other_inputs = use_other_inputs
+        self.use_depth = use_depth
+        self.other_inputs = other_inputs
         self.data_folders = []
         for folder_path in self.data_folder_paths:
-            self.data_folders.append(Data_Folder(folder_path, reduce_resolution=self.reduce_resolution, reduce_fps=self.reduce_fps, use_depth_input=self.use_depth_input, use_other_inputs=self.use_other_inputs, expend_svo=True))
+            self.data_folders.append(Data_Folder(folder_path, reduce_resolution=self.reduce_resolution, reduce_fps=self.reduce_fps, use_depth=self.use_depth, other_inputs=self.other_inputs, expend_svo=True))
         self.len_data_fodlers = len(self.data_folders)
         self.lenght = 0
         for datas in self.data_folders:
@@ -36,7 +36,7 @@ class Load_Data(Dataset):
 
     def __getitem__(self, index):
         folder_index, data_index = self.calculate_index(index)
-        if self.use_other_inputs:
+        if self.other_inputs:
             images, other_inputs, steering_label, throttle_label = self.data_folders[folder_index][data_index]
             return images, other_inputs, steering_label, throttle_label
         images, steering_label, throttle_label = self.data_folders[folder_index][data_index]
@@ -55,12 +55,12 @@ class Load_Data(Dataset):
 
 
 class Data_Folder():
-    def __init__(self, data_folder_path, reduce_resolution=False, reduce_fps=False, use_depth_input=False, use_other_inputs=False, expend_svo=False):
+    def __init__(self, data_folder_path, reduce_resolution=False, reduce_fps=False, use_depth=False, other_inputs=False, expend_svo=False):
         self.data_folder_path = data_folder_path
         self.reduce_resolution = reduce_resolution
         self.reduce_fps = reduce_fps
-        self.use_depth_input = use_depth_input
-        self.use_other_inputs = use_other_inputs
+        self.use_depth = use_depth
+        self.other_inputs = other_inputs
         self.expend_svo = expend_svo
         self.changes = None
 
@@ -115,7 +115,7 @@ class Data_Folder():
             # we converting SVO data to jpg and saving them then using jpg's for training
             if self.expend_svo:
                 # If our mode is expand_svo but we not expanded svo, we expanding it.
-                if not os.path.isdir(self.Color_Image_path) or (self.use_depth_input and not os.path.isdir(self.Depth_image_path)):
+                if not os.path.isdir(self.Color_Image_path) or (self.use_depth and not os.path.isdir(self.Depth_image_path)):
                     logger.warning("First you have to expand the svo file")
                     quit()
                     # ToDo: Multiproccesing quits when runned in there, fix it
@@ -123,7 +123,7 @@ class Data_Folder():
                     # sys.path.append(os.path.join(os.path.expanduser('~'), "e2e-driver", "data"))
                     # from expend_svo import expand
                     # logger.info("Expanding Svo ...")
-                    # expand(self.data_folder_path, self.datas, color=True, depth=use_depth_input, num_workers=6)
+                    # expand(self.data_folder_path, self.datas, color=True, depth=use_depth, num_workers=6)
                 # Overwriting the config data
                 self.cfg["COLOR_IMAGE_FORMAT"] = "jpg"
                 self.cfg["DEPTH_IMAGE_FORMAT"] = "jpg"
@@ -178,7 +178,7 @@ class Data_Folder():
         if self.reduce_resolution:
             color_image = cv2.resize(color_image, (self.reduce_resolution["width"], self.reduce_resolution["height"]), interpolation= cv2.INTER_LINEAR)
         images = color_image
-        if self.use_depth_input:
+        if self.use_depth:
             depth_image = self.load_Image(self.Depth_Image_path, self.Depth_Image_format, index)
             if self.reduce_resolution:
                 depth_image = cv2.resize(depth_image, (self.reduce_resolution["width"], self.reduce_resolution["height"]), interpolation= cv2.INTER_LINEAR)
@@ -193,16 +193,17 @@ class Data_Folder():
         # Not normalizing yet
         images = torch.from_numpy(images)
 
-        if self.use_other_inputs:
-            other_inputs = np.array([
-                [self.datas[index]["IMU_Accel_X"]],
-                [self.datas[index]["IMU_Accel_Y"]],
-                [self.datas[index]["IMU_Accel_Z"]],
-                [self.datas[index]["IMU_Gyro_X"]],
-                [self.datas[index]["IMU_Gyro_Y"]],
-                [self.datas[index]["IMU_Gyro_Z"]],
-                [self.datas[index]["Speed"]]
-            ], dtype=np.float32)
+        if self.other_inputs:
+            other_inputs = np.array([[self.datas[index][input]] for input in self.other_inputs], dtype=np.float32)
+            # other_inputs = np.array([
+            #     [self.datas[index]["IMU_Accel_X"]],
+            #     [self.datas[index]["IMU_Accel_Y"]],
+            #     [self.datas[index]["IMU_Accel_Z"]],
+            #     [self.datas[index]["IMU_Gyro_X"]],
+            #     [self.datas[index]["IMU_Gyro_Y"]],
+            #     [self.datas[index]["IMU_Gyro_Z"]],
+            #     [self.datas[index]["Speed"]]
+            # ], dtype=np.float32)
             other_inputs = torch.from_numpy(other_inputs)
 
         # Making pwm data between -1, 1
@@ -211,7 +212,7 @@ class Data_Folder():
         steering_label = torch.tensor([steering_label], dtype=torch.float)
         throttle_label = torch.tensor([throttle_label], dtype=torch.float)
 
-        if self.use_other_inputs:
+        if self.other_inputs:
             return images, other_inputs, steering_label, throttle_label
         return images, steering_label, throttle_label
 
@@ -220,7 +221,7 @@ if __name__ == "__main__":
     from docopt import docopt
     args = docopt(__doc__)
     data_folders = args["<data_dir>"]
-    test = Load_Data(data_folders, use_other_inputs=True, use_depth_input=True)
+    test = Load_Data(data_folders, other_inputs=True, use_depth=True)
     images, other_inputs, steering_label, throttle_label = test[600]
     print(images.shape)
     print(other_inputs.shape)
