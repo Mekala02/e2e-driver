@@ -195,15 +195,6 @@ class Data_Folder():
 
         if self.other_inputs:
             other_inputs = np.array([[self.datas[index][input]] for input in self.other_inputs], dtype=np.float32)
-            # other_inputs = np.array([
-            #     [self.datas[index]["IMU_Accel_X"]],
-            #     [self.datas[index]["IMU_Accel_Y"]],
-            #     [self.datas[index]["IMU_Accel_Z"]],
-            #     [self.datas[index]["IMU_Gyro_X"]],
-            #     [self.datas[index]["IMU_Gyro_Y"]],
-            #     [self.datas[index]["IMU_Gyro_Z"]],
-            #     [self.datas[index]["Speed"]]
-            # ], dtype=np.float32)
             other_inputs = torch.from_numpy(other_inputs)
 
         # Making pwm data between -1, 1
