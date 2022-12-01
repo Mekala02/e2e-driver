@@ -140,44 +140,17 @@ class Data_Folder():
         self.Color_Image_format = self.cfg["COLOR_IMAGE_FORMAT"]
         self.Depth_Image_format = self.cfg["DEPTH_IMAGE_FORMAT"]
 
-        # Constructing image loader functions
-        for which_image in ["Color", "Depth"]:
-            img_format = getattr(self, f"{which_image}_Image_format")
-            if img_format == "npy":
-                setattr(self, f"load_{which_image}_Image", self.load_npy)
-            elif img_format == "npz":
-                setattr(self, f"load_{which_image}_Image", self.load_npz)
-            elif self.cfg["SVO_COMPRESSION_MODE"] and not self.expend_svo:
-                setattr(self, f"load_{which_image}_Image", self.load_SVO_data)
-            elif img_format == "jpg" or img_format == "jpeg" or img_format == "png" or self.expend_svo:
-                setattr(self, f"load_{which_image}_Image", self.load_jpg)
-            else:
-                logger.warning("Unknown Image Format For Saving")
-            
-    def load_npy(self, path, index):
-        base_name = os.path.basename(path)
-        if base_name == "Color_Image":
-            img_format = self.Color_Image_format
-        elif base_name == "Depth_Image":
-            img_format = self.Depth_image_format
-        return np.load(os.path.join(path, str(self.datas[index]["Data_Id"]) + "." + img_format))
-
-    def load_jpg(self, path, index):
-        base_name = os.path.basename(path)
-        if base_name == "Color_Image":
-            img_format = self.Color_Image_format
-        elif base_name == "Depth_Image":
-            img_format = self.Depth_image_format
-        # cv2 imread return BGR if you want RGB use [:,:,::-1]
-        return cv2.imread(os.path.join(path, str(self.datas[index]["Data_Id"]) + "." + img_format))
-
-    def load_npz(self, path, index):
-        base_name = os.path.basename(path)
-        if base_name == "Color_Image":
-            img_format = self.Color_Image_format
-        elif base_name == "Depth_Image":
-            img_format = self.Depth_image_format
-        return np.load(os.path.join(path, str(self.datas[index]["Data_Id"]) + "." + img_format))["arr_0"]
+    def load_Image(self, path, img_format, index):
+        if img_format == "npy":
+            return np.load(os.path.join(path, str(self.datas[index]["Data_Id"]) + "." + img_format))
+        elif img_format == "npz":
+            return np.load(os.path.join(path, str(self.datas[index]["Data_Id"]) + "." + img_format))["arr_0"]
+        elif self.cfg["SVO_COMPRESSION_MODE"] and not self.expend_svo:
+            return load_SVO_data(self, path, index)
+        elif img_format == "jpg" or img_format == "jpeg" or img_format == "png" or self.expend_svo:
+            return cv2.imread(os.path.join(path, str(self.datas[index]["Data_Id"]) + "." + img_format))
+        else:
+            logger.warning("Unknown Image Format For Loading")
 
     def load_SVO_data(self, path, index):
         base_name = os.path.basename(path)
@@ -199,11 +172,11 @@ class Data_Folder():
         return(self.data_lenght)
 
     def __getitem__(self, index):
-        color_image = self.load_Color_Image(self.Color_Image_path, index)
+        color_image = self.load_Image(self.Color_Image_path, self.Color_Image_format, index)
         color_image = cv2.resize(color_image, (160, 120), interpolation= cv2.INTER_LINEAR)
         images = color_image
         if self.use_depth_input:
-            depth_image = self.load_Depth_Image(self.Depth_Image_path, index)
+            depth_image = self.load_Image(self.Depth_Image_path, self.Depth_Image_format, index)
             depth_image = cv2.resize(depth_image, (160, 120), interpolation= cv2.INTER_LINEAR)
             depth_array = cv2.cvtColor(depth_image, cv2.COLOR_BGR2GRAY)
             depth_array = depth_array.reshape(color_image.shape[0], color_image.shape[1], 1)
