@@ -14,7 +14,6 @@ class Data_Logger:
         self.thread = None
         self.run = True
         self.outputs = {"Data_Id": 0, "Timestamp": 0}
-
         self.index = 0
         self.save_it = {"Data_Id", "Zed_Data_Id", "Timestamp", "Zed_Timestamp", "Steering", "Throttle", "Speed", "Mode1", "Mode2", "IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z",
             "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Stop", "Taxi", "Direction", "Lane", "Pilot_Mode", "Route_Mode", "Motor_Power", "Record", "Speed_Factor", "Fps"}
