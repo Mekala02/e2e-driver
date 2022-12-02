@@ -10,15 +10,16 @@ from networks import Linear
 from networks import Linear_With_Others
 from data_loader import Load_Data
 
-from torch.utils.data import DataLoader
-import torchvision
 from torch.utils.tensorboard import SummaryWriter
+from torch.utils.data import DataLoader
+from prettytable import PrettyTable
 from docopt import docopt
 from tqdm import tqdm
+import torchvision
 import logging
-import sys
 import torch
 import math
+import sys
 import os
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -27,18 +28,21 @@ logger = logging.getLogger("train")
 
 def main():
     # Hyperparameters
-    # If set to None not changing the images resolutions
+    # If reduce_resolution == None zed's resolution will be used
     # None or {"height": x, "width": y}
     reduce_resolution = {"height": 120, "width": 160}
+    # If set to value like 30 it will make training data ~30fps 
+    # It wont work great if datasets fps is close to reduce_fps
     reduce_fps = False
     use_depth = False
     # False or list like ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
     other_inputs = False
-    #2e-3 for startup then reduce to 1e-3
+    # 2e-3 for startup then reduce to 1e-3
     learning_rate = 2e-3
     batch_size = 1024
     num_epochs = 250
     test_data_percentage = 20
+    # Saves image grid for first trrain and test set
     detailed_tensorboard = False
 
     args = docopt(__doc__)
@@ -49,8 +53,7 @@ def main():
         model_save_name = "model"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     torch.manual_seed(22)
-    # If set to value like 30 it will make training data ~30fps 
-    # It wont work great if datasets fps is close to reduce_fps
+
     if use_depth:
         in_channels = 4
     else:
@@ -82,9 +85,9 @@ def main():
     test_set_loader = DataLoader(dataset=test_set, batch_size=batch_size, num_workers=4, pin_memory=True)
 
     if detailed_tensorboard:
-        # Adding first batches of train and test images to tensorboard
+        # Adding train and test images from first batch to tensorboard
         data = next(iter(train_set_loader))
-        # Our image format is BGR so we converting it to RGB with flip on channel dimension
+        # We using BGR image format but tensorboard expects rgb so we converting it to RGB with flip on channel dimension
         images = torch.flip(data[0], [1])
         grid = torchvision.utils.make_grid(images)
         writer.add_image(f"Train Set First Batch", grid, 0)
@@ -97,8 +100,6 @@ def main():
     trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_set_loader, writer=writer, test_set_loader=test_set_loader, model_name=model_save_name, other_inputs=other_inputs, patience=5, delta=0.00005)
     trainer.fit()
     writer.close()
-    # Saving the model
-    # trainer.save_model()
 
 
 class Trainer:
@@ -118,6 +119,8 @@ class Trainer:
         self.patience = patience
         self.delta = delta
 
+        self.loss_table = PrettyTable()
+        self.loss_table.field_names = ["", "Total", "Steering", "Throttle"]
         self.nu_of_train_batches = len(self.train_set_loader)
         if self.test_set_loader:
             self.nu_of_test_batches = len(self.test_set_loader)
@@ -145,6 +148,7 @@ class Trainer:
                     other_inputs = other_inputs.to(self.device)
                 else:
                     images, steering_labels, throttle_labels = data
+                # Normalizing the image
                 images = images.to(self.device, non_blocking=True) / 255.0
                 steering_labels = steering_labels.to(self.device)
                 throttle_labels = throttle_labels.to(self.device)
@@ -170,25 +174,25 @@ class Trainer:
             epoch_losses["steering"].append(epoch_steering_loss)
             epoch_losses["throttle"].append(epoch_throttle_loss)
             epoch_losses["loss"].append(epoch_loss)
-            loss_string = f"For Epoch {epoch} --> Loss: {epoch_loss:.4f}, Steering Loss: {epoch_steering_loss:.4f}, Throttle Loss: {epoch_throttle_loss:.4f}"
+            self.loss_table.add_row(["Train", f"{epoch_loss:.4f}", f"{epoch_steering_loss:.4f}", f"{epoch_throttle_loss:.4f}"])
+            self.loss_table.add_row(["PWM", f"{math.sqrt(epoch_loss)*500:.4f}", f"{math.sqrt(epoch_steering_loss)*500:.4f}", f"{math.sqrt(epoch_throttle_loss)*500:.4f}"])
+            if self.test_set_loader:
+                logger.info("\nEvaluating on test set ...")
+                eval_loss, eval_steering_loss, eval_throttle_loss = self.evaluate()
+                self.loss_table.add_row(["Val", f"{eval_loss:.4f}", f"{eval_steering_loss:.4f}", f"{eval_throttle_loss:.4f}"])
+                self.loss_table.add_row(["Val PWM", f"{math.sqrt(eval_loss)*500:.4f}", f"{math.sqrt(eval_steering_loss)*500:.4f}", f"{math.sqrt(eval_throttle_loss)*500:.4f}"])
+            self.loss_table.sortby = 'Total'
+            logger.info(f"\n{self.loss_table}\n")
+            self.loss_table.clear_rows()
+
             if self.writer:
                 self.writer.add_scalar('Train/Loss', epoch_loss, epoch)
                 self.writer.add_scalar('Train/Steering_Loss', epoch_steering_loss, epoch)
                 self.writer.add_scalar('Train/Throttle_Loss', epoch_throttle_loss, epoch)
-            if self.test_set_loader:
-                logger.info("\nEvaluating on test set ...")
-                eval_loss, eval_steering_loss, eval_throttle_loss = self.evaluate()
-                val_loss_string = f"Val Loss: {eval_loss:.4f} Steering Val Loss: {eval_steering_loss:.4f}, Throttle Val Loss: {eval_throttle_loss:.4f}"
-                logger.info(val_loss_string + " - " + loss_string)
-                logger.info(f"PWM Differance: +-{math.sqrt(eval_loss) * 500}\n")
-                if self.writer:
+                if self.test_set_loader:
                     self.writer.add_scalar('Test/Loss', eval_loss, global_step=epoch)
                     self.writer.add_scalar('Test/Steering_Loss', eval_steering_loss, global_step=epoch)
                     self.writer.add_scalar('Test/Throttle_Loss', eval_throttle_loss, global_step=epoch)
-            else:
-                logger.info(loss_string + '\n')
-
-            if self.writer:
                 self.writer.flush()
 
             # Checking if there is an improvement
@@ -251,7 +255,7 @@ class Trainer:
         torch.save(self.model.state_dict(), os.path.join(model_save_path, self.model_name + ".pt"))
         script_cell = torch.jit.script(self.model)
         torch.jit.save(script_cell, os.path.join(model_save_path, self.model_name + ".jit"))
-        logger.info(f"Saved the model to {model_save_path}\n")
+        logger.info(f"Saved the model to {os.path.join(model_save_path, self.model_name)}\n")
 
 
 if __name__ == "__main__":
