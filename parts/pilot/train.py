@@ -199,41 +199,39 @@ class Trainer:
                     self.writer.add_scalar('Test/Throttle_Loss', eval_throttle_loss, global_step=epoch)
                 self.writer.flush()
 
+            # If this model is better than previous model we saving it
+            if eval_loss < self.test_set_min_loss:
+                self.save_model()
+
             # Checking if there is an improvement
             # We counting as improvement if delta_loss > self.delta
-            delta_train_set_loss =  self.train_set_min_loss - epoch_loss
-            if delta_train_set_loss > 0:
-                self.train_set_min_loss = epoch_loss
-                if delta_train_set_loss >= self.delta:
+            if epoch_loss + self.delta < self.train_set_min_loss:
                     self.train_not_improved_count = 0
-                else:
-                    self.train_not_improved_count += 1
-            if self.test_set_loader:
-                delta_test_set_loss =  self.test_set_min_loss - eval_loss
-                if delta_test_set_loss > 0:
-                    self.test_set_min_loss = eval_loss
-                    if delta_test_set_loss >= self.delta:
-                        self.test_not_improved_count = 0
-                    else:
-                        self.test_not_improved_count += 1
+            else:
+                self.train_not_improved_count += 1
 
-            # If this model is better than previous model we saving it
-            if delta_test_set_loss > 0:
-                self.save_model()
+            if self.test_set_loader:
+                if eval_loss + self.delta < self.test_set_min_loss:
+                    self.test_not_improved_count = 0
+                else:
+                    self.test_not_improved_count += 1
+
+            self.train_set_min_loss = min(self.train_set_min_loss, epoch_loss)
+            self.test_set_min_loss = min(self.test_set_min_loss, eval_loss)
             # Early stopping
             # If loss improve smaller than delta for patience times stops training 
             if (self.train_not_improved_count >= self.patience):
                 logger.info(f"Stopped Training: Delta Loss Is Smaller Than {self.delta} For {self.patience} Times")
                 break
 
+
     def inverse_loss(self, loss):
         # If you want to convert loss to pwm differance you must add the loss functions inverse here
-        # If loss functions inverse isn't written this functionality won't be used
+        # If loss functions inverse isn't written, this functionality won't be used
         if str(self.criterion) == "MSELoss()":
             # Inverse of MSELoss
             return math.sqrt(loss) * 500
-        else:
-            return None
+        return None
 
     def evaluate(self):
         self.model.eval()
