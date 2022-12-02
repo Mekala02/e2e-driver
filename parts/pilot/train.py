@@ -121,6 +121,8 @@ class Trainer:
 
         self.loss_table = PrettyTable()
         self.loss_table.field_names = ["", "Total", "Steering", "Throttle"]
+        # If we don't know the inverse of self.criterion it will return None
+        self.convert_loss_to_pwm = self.inverse_loss(0) != None
         self.nu_of_train_batches = len(self.train_set_loader)
         if self.test_set_loader:
             self.nu_of_test_batches = len(self.test_set_loader)
@@ -175,12 +177,14 @@ class Trainer:
             epoch_losses["throttle"].append(epoch_throttle_loss)
             epoch_losses["loss"].append(epoch_loss)
             self.loss_table.add_row(["Train", f"{epoch_loss:.4f}", f"{epoch_steering_loss:.4f}", f"{epoch_throttle_loss:.4f}"])
-            self.loss_table.add_row(["PWM", f"{math.sqrt(epoch_loss)*500:.4f}", f"{math.sqrt(epoch_steering_loss)*500:.4f}", f"{math.sqrt(epoch_throttle_loss)*500:.4f}"])
+            if self.convert_loss_to_pwm:
+                self.loss_table.add_row(["PWM", f"{self.inverse_loss(epoch_loss):.4f}", f"{self.inverse_loss(epoch_steering_loss):.4f}", f"{self.inverse_loss(epoch_throttle_loss):.4f}"])
             if self.test_set_loader:
                 logger.info("\nEvaluating on test set ...")
                 eval_loss, eval_steering_loss, eval_throttle_loss = self.evaluate()
                 self.loss_table.add_row(["Val", f"{eval_loss:.4f}", f"{eval_steering_loss:.4f}", f"{eval_throttle_loss:.4f}"])
-                self.loss_table.add_row(["Val PWM", f"{math.sqrt(eval_loss)*500:.4f}", f"{math.sqrt(eval_steering_loss)*500:.4f}", f"{math.sqrt(eval_throttle_loss)*500:.4f}"])
+                if self.convert_loss_to_pwm:
+                    self.loss_table.add_row(["Val PWM", f"{self.inverse_loss(eval_loss):.4f}", f"{self.inverse_loss(eval_steering_loss):.4f}", f"{self.inverse_loss(eval_throttle_loss):.4f}"])
             self.loss_table.sortby = 'Total'
             logger.info(f"\n{self.loss_table}\n")
             self.loss_table.clear_rows()
@@ -222,6 +226,15 @@ class Trainer:
                 logger.info(f"Stopped Training: Delta Loss Is Smaller Than {self.delta} For {self.patience} Times")
                 break
 
+    def inverse_loss(self, loss):
+        # If you want to convert loss to pwm differance you must add the loss functions inverse here
+        # If loss functions inverse isn't written this functionality won't be used
+        if str(self.criterion) == "MSELoss()":
+            # Inverse of MSELoss
+            return math.sqrt(loss) * 500
+        else:
+            return None
+
     def evaluate(self):
         self.model.eval()
         losses = dict(steering=[], throttle=[], loss=[])
@@ -239,12 +252,12 @@ class Trainer:
                     steering_prediction, throttle_prediction = self.model(images, other_inputs)
                 else:
                     steering_prediction, throttle_prediction = self.model(images)
-                steering_loss, throttle_loss = self.criterion(steering_prediction, steering_labels), self.criterion(throttle_prediction, throttle_labels)
+                steering_loss = self.criterion(steering_prediction, steering_labels)
+                throttle_loss = self.criterion(throttle_prediction, throttle_labels)
                 loss = self.steering_weight * steering_loss + self.throttle_weight * throttle_loss
                 losses["steering"].append(steering_loss)
                 losses["throttle"].append(throttle_loss)
                 losses["loss"].append(loss)
-                # logger.info(f"\nTest Set--> Batch[{batch_no}/{self.nu_of_test_batches}] Loss: {loss:.2e}, Steering Loss: {steering_loss:.2e}, Throttle Loss: {throttle_loss:.2e}")
         eval_steering_loss = sum(losses["steering"]) / batch_no
         eval_throttle_loss = sum(losses["throttle"]) / batch_no
         eval_loss = sum(losses["loss"]) / batch_no
