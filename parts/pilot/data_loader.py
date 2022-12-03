@@ -17,15 +17,16 @@ import os
 logger = logging.getLogger(__name__)
 
 class Load_Data(Dataset):
-    def __init__(self, data_folder_paths, reduce_resolution=False, reduce_fps=False, use_depth=False, other_inputs=False):
+    def __init__(self, data_folder_paths, transform=None, reduce_resolution=False, reduce_fps=False, use_depth=False, other_inputs=False):
         self.data_folder_paths = data_folder_paths
+        self.transform = transform
         self.reduce_resolution = reduce_resolution
         self.reduce_fps = reduce_fps
         self.use_depth = use_depth
         self.other_inputs = other_inputs
         self.data_folders = []
         for folder_path in self.data_folder_paths:
-            self.data_folders.append(Data_Folder(folder_path, reduce_resolution=self.reduce_resolution, reduce_fps=self.reduce_fps, use_depth=self.use_depth, other_inputs=self.other_inputs, expend_svo=True))
+            self.data_folders.append(Data_Folder(folder_path, transform=self.transform, reduce_resolution=self.reduce_resolution, reduce_fps=self.reduce_fps, use_depth=self.use_depth, other_inputs=self.other_inputs, expend_svo=True))
         self.len_data_fodlers = len(self.data_folders)
         self.lenght = 0
         for datas in self.data_folders:
@@ -55,8 +56,9 @@ class Load_Data(Dataset):
 
 
 class Data_Folder():
-    def __init__(self, data_folder_path, reduce_resolution=False, reduce_fps=False, use_depth=False, other_inputs=False, expend_svo=False):
+    def __init__(self, data_folder_path, transform=None, reduce_resolution=False, reduce_fps=False, use_depth=False, other_inputs=False, expend_svo=False):
         self.data_folder_path = data_folder_path
+        self.transform = transform
         self.reduce_resolution = reduce_resolution
         self.reduce_fps = reduce_fps
         self.use_depth = use_depth
@@ -177,6 +179,12 @@ class Data_Folder():
         color_image = self.load_Image(self.Color_Image_path, self.Color_Image_format, index)
         if self.reduce_resolution:
             color_image = cv2.resize(color_image, (self.reduce_resolution["width"], self.reduce_resolution["height"]), interpolation= cv2.INTER_LINEAR)
+        # Applying transforms such as data augmentation
+        if self.transform:
+            color_image = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
+            for T in self.transform:
+                color_image = T(image=color_image)["image"]
+            color_image = cv2.cvtColor(color_image, cv2.COLOR_RGB2BGR)
         images = color_image
         if self.use_depth:
             depth_image = self.load_Image(self.Depth_Image_path, self.Depth_Image_format, index)
@@ -209,7 +217,7 @@ if __name__ == "__main__":
     from docopt import docopt
     args = docopt(__doc__)
     data_folders = args["<data_dir>"]
-    test = Load_Data(data_folders, other_inputs=True, use_depth=True)
+    test = Load_Data(data_folders, transform=None, other_inputs=True, use_depth=True)
     images, other_inputs, steering_label, throttle_label = test[600]
     print(images.shape)
     print(other_inputs.shape)

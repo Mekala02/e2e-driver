@@ -13,6 +13,7 @@ from data_loader import Load_Data
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 from prettytable import PrettyTable
+import albumentations as A
 from docopt import docopt
 from tqdm import tqdm
 import torchvision
@@ -34,8 +35,13 @@ def main():
     num_epochs = 250
     shuffle_dataset = True
     test_data_percentage = 20
-    # Saves image grid for first trrain and test set
-    detailed_tensorboard = False
+
+    train_transforms = [
+        A.Compose([
+            A.RandomBrightnessContrast(p=0.5)
+        ])
+    ]
+
     # If reduce_resolution == None zed's resolution will be used
     # None or {"height": x, "width": y}
     reduce_resolution = {"height": 120, "width": 160}
@@ -45,6 +51,8 @@ def main():
     use_depth = False
     # False or list like ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
     other_inputs = False
+    # Saves image grid for first trrain and test set
+    detailed_tensorboard = False
 
     if use_depth:
         in_channels = 4
@@ -67,8 +75,8 @@ def main():
         example_input = (example_input, torch.ones(1, (len(other_inputs)), device=device))
     writer.add_graph(model, input_to_model=example_input, verbose=False, use_strict_trace=True)
 
-    train_set_loader = Load_Data(data_dirs, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
-    test_set_loader = Load_Data(data_dirs, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
+    train_set_loader = Load_Data(data_dirs, transform=train_transforms, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
+    test_set_loader = Load_Data(data_dirs, transform=None, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
     assert len(train_set_loader) == len(test_set_loader)
     len_dataset = len(train_set_loader)
     test_len = math.floor(len_dataset * test_data_percentage / 100)
