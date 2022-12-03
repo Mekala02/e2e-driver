@@ -197,11 +197,8 @@ class Data_Folder():
             other_inputs = np.array([[self.datas[index][input]] for input in self.other_inputs], dtype=np.float32)
             other_inputs = torch.from_numpy(other_inputs)
 
-        # Making pwm data between -1, 1
-        steering_label = (self.datas[index]["Steering"] - 1500) / 500
-        throttle_label = (self.datas[index]["Throttle"] - 1500) / 500
-        steering_label = torch.tensor([steering_label], dtype=torch.float)
-        throttle_label = torch.tensor([throttle_label], dtype=torch.float)
+        steering_label = torch.tensor([self.datas[index]["Steering"]], dtype=torch.float)
+        throttle_label = torch.tensor([self.datas[index]["Throttle"]], dtype=torch.float)
 
         if self.other_inputs:
             return images, other_inputs, steering_label, throttle_label

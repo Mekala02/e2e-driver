@@ -150,10 +150,10 @@ class Trainer:
                     other_inputs = other_inputs.to(self.device)
                 else:
                     images, steering_labels, throttle_labels = data
-                # Normalizing the image
-                images = images.to(self.device, non_blocking=True) / 255.0
-                steering_labels = steering_labels.to(self.device)
-                throttle_labels = throttle_labels.to(self.device)
+                # Normalizing the inputs
+                images = self.normalize_image(images.to(self.device, non_blocking=True))
+                steering_labels = self.normalize_pwm(steering_labels.to(self.device, non_blocking=True))
+                throttle_labels = self.normalize_pwm(throttle_labels.to(self.device, non_blocking=True))
                 if self.other_inputs:
                     steering_prediction, throttle_prediction = self.model(images, other_inputs)
                 else:
@@ -243,9 +243,9 @@ class Trainer:
                     other_inputs = other_inputs.to(self.device)
                 else:
                     images, steering_labels, throttle_labels = data
-                images = images.to(self.device, non_blocking=True) / 255.0
-                steering_labels = steering_labels.to(self.device)
-                throttle_labels = throttle_labels.to(self.device)
+                images = self.normalize_image(images.to(self.device, non_blocking=True))
+                steering_labels = self.normalize_pwm(steering_labels.to(self.device, non_blocking=True))
+                throttle_labels = self.normalize_pwm(throttle_labels.to(self.device, non_blocking=True))
                 if self.other_inputs:  
                     steering_prediction, throttle_prediction = self.model(images, other_inputs)
                 else:
@@ -260,6 +260,16 @@ class Trainer:
         eval_throttle_loss = sum(losses["throttle"]) / batch_no
         eval_loss = sum(losses["loss"]) / batch_no
         return eval_loss, eval_steering_loss, eval_throttle_loss
+
+    @staticmethod
+    def normalize_image(array):
+        # Making values between [0, 1]
+        return array / 255
+
+    @staticmethod
+    def normalize_pwm(array):
+        # Making values between [-1, 1]
+        return (array - 1500) / 500
 
     def save_model(self):
         model_save_path = os.path.join(os.path.expanduser('~'), "e2e-driver", "models")
