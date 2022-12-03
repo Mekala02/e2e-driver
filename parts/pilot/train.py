@@ -28,51 +28,43 @@ logger = logging.getLogger("train")
 
 
 def main():
-    # Hyperparameters
-    # 2e-3 for startup then reduce to 1e-3
+    '''
+    learning_rate:          2e-3 for startup then reduce to 1e-3
+    validation_split:       Splits the training data [0,1]
+    reduce_resolution:      None or {"height": x, "width": y} if None zed's resolution will be used
+    reduce_fps:             If set to value like 30 it will make training data ~30fps. It wont work great if datasets fps is close to reduce_fps
+    other_inputs:           None or list like ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
+    detailed_tensorboard:   Saves image grid for first train and test set batch
+    train_transforms:       Thoose transformations will be applied the train set when training
+    '''
+    use_depth = False
     learning_rate = 2e-3
     batch_size = 1024
     num_epochs = 250
     shuffle_dataset = True
-    # Split the training data
     validation_split = 0.2
+    reduce_resolution = {"height": 120, "width": 160}
+    reduce_fps = False
+    other_inputs = None
+    detailed_tensorboard = False
     train_transforms = [
         A.Compose([
             A.RandomBrightnessContrast(p=0.5)
         ])
     ]
-    # If reduce_resolution == None zed's resolution will be used
-    # None or {"height": x, "width": y}
-    reduce_resolution = {"height": 120, "width": 160}
-    # If set to value like 30 it will make training data ~30fps 
-    # It wont work great if datasets fps is close to reduce_fps
-    reduce_fps = False
-    use_depth = False
-    # False or list like ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
-    other_inputs = False
-    # Saves image grid for first trrain and test set
-    detailed_tensorboard = False
 
-    if use_depth:
-        in_channels = 4
-    else:
-        in_channels = 3
+    in_channels = 4 if use_depth else 3
+    model = Linear(in_channels=4 if use_depth else 3).to(device)
+    criterion = torch.nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
+    writer = SummaryWriter(f"tb_logs/{model_save_name}")
     torch.manual_seed(22)
     # Our input size is not changing so we can use cudnn's optimization
     torch.backends.cudnn.benchmark = True
 
-    model = Linear(in_channels=in_channels).to(device)
     if model_path:
         model.load_state_dict(torch.load(model_path))
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    criterion = torch.nn.MSELoss()
-
-    writer = SummaryWriter(f"tb_logs/{model_save_name}")
-    example_input = torch.ones((1, in_channels, reduce_resolution["height"], reduce_resolution["width"]), device=device)
-    if other_inputs:
-        example_input = (example_input, torch.ones(1, (len(other_inputs)), device=device))
-    writer.add_graph(model, input_to_model=example_input, verbose=False, use_strict_trace=True)
 
     train_set = Load_Data(data_dirs, transform=train_transforms, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
 
@@ -95,6 +87,10 @@ def main():
 
     trainer = Trainer(model, criterion, optimizer, device, num_epochs, trainloader, writer=writer, testlaoder=testlaoder, model_name=model_save_name, other_inputs=other_inputs, patience=5, delta=0.00005)
 
+    example_input = torch.ones((1, in_channels, reduce_resolution["height"], reduce_resolution["width"]), device=device)
+    if other_inputs:
+        example_input = (example_input, torch.ones(1, (len(other_inputs)), device=device))
+    writer.add_graph(model, input_to_model=example_input, verbose=False, use_strict_trace=True)
     if detailed_tensorboard:
         # Adding train and test images from first batch to tensorboard
         data = next(iter(trainloader))
