@@ -1,7 +1,7 @@
 """
 Usage:
-    train.py  <data_dirs>... [--model=None] [--name=None]
-
+    train.py  <data_dirs>... [--test_dirs=None]... [--model=None] [--name=None]
+    
 Options:
   -h --help     Show this screen.
 """
@@ -34,14 +34,13 @@ def main():
     batch_size = 1024
     num_epochs = 250
     shuffle_dataset = True
-    test_data_percentage = 20
-
+    # Split the training data
+    validation_split = 0.2
     train_transforms = [
         A.Compose([
             A.RandomBrightnessContrast(p=0.5)
         ])
     ]
-
     # If reduce_resolution == None zed's resolution will be used
     # None or {"height": x, "width": y}
     reduce_resolution = {"height": 120, "width": 160}
@@ -75,45 +74,52 @@ def main():
         example_input = (example_input, torch.ones(1, (len(other_inputs)), device=device))
     writer.add_graph(model, input_to_model=example_input, verbose=False, use_strict_trace=True)
 
-    train_set_loader = Load_Data(data_dirs, transform=train_transforms, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
-    test_set_loader = Load_Data(data_dirs, transform=None, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
-    assert len(train_set_loader) == len(test_set_loader)
-    len_dataset = len(train_set_loader)
-    test_len = math.floor(len_dataset * test_data_percentage / 100)
+    train_set = Load_Data(data_dirs, transform=train_transforms, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
 
-    train_set = torch.utils.data.random_split(train_set_loader, [len_dataset-test_len, test_len])[0]
-    test_set = torch.utils.data.random_split(test_set_loader, [len_dataset-test_len, test_len])[1]
+    test_sets = []
+    if validation_split:
+        test_set = Load_Data(data_dirs, transform=None, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
+        assert len(train_set) == len(test_set)
+        len_dataset = len(train_set)
+        test_len = math.floor(len_dataset * validation_split)
+        train_set = torch.utils.data.random_split(train_set, [len_dataset-test_len, test_len])[0]
+        test_sets.append(torch.utils.data.random_split(test_set, [len_dataset-test_len, test_len])[1])
+    if test_dirs:
+        test_sets.append(Load_Data(test_dirs, transform=None, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs))
 
-    train_data = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
-    test_data = DataLoader(dataset=test_set, batch_size=batch_size, num_workers=4, pin_memory=True)
+    trainloader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
+    if test_sets:
+        testlaoder = DataLoader(dataset=torch.utils.data.ConcatDataset(test_sets), batch_size=batch_size, num_workers=4, pin_memory=True)
+    else:
+        testlaoder = None
+
+    trainer = Trainer(model, criterion, optimizer, device, num_epochs, trainloader, writer=writer, testlaoder=testlaoder, model_name=model_save_name, other_inputs=other_inputs, patience=5, delta=0.00005)
 
     if detailed_tensorboard:
         # Adding train and test images from first batch to tensorboard
-        data = next(iter(train_data))
+        data = next(iter(trainloader))
         # We using BGR image format but tensorboard expects rgb so we converting it to RGB with flip on channel dimension
         images = torch.flip(data[0], [1])
         grid = torchvision.utils.make_grid(images)
         writer.add_image(f"Train Set First Batch", grid, 0)
-        if test_data_percentage:
-            data = next(iter(test_data))
+        if testlaoder:
+            data = next(iter(testlaoder))
             images = torch.flip(data[0], [1])
             grid = torchvision.utils.make_grid(images)
             writer.add_image(f"Test Set First Batch", grid, 0)
 
-    trainer = Trainer(model, criterion, optimizer, device, num_epochs, train_data, writer=writer, test_data=test_data, model_name=model_save_name, other_inputs=other_inputs, patience=5, delta=0.00005)
     trainer.fit()
     writer.close()
 
-
 class Trainer:
-    def __init__(self, model, criterion, optimizer, device, num_epochs, train_data, writer=None, test_data=None, model_name="model", other_inputs=False, patience=5, delta=0.00005):
+    def __init__(self, model, criterion, optimizer, device, num_epochs, trainloader, writer=None, testlaoder=None, model_name="model", other_inputs=False, patience=5, delta=0.00005):
         self.model = model
         self.criterion = criterion
         self.optimizer = optimizer
         self.device = device
-        self.train_data = train_data
+        self.trainloader = trainloader
         self.writer = writer
-        self.test_data = test_data
+        self.testlaoder = testlaoder
         self.model_name = model_name
         self.other_inputs = other_inputs
         self.num_epochs = num_epochs
@@ -126,9 +132,9 @@ class Trainer:
         self.loss_table.field_names = ["", "Total", "Steering", "Throttle"]
         # If we don't know the inverse of self.criterion it will return None
         self.convert_loss_to_pwm = self.inverse_loss(0) != None
-        self.nu_of_train_batches = len(self.train_data)
-        if self.test_data:
-            self.nu_of_test_batches = len(self.test_data)
+        self.nu_of_train_batches = len(self.trainloader)
+        if self.testlaoder:
+            self.nu_of_test_batches = len(self.testlaoder)
         self.train_not_improved_count = 0
         self.test_not_improved_count = 0
         self.train_set_min_loss = float('inf')
@@ -143,7 +149,7 @@ class Trainer:
         epoch_losses = dict(steering=[], throttle=[], loss=[])
         for epoch in range(1, self.num_epochs+1):
             self.model.train()
-            pbar = tqdm(self.train_data, desc=f"Epoch: {epoch} ", file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}')
+            pbar = tqdm(self.trainloader, desc=f"Epoch: {epoch} ", file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}')
             batch_losses = dict(steering=[], throttle=[], loss=[])
             for batch_no, data in enumerate(pbar, 1):
                 for param in self.model.parameters():
@@ -182,7 +188,7 @@ class Trainer:
             self.loss_table.add_row(["Train", f"{epoch_loss:.4f}", f"{epoch_steering_loss:.4f}", f"{epoch_throttle_loss:.4f}"])
             if self.convert_loss_to_pwm:
                 self.loss_table.add_row(["PWM", f"{self.inverse_loss(epoch_loss):.4f}", f"{self.inverse_loss(epoch_steering_loss):.4f}", f"{self.inverse_loss(epoch_throttle_loss):.4f}"])
-            if self.test_data:
+            if self.testlaoder:
                 logger.info("\nEvaluating on test set ...")
                 eval_loss, eval_steering_loss, eval_throttle_loss = self.evaluate()
                 self.loss_table.add_row(["Val", f"{eval_loss:.4f}", f"{eval_steering_loss:.4f}", f"{eval_throttle_loss:.4f}"])
@@ -196,15 +202,19 @@ class Trainer:
                 self.writer.add_scalar('Train/Loss', epoch_loss, epoch)
                 self.writer.add_scalar('Train/Steering_Loss', epoch_steering_loss, epoch)
                 self.writer.add_scalar('Train/Throttle_Loss', epoch_throttle_loss, epoch)
-                if self.test_data:
+                if self.testlaoder:
                     self.writer.add_scalar('Test/Loss', eval_loss, global_step=epoch)
                     self.writer.add_scalar('Test/Steering_Loss', eval_steering_loss, global_step=epoch)
                     self.writer.add_scalar('Test/Throttle_Loss', eval_throttle_loss, global_step=epoch)
                 self.writer.flush()
 
             # If this model is better than previous model we saving it
-            if eval_loss < self.test_set_min_loss:
-                self.save_model()
+            if self.testlaoder:
+                if eval_loss < self.test_set_min_loss:
+                    self.save_model()
+            else:
+                if epoch_loss < self.train_set_min_loss:
+                    self.save_model()
 
             # Checking if there is an improvement
             # We counting as improvement if delta_loss > self.delta
@@ -212,15 +222,15 @@ class Trainer:
                     self.train_not_improved_count = 0
             else:
                 self.train_not_improved_count += 1
+            self.train_set_min_loss = min(self.train_set_min_loss, epoch_loss)
 
-            if self.test_data:
+            if self.testlaoder:
                 if eval_loss + self.delta < self.test_set_min_loss:
                     self.test_not_improved_count = 0
                 else:
                     self.test_not_improved_count += 1
+                self.test_set_min_loss = min(self.test_set_min_loss, eval_loss)
 
-            self.train_set_min_loss = min(self.train_set_min_loss, epoch_loss)
-            self.test_set_min_loss = min(self.test_set_min_loss, eval_loss)
             # Early stopping
             # If loss improve smaller than delta for patience times stops training 
             if (self.train_not_improved_count >= self.patience):
@@ -240,7 +250,7 @@ class Trainer:
         self.model.eval()
         losses = dict(steering=[], throttle=[], loss=[])
         with torch.no_grad():
-            for batch_no, data in enumerate(tqdm(self.test_data, file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}'), 1):
+            for batch_no, data in enumerate(tqdm(self.testlaoder, file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}'), 1):
                 if self.other_inputs:
                     images, other_inputs, steering_labels, throttle_labels = data
                     other_inputs = other_inputs.to(self.device)
@@ -285,6 +295,7 @@ class Trainer:
 if __name__ == "__main__":
     args = docopt(__doc__)
     data_dirs = args["<data_dirs>"]
+    test_dirs = args["--test_dirs"]
     model_path = args["--model"]
     model_save_name = args["--name"]
     if not model_save_name:
