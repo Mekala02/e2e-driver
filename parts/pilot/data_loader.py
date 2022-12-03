@@ -181,6 +181,7 @@ class Data_Folder():
             color_image = cv2.resize(color_image, (self.reduce_resolution["width"], self.reduce_resolution["height"]), interpolation= cv2.INTER_LINEAR)
         # Applying transforms such as data augmentation
         if self.transform:
+            # Albumentations uses rgb images so we converting bgr to rgb
             color_image = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
             for T in self.transform:
                 color_image = T(image=color_image)["image"]
