@@ -115,6 +115,7 @@ RUN pip3 install --no-cache-dir --verbose pyserial
 RUN pip3 install --no-cache-dir --verbose tqdm
 RUN pip3 install --no-cache-dir --verbose cupy-cuda11x -f https://pip.cupy.dev/aarch64
 RUN pip3 install --no-cache-dir --verbose PrettyTable
+RUN pip3 install --no-cache-dir --verbose -U albumentations
 
 
 #
