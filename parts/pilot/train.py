@@ -28,6 +28,13 @@ logger = logging.getLogger("train")
 
 def main():
     # Hyperparameters
+    # 2e-3 for startup then reduce to 1e-3
+    learning_rate = 2e-3
+    batch_size = 1024
+    num_epochs = 250
+    test_data_percentage = 20
+    # Saves image grid for first trrain and test set
+    detailed_tensorboard = False
     # If reduce_resolution == None zed's resolution will be used
     # None or {"height": x, "width": y}
     reduce_resolution = {"height": 120, "width": 160}
@@ -37,13 +44,6 @@ def main():
     use_depth = False
     # False or list like ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
     other_inputs = False
-    # 2e-3 for startup then reduce to 1e-3
-    learning_rate = 2e-3
-    batch_size = 1024
-    num_epochs = 250
-    test_data_percentage = 20
-    # Saves image grid for first trrain and test set
-    detailed_tensorboard = False
 
     args = docopt(__doc__)
     data_dirs = args["<data_dirs>"]
