@@ -32,6 +32,7 @@ def main():
     learning_rate = 2e-3
     batch_size = 1024
     num_epochs = 250
+    shuffle_dataset = True
     test_data_percentage = 20
     # Saves image grid for first trrain and test set
     detailed_tensorboard = False
@@ -45,20 +46,12 @@ def main():
     # False or list like ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
     other_inputs = False
 
-    args = docopt(__doc__)
-    data_dirs = args["<data_dirs>"]
-    model_path = args["--model"]
-    model_save_name = args["--name"]
-    if not model_save_name:
-        model_save_name = "model"
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    torch.manual_seed(22)
-
     if use_depth:
         in_channels = 4
     else:
         in_channels = 3
 
+    torch.manual_seed(22)
     # Our input size is not changing so we can use cudnn's optimization
     torch.backends.cudnn.benchmark = True
 
@@ -280,4 +273,11 @@ class Trainer:
 
 
 if __name__ == "__main__":
+    args = docopt(__doc__)
+    data_dirs = args["<data_dirs>"]
+    model_path = args["--model"]
+    model_save_name = args["--name"]
+    if not model_save_name:
+        model_save_name = "model"
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     main()
