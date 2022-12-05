@@ -3,7 +3,7 @@ import random
 import cv2
 
 class Resize:
-    def __init__(self, p=1, width, height):
+    def __init__(self, width, height, p=1):
         '''
         Resizes the image
         '''
