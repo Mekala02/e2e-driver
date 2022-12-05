@@ -48,12 +48,11 @@ def main():
     image_resolution = {"height": 120, "width": 160}
     reduce_fps = False
     other_inputs = None
-    detailed_tensorboard = False
+    detailed_tensorboard = True
 
     transforms = {
         "color_image": [
             ["custom", CustomTransforms.Resize(image_resolution["width"], image_resolution["height"])]
-
         ],
         "depth_image": [
             ["custom", CustomTransforms.Resize(image_resolution["width"], image_resolution["height"])]
@@ -77,7 +76,8 @@ def main():
                     A.GaussNoise(p=0.15, var_limit=(10.0, 50.0), per_channel=True, mean=0.0),
                 ])
             ],
-            ["custom", CustomTransforms.Crop_Without_Remove(crop_top=60, crop_bottom=0, crop_left=0, crop_right=0)]
+            ["custom", CustomTransforms.Crop_Without_Remove(p=0.5, crop_top=60)],
+            ["custom", CustomTransforms.Crop_Without_Remove(p=0.3, crop_left=60, crop_right=60)]
         ],
         "depth_image": [
             *transforms["depth_image"]
