@@ -26,8 +26,10 @@ class Crop_Without_Remove:
         self.crop_right = crop_right
 
     def __call__(self, image):
+        img = image.copy()
         height, width, channel = image.shape
-        multiplier = np.zeros(image.shape, dtype=np.float32)
-        multiplier[self.crop_top:height-self.crop_bottom, self.crop_left:width-self.crop_right, :] = 1
-        return np.multiply(image, multiplier)
+        delete = np.ones((height, width), dtype=bool)
+        delete[self.crop_top:height-self.crop_bottom, self.crop_left:width-self.crop_right] = False
+        img[np.where(delete==True)] = 0
+        return img
     
