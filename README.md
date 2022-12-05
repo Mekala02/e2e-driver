@@ -23,7 +23,7 @@ Web interface.<br/>
 
 Web Interface For Live Data:
 
-<img src="https://github.com/Mekala02/e2e-driver/blob/main/docs/web_interface.gif" title="Web_Interface" alt="Web_Interface"/>&nbsp;
+<img src="https://github.com/Mekala02/e2e-driver/blob/main/docs/16.jpg" title="Web_Interface" alt="Web_Interface"/>&nbsp;
 
 Web Interface For Editing Data:
 
