@@ -53,6 +53,7 @@ def main():
     transforms = {
         "color_image": [
             ["custom", CustomTransforms.Resize(image_resolution["width"], image_resolution["height"])]
+
         ],
         "depth_image": [
             ["custom", CustomTransforms.Resize(image_resolution["width"], image_resolution["height"])]
@@ -60,6 +61,9 @@ def main():
     }
     train_transforms = {
         "color_image": [
+            *transforms["color_image"],
+            # WTF IS THAT BUGG IT INVERTS COLOR
+            # ["custom", CustomTransforms.Crop_Without_Remove(crop_top=60, crop_bottom=0, crop_left=0, crop_right=0)],
             ["albumation", 
                 A.Compose([
                     A.RandomBrightnessContrast(p=0.5)
@@ -67,6 +71,7 @@ def main():
             ]
         ],
         "depth_image": [
+            *transforms["depth_image"]
         ]
     }
 
