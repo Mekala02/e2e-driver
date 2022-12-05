@@ -62,13 +62,22 @@ def main():
     train_transforms = {
         "color_image": [
             *transforms["color_image"],
-            # WTF IS THAT BUGG IT INVERTS COLOR
-            # ["custom", CustomTransforms.Crop_Without_Remove(crop_top=60, crop_bottom=0, crop_left=0, crop_right=0)],
             ["albumation", 
                 A.Compose([
-                    A.RandomBrightnessContrast(p=0.5)
+                    A.RandomBrightnessContrast(p=0.5, brightness_limit=(-0.15, 0.30), contrast_limit=(-0.2, 0.2), brightness_by_max=True),
+                    A.RandomGamma(p=0.1, gamma_limit=(80, 120), eps=None),
+                    A.Blur(p=0.1, blur_limit=(3, 7)),
+                    A.Sharpen(p=0.1, alpha=(0.2, 0.5), lightness=(0.5, 1.0)),
+                    A.CLAHE(p=0.03, clip_limit=(2, 5), tile_grid_size=(8, 8)),
+                    A.Equalize(p=0.05, mode='cv', by_channels=True),
+                    A.FancyPCA(p=0.05, alpha=0.1),
+                    A.RandomToneCurve(p=0.1, scale=0.1),
+                    A.CoarseDropout(p=0.05, max_holes=8, max_height=6, max_width=6, min_holes=4, min_height=6, min_width=6, fill_value=(0, 0, 0), mask_fill_value=None),
+                    A.RandomRain(p=0.01, slant_lower=-5, slant_upper=5, drop_length=10, drop_width=1, drop_color=(0, 0, 0), blur_value=4, brightness_coefficient=0.7, rain_type='drizzle'),
+                    A.GaussNoise(p=0.15, var_limit=(10.0, 50.0), per_channel=True, mean=0.0),
                 ])
-            ]
+            ],
+            ["custom", CustomTransforms.Crop_Without_Remove(crop_top=60, crop_bottom=0, crop_left=0, crop_right=0)]
         ],
         "depth_image": [
             *transforms["depth_image"]
