@@ -9,6 +9,7 @@ Options:
 from networks import Linear
 from networks import Linear_With_Others
 from data_loader import Load_Data
+import custom_transforms as CustomTransforms
 
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
@@ -31,11 +32,12 @@ def main():
     '''
     learning_rate:          2e-3 for startup then reduce to 1e-3
     validation_split:       Splits the training data [0,1]
-    reduce_resolution:      None or {"height": x, "width": y} if None zed's resolution will be used
+    image_resolution:       None or {"height": x, "width": y} if None zed's resolution will be used
     reduce_fps:             If set to value like 30 it will make training data ~30fps. It wont work great if datasets fps is close to reduce_fps
     other_inputs:           None or list like ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
     detailed_tensorboard:   Saves image grid for first train and test set batch
-    train_transforms:       Thoose transformations will be applied the train set when training
+    transforms:             Thoose transformations will be applied to all data
+    train_transforms:       Thoose transformations will be applied only to train set
     '''
     use_depth = False
     learning_rate = 2e-3
@@ -43,15 +45,30 @@ def main():
     num_epochs = 250
     shuffle_dataset = True
     validation_split = 0.2
-    reduce_resolution = {"height": 120, "width": 160}
+    image_resolution = {"height": 120, "width": 160}
     reduce_fps = False
     other_inputs = None
     detailed_tensorboard = False
-    train_transforms = [
-        A.Compose([
-            A.RandomBrightnessContrast(p=0.5)
-        ])
-    ]
+
+    transforms = {
+        "color_image": [
+            ["custom", CustomTransforms.Resize(image_resolution["width"], image_resolution["height"])]
+        ],
+        "depth_image": [
+            ["custom", CustomTransforms.Resize(image_resolution["width"], image_resolution["height"])]
+        ]
+    }
+    train_transforms = {
+        "color_image": [
+            ["albumation", 
+                A.Compose([
+                    A.RandomBrightnessContrast(p=0.5)
+                ])
+            ]
+        ],
+        "depth_image": [
+        ]
+    }
 
     in_channels = 4 if use_depth else 3
     model = Linear(in_channels=4 if use_depth else 3).to(device)
@@ -66,18 +83,18 @@ def main():
     if model_path:
         model.load_state_dict(torch.load(model_path))
 
-    train_set = Load_Data(data_dirs, transform=train_transforms, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
+    train_set = Load_Data(data_dirs, transform=train_transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
 
     test_sets = []
     if validation_split:
-        test_set = Load_Data(data_dirs, transform=None, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
+        test_set = Load_Data(data_dirs, transform=transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
         assert len(train_set) == len(test_set)
         len_dataset = len(train_set)
         test_len = math.floor(len_dataset * validation_split)
         train_set = torch.utils.data.random_split(train_set, [len_dataset-test_len, test_len])[0]
         test_sets.append(torch.utils.data.random_split(test_set, [len_dataset-test_len, test_len])[1])
     if test_dirs:
-        test_sets.append(Load_Data(test_dirs, transform=None, reduce_resolution=reduce_resolution, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs))
+        test_sets.append(Load_Data(test_dirs, transform=transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs))
 
     trainloader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
     if test_sets:
@@ -87,7 +104,7 @@ def main():
 
     trainer = Trainer(model, criterion, optimizer, device, num_epochs, trainloader, writer=writer, testlaoder=testlaoder, model_name=model_save_name, other_inputs=other_inputs, patience=5, delta=0.00005)
 
-    example_input = torch.ones((1, in_channels, reduce_resolution["height"], reduce_resolution["width"]), device=device)
+    example_input = torch.ones((1, in_channels, image_resolution["height"], image_resolution["width"]), device=device)
     if other_inputs:
         example_input = (example_input, torch.ones(1, (len(other_inputs)), device=device))
     writer.add_graph(model, input_to_model=example_input, verbose=False, use_strict_trace=True)
