@@ -42,11 +42,11 @@ def main():
     use_depth = False
     learning_rate = 2e-3
     batch_size = 1024
-    num_epochs = 250
+    num_epochs = 512
     shuffle_dataset = True
     validation_split = 0.2
     image_resolution = {"height": 120, "width": 160}
-    reduce_fps = False
+    reduce_fps = 10
     other_inputs = None
     detailed_tensorboard = True
 
@@ -63,21 +63,21 @@ def main():
             *transforms["color_image"],
             ["albumation", 
                 A.Compose([
-                    A.RandomBrightnessContrast(p=0.5, brightness_limit=(-0.15, 0.30), contrast_limit=(-0.2, 0.2), brightness_by_max=True),
-                    A.RandomGamma(p=0.1, gamma_limit=(80, 120), eps=None),
-                    A.Blur(p=0.1, blur_limit=(3, 7)),
+                    A.RandomBrightnessContrast(p=0.6, brightness_limit=(-0.30, 0.35), contrast_limit=(-0.2, 0.2), brightness_by_max=True),
+                    A.RandomGamma(p=0.15, gamma_limit=(80, 120), eps=None),
+                    A.Blur(p=0.15, blur_limit=(3, 7)),
                     A.Sharpen(p=0.1, alpha=(0.2, 0.5), lightness=(0.5, 1.0)),
                     A.CLAHE(p=0.03, clip_limit=(2, 5), tile_grid_size=(8, 8)),
                     A.Equalize(p=0.05, mode='cv', by_channels=True),
                     A.FancyPCA(p=0.05, alpha=0.1),
                     A.RandomToneCurve(p=0.1, scale=0.1),
-                    A.CoarseDropout(p=0.05, max_holes=8, max_height=6, max_width=6, min_holes=4, min_height=6, min_width=6, fill_value=(0, 0, 0), mask_fill_value=None),
-                    A.RandomRain(p=0.01, slant_lower=-5, slant_upper=5, drop_length=10, drop_width=1, drop_color=(0, 0, 0), blur_value=4, brightness_coefficient=0.7, rain_type='drizzle'),
+                    A.CoarseDropout(p=0.06, max_holes=8, max_height=6, max_width=6, min_holes=4, min_height=6, min_width=6, fill_value=(0, 0, 0), mask_fill_value=None),
+                    A.RandomRain(p=0.02, slant_lower=-5, slant_upper=5, drop_length=10, drop_width=1, drop_color=(0, 0, 0), blur_value=4, brightness_coefficient=0.7, rain_type='drizzle'),
                     A.GaussNoise(p=0.15, var_limit=(10.0, 50.0), per_channel=True, mean=0.0),
                 ])
             ],
-            ["custom", CustomTransforms.Crop_Without_Remove(p=0.5, crop_top=60)],
-            ["custom", CustomTransforms.Crop_Without_Remove(p=0.3, crop_left=60, crop_right=60)]
+            ["custom", CustomTransforms.Crop_Without_Remove(p=0.5, crop_top=45)],
+            ["custom", CustomTransforms.Crop_Without_Remove(p=0.35, crop_left=30, crop_right=30)]
         ],
         "depth_image": [
             *transforms["depth_image"]
@@ -116,7 +116,7 @@ def main():
     else:
         testlaoder = None
 
-    trainer = Trainer(model, criterion, optimizer, device, num_epochs, trainloader, writer=writer, testlaoder=testlaoder, model_name=model_save_name, other_inputs=other_inputs, patience=5, delta=0.00005)
+    trainer = Trainer(model, criterion, optimizer, device, num_epochs, trainloader, writer=writer, testlaoder=testlaoder, model_name=model_save_name, other_inputs=other_inputs, patience=5, delta=0.000005)
 
     example_input = torch.ones((1, in_channels, image_resolution["height"], image_resolution["width"]), device=device)
     if other_inputs:
