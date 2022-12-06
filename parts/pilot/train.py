@@ -1,10 +1,10 @@
 """
 Usage:
-    train.py  <data_dirs>... [--test_sets=<test_dirs>]... [--model=<pretrained_model>] [--name=<models_name>]
+    train.py  <data_dirs>... [--test_dirs=<test_dirs>]... [--model=<pretrained_model>] [--name=<models_name>]
     
 Options:
   -h --help                     Show this screen.
-  --test_sets=<test_dirs>       Specify seperate test set
+  --test_dirs=<test_dirs>       Specify seperate test set
   --model=<pretrained_model>    Pretrained model
   --name=<models_name>          Model's name
 """
@@ -325,7 +325,7 @@ class Trainer:
 if __name__ == "__main__":
     args = docopt(__doc__)
     data_dirs = args["<data_dirs>"]
-    test_dirs = args["--test_sets"]
+    test_dirs = args["--test_dirs"]
     model_path = args["--model"]
     model_save_name = args["--name"]
     if not model_save_name:
