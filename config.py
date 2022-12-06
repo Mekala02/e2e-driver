@@ -1,5 +1,5 @@
 config = dict(
-    DRIVE_LOOP_HZ = 120,
+    DRIVE_LOOP_HZ = 50,
     USE_OBJECT_DETECTION = False,
     USE_DAGGER = True,
     # If REDUCED_CAMERA_RESOLUTION == None ZED_RESOLUTION will be used
@@ -7,7 +7,7 @@ config = dict(
     REDUCED_CAMERA_RESOLUTION = {"HEIGHT": 120, "WIDTH": 160},
 
     ZED_RESOLUTION = "VGA",
-    CAMERA_FPS = 100,
+    CAMERA_FPS = 50,
     CAMERA_IMAGE_FLIP = "ON",
     # NONE, PERFORMANCE, QUALITY, ULTRA
     DEPTH_MODE = "NONE",
