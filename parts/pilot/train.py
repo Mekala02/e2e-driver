@@ -1,9 +1,12 @@
 """
 Usage:
-    train.py  <data_dirs>... [--test_dirs=None]... [--model=None] [--name=None]
+    train.py  <data_dirs>... [--test_sets=<test_dirs>]... [--model=<pretrained_model>] [--name=<models_name>]
     
 Options:
-  -h --help     Show this screen.
+  -h --help                     Show this screen.
+  --test_sets=<test_dirs>       Specify seperate test set
+  --model=<pretrained_model>    Pretrained model
+  --name=<models_name>          Model's name
 """
 
 from networks import Linear
@@ -322,7 +325,7 @@ class Trainer:
 if __name__ == "__main__":
     args = docopt(__doc__)
     data_dirs = args["<data_dirs>"]
-    test_dirs = args["--test_dirs"]
+    test_dirs = args["--test_sets"]
     model_path = args["--model"]
     model_save_name = args["--name"]
     if not model_save_name:
