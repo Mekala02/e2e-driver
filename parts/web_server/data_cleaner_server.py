@@ -1,9 +1,12 @@
 """
 Usage:
-    data_cleaner_app.py  <data_dir> [--changes]
+    data_cleaner_app.py  <data_dir> [--edit_changes] [--expended_svo]
 
 Options:
-  -h --help     Show this screen.
+  -h --help         Show this screen.
+  <data_dir>        Data directory
+  --edit_changes    Loads server with previously made changes
+  --expended_svo    Loads from expended svo folder
 """
 
 import sys
@@ -171,14 +174,14 @@ if __name__=="__main__":
     # Default values for server startup
     client_outputs = {"Data_Lenght": len(datas), "Data_Index": 0, "Data_Folder": folder_name,
     "Left_Marker": 0, "Right_Marker": 0, "Select_List": [], "Camera_Mode": "Color_Image", "Graph1_Mode": ["Steering"]}
-    if args["--changes"]:
+    if args["--edit_changes"]:
         changes_path = os.path.join(data_folder, "changes.json")
         with open(changes_path) as changes_file:
             client_outputs["Select_List"] = json.load(changes_file)
 
     Color_Image_folder_path = os.path.join(data_folder , "Color_Image")
     Depth_Image_folder_path = os.path.join(data_folder , "Depth_Image")
-    if cfg["SVO_COMPRESSION_MODE"]:
+    if cfg["SVO_COMPRESSION_MODE"] and not args["--expended_svo"]:
         Color_Image_format = "svo"
         Depth_Image_format = "svo"
     else:
