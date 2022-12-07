@@ -3,12 +3,12 @@ logger = logging.getLogger(__name__)
 
 class Image_Loader():
     def __init__(self, img_format, svo_path=None):
-
+        self.img_format = img_format
         if img_format == "jpg" or img_format == "jpeg" or img_format == "png":
             import cv2
             self.f = cv2.imread
 
-        if img_format == "npy":
+        elif img_format == "npy":
             import numpy as np
             self.f = np.load
 
@@ -56,7 +56,7 @@ class Image_Loader():
             
     
     def __call__(self, path, zed_data_id=None, type_=None):
-        if zed_data_id:
+        if self.img_format == "svo":
             return self.f(path, zed_data_id, type_)
         return self.f(path)
 
