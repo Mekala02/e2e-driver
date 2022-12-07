@@ -6,6 +6,11 @@ Options:
   -h --help     Show this screen.
 """
 
+import sys
+import os
+sys.path.append(os.path.join(os.path.expanduser('~'), "e2e-driver"))
+from common_functions import Image_Loader
+
 from flask import Flask, render_template, Response, request, jsonify
 from waitress import serve
 from docopt import docopt
@@ -15,8 +20,6 @@ import logging
 import json
 import time
 import cv2
-import sys
-import os
 
 app=Flask(__name__)
 # Servers memory
@@ -26,35 +29,25 @@ def generate_frames():
     while True:
         # Geeting img id according to our data index (cursor on the bar)
         data_id = datas[client_outputs["Data_Index"]]["Data_Id"]
-        # Getting camera mode (Color, Depth, Object_Detection)
+        # Getting camera mode (Color_Image, Depth_Image, Object_Detection)
         camera_mode = client_outputs["Camera_Mode"]
-        if cfg["SVO_COMPRESSION_MODE"] == None:
-            frame_path = os.path.join(data_folder, "big_data", camera_mode)
-            image_format = cfg[camera_mode.upper() + "_FORMAT"]
-            if image_format == "npy":
-                frame = np.load(os.path.join(frame_path, str(data_id) + "." + image_format))
-            elif image_format == "npz":
-                frame = np.load(os.path.join(frame_path, str(data_id) + "." + image_format))["arr_0"]
-            elif image_format == "jpg" or image_format == "jpeg" or image_format == "png":
-                frame = cv2.imread(os.path.join(frame_path, str(data_id) + "." + image_format))
+        if camera_mode == "Color_Image":
+            if Color_Image_format == "svo":
+                zed_data_id = datas[client_outputs["Data_Index"]]["Zed_Data_Id"]
+                frame = color_image_loader(0, zed_data_id, "Color_Image")
             else:
-                logger.warning("Unknown Image Format")
-        else:
-            # We looking current indexes(line in json file) zed data index element
-            # Becouse sometimes on is slover than other so we need to synchronize svo and json
-            zed.set_svo_position(datas[client_outputs["Data_Index"]]["Zed_Data_Id"])
-            if (err:=zed.grab()) == sl.ERROR_CODE.SUCCESS:
-                if camera_mode == "Color_Image":
-                    zed.retrieve_image(zed_Color_Image, sl.VIEW.LEFT)
-                    frame = zed_Color_Image.get_data()
-                elif camera_mode == "Depth_Image":
-                    zed.retrieve_image(zed_Depth_Image, sl.VIEW.DEPTH)
-                    frame = zed_Depth_Image.get_data()
-                ret, buffer = cv2.imencode('.jpg', frame)
-                frame=buffer.tobytes()
-                yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                color_image_path = os.path.join(Color_Image_folder_path, str(data_id) + "." + Color_Image_format)
+                frame = color_image_loader(color_image_path)
+        elif camera_mode == "Depth_Image":
+            if Color_Image_format == "svo":
+                zed_data_id = datas[client_outputs["Data_Index"]]["Zed_Data_Id"]
+                frame = depth_image_loader(0, zed_data_id, "Depth_Image")
             else:
-                print(err)
+                depth_image_path = os.path.join(Depth_Image_folder_path, str(data_id) + "." + Depth_Image_format)
+                frame = depth_image_loader(depth_image_path)
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
+        yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         # While loop is too fast we need to slow down interval is 4ms (250fps)
         time.sleep(0.004)
 
@@ -182,16 +175,25 @@ if __name__=="__main__":
         changes_path = os.path.join(data_folder, "changes.json")
         with open(changes_path) as changes_file:
             client_outputs["Select_List"] = json.load(changes_file)
+
+    Color_Image_folder_path = os.path.join(data_folder , "Color_Image")
+    Depth_Image_folder_path = os.path.join(data_folder , "Depth_Image")
     if cfg["SVO_COMPRESSION_MODE"]:
-        import pyzed.sl as sl
-        input_path = os.path.join(data_folder, "zed_record.svo")
-        init_parameters = sl.InitParameters()
-        init_parameters.set_from_svo_file(input_path)
-        zed = sl.Camera()
-        zed_Color_Image = sl.Mat()
-        zed_Depth_Image = sl.Mat()
-        if (err:=zed.open(init_parameters)) != sl.ERROR_CODE.SUCCESS:
-            logger.error(err)
+        Color_Image_format = "svo"
+        Depth_Image_format = "svo"
+    else:
+        Color_Image_format = cfg["COLOR_IMAGE_FORMAT"]
+        Depth_Image_format = cfg["DEPTH_IMAGE_FORMAT"]
+
+    if Color_Image_format == "svo":
+        color_image_loader = Image_Loader(Color_Image_format, svo_path=os.path.join(data_folder, "zed_record.svo"))
+    else:
+        color_image_loader = Image_Loader(Color_Image_format)
+    if Depth_Image_format == "svo":
+        depth_image_loader = Image_Loader(Depth_Image_format, os.path.join(data_folder, "zed_record.svo"))
+    else:
+        depth_image_loader = Image_Loader(Depth_Image_format)
+
     threading.Thread(target=server_thread, daemon=True, name="Server_Thread").start()
 
     try:
