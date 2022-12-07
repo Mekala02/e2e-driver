@@ -4,6 +4,10 @@ logger = logging.getLogger(__name__)
 class Image_Loader():
     def __init__(self, img_format, svo_path=None):
 
+        if img_format == "jpg" or img_format == "jpeg" or img_format == "png":
+            import cv2
+            self.f = cv2.imread
+
         if img_format == "npy":
             import numpy as np
             self.f = np.load
@@ -14,7 +18,7 @@ class Image_Loader():
                 return np.load(path)["arr_0"]
             self.f = load_npz
 
-        elif svo_path:
+        elif img_format == "svo":
             import pyzed.sl as sl
             import cv2
             import os
@@ -46,10 +50,6 @@ class Image_Loader():
                         depth_array = zed_Depth_Map.get_data()
                         return depth_array
             self.f = load_SVO_data
-
-        elif img_format == "jpg" or img_format == "jpeg" or img_format == "png":
-            import cv2
-            self.f = cv2.imread
 
         else:
             logger.warning("Unsupported Format")
