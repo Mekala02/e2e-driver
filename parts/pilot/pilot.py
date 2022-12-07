@@ -18,7 +18,6 @@ class Pilot:
         self.model_path = None
         self.steering = 1500
         self.throttle = 1500
-        self.reduced_camera_resolution = cfg["REDUCED_CAMERA_RESOLUTION"]
         self.steering_min_pwm = cfg["STEERING_MIN_PWM"]
         self.steering_max_pwm = cfg["STEERING_MAX_PWM"]
         self.throttle_max_pwm = cfg["THROTTLE_MAX_PWM"]
@@ -56,16 +55,17 @@ class Pilot:
         # First pass is slow so we are warming up
         logger.info("Warming Up The Model...")
         with torch.no_grad():
-            model(torch.ones((1, 3, self.reduced_camera_resolution["HEIGHT"], self.reduced_camera_resolution["WIDTH"]), device=device))
+            model((torch.from_numpy(self.shared_dict["cpu_image"].transpose(2, 0, 1))/255).to(device, non_blocking=True).unsqueeze(0))
         logger.info("Warmup Done")
         while self.shared_dict["run"]:
             start_time = time.time()
             if self.shared_dict["pilot_mode"] == "Angle" or self.shared_dict["pilot_mode"] == "Full_Auto":
                 # (H x W x C) to (C x H x W) then [0, 1]
                 color_image = torch.from_numpy(self.shared_dict["cpu_image"].transpose(2, 0, 1)) / 255
-                gpu_image = color_image.to(device, non_blocking=True).view(1, 3, self.reduced_camera_resolution["HEIGHT"], self.reduced_camera_resolution["WIDTH"])
+                gpu_image = color_image.to(device, non_blocking=True)
                 with torch.no_grad():
-                    steering, throttle = model(gpu_image)
+                    # Unsqueeze adds dimension to image (batch dimension)
+                    steering, throttle = model(gpu_image.unsqueeze(0))
                 # We made data between -1, 1 when trainig so unpacking thoose to pwm value
                 self.shared_dict["steering"] = int(steering * 500 + 1500)
                 self.shared_dict["throttle"] = int(throttle * 500 + 1500)
