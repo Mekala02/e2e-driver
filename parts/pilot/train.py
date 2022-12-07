@@ -52,6 +52,7 @@ def main():
     reduce_fps = 10
     other_inputs = None
     detailed_tensorboard = True
+    expend_svo = True
 
     transforms = {
         "color_image": [
@@ -100,18 +101,18 @@ def main():
     if model_path:
         model.load_state_dict(torch.load(model_path))
 
-    train_set = Load_Data(data_dirs, transform=train_transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
+    train_set = Load_Data(data_dirs, transform=train_transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs, expend_svo=expend_svo)
 
     test_sets = []
     if validation_split:
-        test_set = Load_Data(data_dirs, transform=transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
+        test_set = Load_Data(data_dirs, transform=transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs, expend_svo=expend_svo)
         assert len(train_set) == len(test_set)
         len_dataset = len(train_set)
         test_len = math.floor(len_dataset * validation_split)
         train_set = torch.utils.data.random_split(train_set, [len_dataset-test_len, test_len])[0]
         test_sets.append(torch.utils.data.random_split(test_set, [len_dataset-test_len, test_len])[1])
     if test_dirs:
-        test_sets.append(Load_Data(test_dirs, transform=transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs))
+        test_sets.append(Load_Data(test_dirs, transform=transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs, expend_svo=expend_svo))
 
     trainloader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
     if test_sets:

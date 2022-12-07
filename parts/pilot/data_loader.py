@@ -6,26 +6,31 @@ Options:
   -h --help     Show this screen.
 """
 
+import sys
+import os
+sys.path.append(os.path.join(os.path.expanduser('~'), "e2e-driver"))
+from common_functions import Image_Loader
+
 from torch.utils.data import Dataset
 import numpy as np
 import logging
 import torch
 import json
 import cv2
-import os
 
 logger = logging.getLogger(__name__)
 
 class Load_Data(Dataset):
-    def __init__(self, data_folder_paths, transform=None, reduce_fps=False, use_depth=False, other_inputs=False):
+    def __init__(self, data_folder_paths, transform=None, reduce_fps=False, use_depth=False, other_inputs=False, expend_svo=False):
         self.data_folder_paths = data_folder_paths
         self.transform = transform
         self.reduce_fps = reduce_fps
         self.use_depth = use_depth
         self.other_inputs = other_inputs
+        self.expend_svo = expend_svo
         self.data_folders = []
         for folder_path in self.data_folder_paths:
-            self.data_folders.append(Data_Folder(folder_path, transform=self.transform, reduce_fps=self.reduce_fps, use_depth=self.use_depth, other_inputs=self.other_inputs, expend_svo=True))
+            self.data_folders.append(Data_Folder(folder_path, transform=self.transform, reduce_fps=self.reduce_fps, use_depth=self.use_depth, other_inputs=self.other_inputs, expend_svo=self.expend_svo))
         self.len_data_fodlers = len(self.data_folders)
         self.lenght = 0
         for datas in self.data_folders:
@@ -110,6 +115,7 @@ class Data_Folder():
 
         self.data_lenght = len(self.datas)
 
+        svo_path = None
         if self.cfg["SVO_COMPRESSION_MODE"]:
             # If we recorded the data to SVO file but want fast training
             # we converting SVO data to jpg and saving them then using jpg's for training
@@ -128,47 +134,15 @@ class Data_Folder():
                 self.cfg["COLOR_IMAGE_FORMAT"] = "jpg"
                 self.cfg["DEPTH_IMAGE_FORMAT"] = "jpg"
             else:
-                import pyzed.sl as sl
-                input_path = os.path.join(self.data_folder_path, "zed_record.svo")
-                init_parameters = sl.InitParameters()
-                init_parameters.set_from_svo_file(input_path)
-                init_parameters.svo_real_time_mode = False
-                self.zed = sl.Camera()
-                self.zed_Color_Image = sl.Mat()
-                self.zed_Depth_Map = sl.Mat()
-                if (err:=self.zed.open(init_parameters)) != sl.ERROR_CODE.SUCCESS:
-                    logger.error(err)
+                svo_path = os.path.join(self.data_folder_path, "zed_record.svo")
+                self.cfg["COLOR_IMAGE_FORMAT"] = "svo"
+                self.cfg["DEPTH_IMAGE_FORMAT"] = "svo"  
 
         self.Color_Image_format = self.cfg["COLOR_IMAGE_FORMAT"]
         self.Depth_Image_format = self.cfg["DEPTH_IMAGE_FORMAT"]
 
-    def load_Image(self, path, img_format, index):
-        if img_format == "npy":
-            return np.load(os.path.join(path, str(self.datas[index]["Data_Id"]) + "." + img_format))
-        elif img_format == "npz":
-            return np.load(os.path.join(path, str(self.datas[index]["Data_Id"]) + "." + img_format))["arr_0"]
-        elif self.cfg["SVO_COMPRESSION_MODE"] and not self.expend_svo:
-            return load_SVO_data(self, path, index)
-        elif img_format == "jpg" or img_format == "jpeg" or img_format == "png" or self.expend_svo:
-            return cv2.imread(os.path.join(path, str(self.datas[index]["Data_Id"]) + "." + img_format))
-        else:
-            logger.warning("Unknown Image Format For Loading")
-
-    def load_SVO_data(self, path, index):
-        base_name = os.path.basename(path)
-        self.zed.set_svo_position(self.datas[index]["Zed_Data_Id"])
-        if (err:=self.zed.grab()) != sl.ERROR_CODE.SUCCESS:
-            logger.warning(err)
-        else:
-            if base_name == "Color_Image":
-                self.zed.retrieve_image(self.zed_Color_Image, sl.VIEW.LEFT)
-                bgra_image = self.zed_BGR_Image.get_data()
-                color_image = cv2.cvtColor(bgra_image, cv2.COLOR_BGRA2BGR)
-                return color_image
-            elif base_name == "Depth_Image":
-                self.zed.retrieve_measure(self.zed_Depth_Map, sl.MEASURE.DEPTH)
-                depth_array = self.zed_Depth_Map.get_data()
-                return depth_array
+        self.color_image_loader = Image_Loader(self.Color_Image_format, svo_path=svo_path)
+        self.depth_image_loader = Image_Loader(self.Depth_Image_format, svo_path=svo_path)
 
     @staticmethod
     def apply_transforms(image, transforms):
@@ -184,14 +158,24 @@ class Data_Folder():
         return(self.data_lenght)
 
     def __getitem__(self, index):
-        color_image = self.load_Image(self.Color_Image_path, self.Color_Image_format, index)
+        if self.Color_Image_format == "svo":
+            zed_data_id = self.datas[index]["Zed_Data_Id"]
+            color_image = self.color_image_loader(0, zed_data_id, "Color_Image")
+        else:
+            color_image_path = os.path.join(self.Color_Image_path, str(self.datas[index]["Data_Id"]) + "." + self.Color_Image_format)
+            color_image = self.color_image_loader(color_image_path)
         # Applying transforms such as resizing, data augmentation
-        if self.transform["color_image"]:
+        if self.transform and self.transform["color_image"]:
             color_image = self.apply_transforms(color_image, self.transform["color_image"])
         images = color_image
         if self.use_depth:
-            depth_image = self.load_Image(self.Depth_Image_path, self.Depth_Image_format, index)
-            if self.transform["depth_image"]:
+            if self.Depth_Image_format == "svo":
+                zed_data_id = self.datas[index]["Zed_Data_Id"]
+                depth_image = self.depth_image_loader(0, zed_data_id, "Depth_Image")
+            else:
+                depth_image_path = os.path.join(self.Depth_Image_path, str(self.datas[index]["Data_Id"]) + "." + self.Depth_Image_format)
+                depth_image = self.depth_image_loader(depth_image_path)
+            if self.transform and self.transform["depth_image"]:
                 depth_image = self.apply_transforms(depth_image, self.transform["depth_image"])
             depth_array = cv2.cvtColor(depth_image, cv2.COLOR_BGR2GRAY)
             depth_array = depth_array.reshape(color_image.shape[0], color_image.shape[1], 1)
@@ -220,8 +204,11 @@ if __name__ == "__main__":
     from docopt import docopt
     args = docopt(__doc__)
     data_folders = args["<data_dir>"]
-    test = Load_Data(data_folders, transform=None, other_inputs=True, use_depth=True)
-    images, other_inputs, steering_label, throttle_label = test[600]
+    other_inputs = ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
+    test = Load_Data(data_folders, transform=None, other_inputs=other_inputs, use_depth=False, expend_svo=False)
+    # images, steering_label, throttle_label = test[10]
+
+    images, other_inputs, steering_label, throttle_label = test[10]
     print(images.shape)
     print(other_inputs.shape)
     print(steering_label.shape)
