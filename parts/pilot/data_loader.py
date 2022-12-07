@@ -71,8 +71,8 @@ class Data_Folder():
         self.config_file_path = os.path.join(self.data_folder_path , "cfg.json")
         self.changes_file_path = os.path.join(self.data_folder_path , "changes.json")
         self.memory_file_path = os.path.join(self.data_folder_path , "memory.json")
-        self.Color_Image_path = os.path.join(self.data_folder_path , "Color_Image")
-        self.Depth_Image_path = os.path.join(self.data_folder_path , "Depth_Image")
+        self.Color_Image_folder_path = os.path.join(self.data_folder_path , "Color_Image")
+        self.Depth_Image_folder_path = os.path.join(self.data_folder_path , "Depth_Image")
 
         # Opening and reading from files
         with open(self.config_file_path) as cfg_file:
@@ -116,7 +116,7 @@ class Data_Folder():
         if self.cfg["SVO_COMPRESSION_MODE"]:
             # We converting SVO data to jpg and saving them then using jpg's for training fast
             # If we not expanded svo, we expanding it.
-            if not os.path.isdir(self.Color_Image_path) or (self.use_depth and not os.path.isdir(self.Depth_image_path)):
+            if not os.path.isdir(self.Color_Image_folder_path) or (self.use_depth and not os.path.isdir(self.Depth_Image_folder_path)):
                 logger.warning("First you have to expand the svo file")
                 quit()
                 # ToDo: Multiproccesing quits when runned in there, fix it
@@ -149,14 +149,14 @@ class Data_Folder():
         return(self.data_lenght)
 
     def __getitem__(self, index):
-        color_image_path = os.path.join(self.Color_Image_path, str(self.datas[index]["Data_Id"]) + "." + self.Color_Image_format)
+        color_image_path = os.path.join(self.Color_Image_folder_path, str(self.datas[index]["Data_Id"]) + "." + self.Color_Image_format)
         color_image = self.color_image_loader(color_image_path)
         # Applying transforms such as resizing, data augmentation
         if self.transform and self.transform["color_image"]:
             color_image = self.apply_transforms(color_image, self.transform["color_image"])
         images = color_image
         if self.use_depth:
-            depth_image_path = os.path.join(self.Depth_Image_path, str(self.datas[index]["Data_Id"]) + "." + self.Depth_Image_format)
+            depth_image_path = os.path.join(self.Depth_Image_folder_path, str(self.datas[index]["Data_Id"]) + "." + self.Depth_Image_format)
             depth_image = self.depth_image_loader(depth_image_path)
             if self.transform and self.transform["depth_image"]:
                 depth_image = self.apply_transforms(depth_image, self.transform["depth_image"])
