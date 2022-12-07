@@ -15,7 +15,7 @@ import cv2
 import os
 
 
-def write(data_folder, datas, start, stop, color=False, depth=False):
+def write(data_folder, datas, cfg, start, stop, color=False, depth=False):
     index = start
     svo_path = os.path.join(data_folder, "zed_record.svo")
     color_data_path = os.path.join(data_folder, "Color_Image")
@@ -30,6 +30,7 @@ def write(data_folder, datas, start, stop, color=False, depth=False):
     if (err:=zed.open(init_parameters)) != sl.ERROR_CODE.SUCCESS:
         print(err)
         return
+    reduced_camera_resolution = cfg["REDUCED_CAMERA_RESOLUTION"]
 
     print("Procces Started")
     while(index < stop):
@@ -41,13 +42,15 @@ def write(data_folder, datas, start, stop, color=False, depth=False):
                 if(color):
                     zed.retrieve_image(zed_Color_Image, sl.VIEW.LEFT)
                     color_image = cv2.cvtColor(zed_Color_Image.get_data(), cv2.COLOR_RGBA2RGB)
-                    color_image = cv2.resize(color_image, (160, 120), interpolation= cv2.INTER_LINEAR)
+                    if reduced_camera_resolution:
+                        color_image = cv2.resize(color_image, (reduced_camera_resolution["WIDTH"], reduced_camera_resolution["HEIGHT"]), interpolation= cv2.INTER_LINEAR)
                     # Giving data name according to memory.json Zed_Data_Id (not the zed_camera )
                     cv2.imwrite(color_image_file, color_image)
                 if(depth):
                     zed.retrieve_image(zed_Depth_Image, sl.VIEW.DEPTH)
                     depth_image = cv2.cvtColor(zed_Depth_Image.get_data(), cv2.COLOR_RGBA2RGB)
-                    depth_image = cv2.resize(depth_image, (160, 120), interpolation= cv2.INTER_LINEAR)
+                    if reduced_camera_resolution:
+                        depth_image = cv2.resize(depth_image, (reduced_camera_resolution["WIDTH"], reduced_camera_resolution["HEIGHT"]), interpolation= cv2.INTER_LINEAR)
                     cv2.imwrite(depth_image_file, depth_image)
             else:
                 print(err)
@@ -56,17 +59,13 @@ def write(data_folder, datas, start, stop, color=False, depth=False):
     print("This Process Is Compleated")
 
 
-def expand(data_folder, datas, color=False, depth=False, num_workers=6):
+def expand(data_folder, datas, cfg, color=False, depth=False, num_workers=6):
     color_data_path = os.path.join(data_folder, "Color_Image")
     depth_data_path = os.path.join(data_folder, "Depth_Image")
     if not os.path.isdir(color_data_path):
         os.mkdir(color_data_path)
     if depth and not os.path.isdir(depth_data_path):
         os.mkdir(depth_data_path)
-
-    # config_file_path = os.path.join(data_folder, "cfg.json")
-    # with open(config_file_path) as cfg_file:
-    #     cfg = json.load(cfg_file)
 
     quotient, remainder = divmod(len(datas), num_workers)
     processes = []
@@ -76,7 +75,7 @@ def expand(data_folder, datas, color=False, depth=False, num_workers=6):
         # If we have remainder last one process do extra work
         if i == num_workers:
             stop += remainder
-        p = mp.Process(target=write, args=(data_folder, datas, start, stop, color, depth), daemon=True, name=i)
+        p = mp.Process(target=write, args=(data_folder, datas, cfg, start, stop, color, depth), daemon=True, name=i)
         processes.append(p)
         start +=  quotient
         stop = start + quotient
@@ -93,5 +92,8 @@ if __name__ == "__main__":
     depth = args["-d"]
     with open(os.path.join(data_folder, "memory.json")) as data_file:
         datas = json.load(data_file)
-    expand(data_folder, datas, color=color, depth=depth, num_workers=7)
+    config_file_path = os.path.join(data_folder, "cfg.json")
+    with open(config_file_path) as cfg_file:
+        cfg = json.load(cfg_file)
+    expand(data_folder, datas, cfg, color=color, depth=depth, num_workers=7)
     
