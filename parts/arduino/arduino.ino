@@ -74,10 +74,9 @@ void loop() {
     if (pyserial_throttle == 0)
         throttle = ch[3];
     else if (1000 < pyserial_throttle && pyserial_throttle < 2000)
-        throttle = 1500; // tmp for safety
-        // throttle = pyserial_throttle; // not tested
-    // else
-    //     throttle = 1500 // not tested
+        throttle = pyserial_throttle;
+    else
+        throttle = 1500;
 
     mod1 = mode(ch[5]);
     mod2 = mode(ch[6]);
