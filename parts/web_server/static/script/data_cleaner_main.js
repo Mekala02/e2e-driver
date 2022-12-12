@@ -55,15 +55,15 @@ function update_indicators(){
     .then(function(){data_clear_track.Update_Graph_Display()})
   }
 
-document.getElementById("Stop").addEventListener("dblclick", function() {data_clear_track.Update_Select_List({Stop: false})})
-document.getElementById("Stop").addEventListener("click", function() {data_clear_track.Update_Select_List({Stop: true})})
+document.getElementById("Stop").addEventListener("dblclick", function() {data_clear_track.Update_Select_List({Stop: 0})})
+document.getElementById("Stop").addEventListener("click", function() {data_clear_track.Update_Select_List({Stop: 1})})
 
-document.getElementById("Taxi").addEventListener("dblclick", function() {data_clear_track.Update_Select_List({Taxi: false})})
-document.getElementById("Taxi").addEventListener("click", function() {data_clear_track.Update_Select_List({Taxi: true})})
+document.getElementById("Taxi").addEventListener("dblclick", function() {data_clear_track.Update_Select_List({Taxi: 0})})
+document.getElementById("Taxi").addEventListener("click", function() {data_clear_track.Update_Select_List({Taxi: 1})})
 
 
 // If double click to arrow container direction will be none
-document.getElementById("Arrow_Container").addEventListener("dblclick", function() {data_clear_track.Update_Select_List({Direction: "None"})})
+document.getElementById("Arrow_Container").addEventListener("dblclick", function() {data_clear_track.Update_Select_List({Direction: null})})
 
 document.getElementById("Left_Arrow").addEventListener("click", function() {data_clear_track.Update_Select_List({Direction: "Left"})})
 document.getElementById("Forward_Arrow").addEventListener("click", function() {data_clear_track.Update_Select_List({Direction: "Forward"})})
