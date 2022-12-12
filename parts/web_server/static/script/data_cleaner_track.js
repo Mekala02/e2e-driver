@@ -180,30 +180,30 @@ class Data_Clear_Track extends Main_Track {
         // Changes is a dict
         if (synchronize == 0){
             // Slect List contins dicts, thoose dicts contain: Div, Indexes[Right, Left], Changes {}
-            for (const dict of this.outputs["Select_List"]){
+            for (const current_changes of this.outputs["Select_List"]){
                 // Searching for dict that indexes matches with selected indexes
-                if (dict["Indexes"][0] == this.outputs["Left_Marker"] && dict["Indexes"][1] == this.outputs["Right_Marker"]){
+                if (current_changes["Indexes"][0] == this.outputs["Left_Marker"] && current_changes["Indexes"][1] == this.outputs["Right_Marker"]){
                     // If we found that div (if it's exist)
                     for (const key in changes){
-                        // Looking to changes list if that element doesnt exist we adding it to the list
-                        if (key in dict["Changes"]){
+                        // Looking to changes dict if that element doesnt exist we adding it to the dict
+                        if (key in current_changes["Changes"]){
                             // If that value already exist we removing it from list
-                            if (changes[key] == dict["Changes"][key])
-                                delete dict["Changes"][key]
+                            if (changes[key] == current_changes["Changes"][key])
+                                delete current_changes["Changes"][key]
                             else
-                                dict["Changes"][key] = changes[key]
+                            current_changes["Changes"][key] = changes[key]
                             }
                         else
-                            dict["Changes"][key] = changes[key]
+                            current_changes["Changes"][key] = changes[key]
                     }
-                    // If that section going to b deleted we marking it with red
+                    // If that section going to be deleted we marking it with red
                     // Trying becouse if we refresh the page we losing the div so we cant change it color
-                    if ("Delete" in dict["Changes"])
-                        try{dict["Div"].style.backgroundColor = "#ff4e4e"} catch{}
+                    if ("Delete" in current_changes["Changes"])
+                        try{current_changes["Div"].style.backgroundColor = "#ff4e4e"} catch{}
                     else
-                        try{dict["Div"].style.backgroundColor = "yellow"} catch{}
+                        try{current_changes["Div"].style.backgroundColor = "yellow"} catch{}
                     // Updating changes list for seing the changes we made
-                    this.update_display_changes(dict["Changes"])
+                    this.update_display_changes(current_changes["Changes"])
                     this.send_data({Select_List: this.outputs["Select_List"]})
                     return
                 }
