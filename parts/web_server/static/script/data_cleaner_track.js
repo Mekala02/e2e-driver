@@ -208,25 +208,27 @@ class Data_Clear_Track extends Main_Track {
                     return
                 }
             }
-            // If there is no selected mark here we make one
-            var tmp_dict = {}
-            tmp_dict["Indexes"] = [this.outputs["Left_Marker"], this.outputs["Right_Marker"]]
-            tmp_dict["Changes"] = {}
-            // We are that div for later use
-            tmp_dict["Div"] = this.selected_between_div
-            for (const key in changes)
-                // If there is duplicates we are not saving same thing twice
-                if (key in tmp_dict["Changes"] == false)
-                    tmp_dict["Changes"][key] = changes[key]
-            if ("Delete" in changes)
-                this.selected_between_div.style.backgroundColor = "#ff4e4e"
-            else
-                this.selected_between_div.style.backgroundColor = "yellow"
-            // Tis div is n longer for selected between so we removing it from selected between div
-            this.selected_between_div = 0
-            this.outputs["Select_List"].push(tmp_dict)
-            this.update_display_changes(tmp_dict["Changes"])
-            this.send_data({Select_List: this.outputs["Select_List"]})
+            // If there is no selected mark here we make one (left marker has to be <= right marker)
+            if (this.outputs["Left_Marker"] <= this.outputs["Right_Marker"]){
+                var tmp_dict = {}
+                tmp_dict["Indexes"] = [this.outputs["Left_Marker"], this.outputs["Right_Marker"]]
+                tmp_dict["Changes"] = {}
+                // We are that div for later use
+                tmp_dict["Div"] = this.selected_between_div
+                for (const key in changes)
+                    // If there is duplicates we are not saving same thing twice
+                    if (key in tmp_dict["Changes"] == false)
+                        tmp_dict["Changes"][key] = changes[key]
+                if ("Delete" in changes)
+                    this.selected_between_div.style.backgroundColor = "#ff4e4e"
+                else
+                    this.selected_between_div.style.backgroundColor = "yellow"
+                // Tis div is n longer for selected between so we removing it from selected between div
+                this.selected_between_div = 0
+                this.outputs["Select_List"].push(tmp_dict)
+                this.update_display_changes(tmp_dict["Changes"])
+                this.send_data({Select_List: this.outputs["Select_List"]})
+            }
         }
         else{
             // If we are syncronizing after refresh looping over select list
