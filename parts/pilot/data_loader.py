@@ -91,12 +91,12 @@ class Data_Folder():
                 if "Delete" in change_dict["Changes"]:
                     self.deleted_data_indexes.append(change_dict["Indexes"])
                 else:
-                    self.other_changes_indexes.append(change_dict["Indexes"])
-                    # ToDo made the changes
+                    for key, value in change_dict["Changes"].items():
+                        for i in range(change_dict["Indexes"][0], change_dict["Indexes"][1]):
+                            self.datas[i][key] = value
             self.deleted_data_indexes = np.array(self.deleted_data_indexes)
-            self.other_changes_indexes = np.array(self.other_changes_indexes)
             for deleted_indexes in self.deleted_data_indexes:
-                self.datas= np.delete(self.datas, [range(deleted_indexes[0], deleted_indexes[1]+1)])
+                self.datas= np.delete(self.datas, [range(deleted_indexes[0], deleted_indexes[1])])
 
         if self.reduce_fps:
             # Sampling data according to fps (deleting unnecesary datapoints)
