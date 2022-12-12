@@ -1,3 +1,4 @@
+from common_functions import pwm2folat, float2pwm
 from config import config as cfg
 
 import threading
@@ -36,8 +37,9 @@ class Arduino:
         if buffer and buffer[0] == "s":
             # re.search(r"t\d+.\d+s\d+.\d+v\d+.\d+e", data) // todo
             data_array = re.split(r's|t|m|m|v|e', buffer)
-            self.Steering = int(data_array[1])
-            self.Throttle = int(data_array[2])
+            # Steering value increases when turning to left so we reversing it with -.
+            self.Steering = -pwm2folat(int(data_array[1]))
+            self.Throttle = pwm2folat(int(data_array[2]))
             # if 0 --> radio turned off, elif 1 --> mode 1, elif 2 --> mode 2
             self.Mode1 = int(data_array[3])
             self.Mode2 = int(data_array[4])
@@ -73,12 +75,12 @@ class Arduino:
             steering = 0
             throttle = 0
         elif pilot_mode_string == "Angle":
-            steering = self.memory.memory["Steering"]
+            steering = float2pwm(self.memory.memory["Steering"])
             throttle = 0
         elif pilot_mode_string == "Full_Auto":
-            steering = self.memory.memory["Steering"]
-            throttle = self.memory.memory["Motor_Power"] * self.memory.memory["Throttle"]
-            throttle = self.memory.memory["Speed_Factor"] * (throttle - 1500) + 1500
+            steering = float2pwm(self.memory.memory["Steering"])
+            throttle = self.memory.memory["Speed_Factor"] * self.memory.memory["Motor_Power"] * self.memory.memory["Throttle"]
+            throttle = float2pwm(throttle)
             
         # s is for stating start of steering value t is for throttle and e is for end, \r for read ending
         formatted_data = "s" + str(steering) + "t" + str(throttle) + 'e' + '\r'

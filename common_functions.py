@@ -60,3 +60,9 @@ class Image_Loader():
             return self.f(path, zed_data_id, type_)
         return self.f(path)
 
+def pwm2folat(value):
+    return (value - 1500) / 500
+
+def float2pwm(value):
+    return value * 500 + 1500
+
