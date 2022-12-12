@@ -55,18 +55,22 @@ function update_indicators(){
     .then(function(){data_clear_track.Update_Graph_Display()})
   }
 
-document.getElementById("Stop").addEventListener("click", function() {data_clear_track.Update_Select_List(["Stop"])})
-document.getElementById("Taxi").addEventListener("click", function() {data_clear_track.Update_Select_List(["Taxi"])})
+document.getElementById("Stop").addEventListener("dblclick", function() {data_clear_track.Update_Select_List({Stop: false})})
+document.getElementById("Stop").addEventListener("click", function() {data_clear_track.Update_Select_List({Stop: true})})
+
+document.getElementById("Taxi").addEventListener("dblclick", function() {data_clear_track.Update_Select_List({Taxi: false})})
+document.getElementById("Taxi").addEventListener("click", function() {data_clear_track.Update_Select_List({Taxi: true})})
+
 
 // If double click to arrow container direction will be none
-document.getElementById("Arrow_Container").addEventListener("dblclick", function() {data_clear_track.Update_Select_List(["None_Direction"])})
+document.getElementById("Arrow_Container").addEventListener("dblclick", function() {data_clear_track.Update_Select_List({Direction: "None"})})
 
-document.getElementById("Left_Arrow").addEventListener("click", function() {data_clear_track.Update_Select_List(["Left_Direction"])})
-document.getElementById("Forward_Arrow").addEventListener("click", function() {data_clear_track.Update_Select_List(["Forward_Direction"])})
-document.getElementById("Right_Arrow").addEventListener("click", function() {data_clear_track.Update_Select_List(["Right_Direction"])})
+document.getElementById("Left_Arrow").addEventListener("click", function() {data_clear_track.Update_Select_List({Direction: "Left"})})
+document.getElementById("Forward_Arrow").addEventListener("click", function() {data_clear_track.Update_Select_List({Direction: "Forward"})})
+document.getElementById("Right_Arrow").addEventListener("click", function() {data_clear_track.Update_Select_List({Direction: "Right"})})
 
-document.getElementById("Left_Lane").addEventListener("click", function() {data_clear_track.Update_Select_List(["Left_Lane"])})
-document.getElementById("Right_Lane").addEventListener("click", function() {data_clear_track.Update_Select_List(["Right_Lane"])})
+document.getElementById("Left_Lane").addEventListener("click", function() {data_clear_track.Update_Select_List({Lane: "Left"})})
+document.getElementById("Right_Lane").addEventListener("click", function() {data_clear_track.Update_Select_List({Lane: "Right"})})
 document.getElementById("Emergency_Button").addEventListener("click", function() {data_clear_track.Emergency_Stop()})
 
 document.getElementById('C_Color_Image').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("Color_Image")})
@@ -122,7 +126,7 @@ document.getElementById('Mark_Right_Button').addEventListener("click", function(
   data_clear_track.update_display_changes(undefined, 1)})
 document.getElementById('Unselect_Button').addEventListener("click", function() {data_clear_track.unselect()
   data_clear_track.update_display_changes(undefined, 1)})
-document.getElementById('Delete_Button').addEventListener("click", function() {data_clear_track.Update_Select_List(["Delete"])})
+document.getElementById('Delete_Button').addEventListener("click", function() {data_clear_track.Update_Select_List({Delete: true})})
 document.getElementById('Save_Button').addEventListener("click", function() {data_clear_track.save_changes()})
 document.getElementById('Apply_Button').addEventListener("click", function() {data_clear_track.apply_changes()})
 

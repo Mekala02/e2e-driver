@@ -165,8 +165,9 @@ class Data_Clear_Track extends Main_Track {
             var inner = ""
             // We are making string for adding to inner html
             // Br is a new line on html
-            for (const change of changes){
-                inner = inner.concat(change)
+            for (const key in changes){
+                inner = inner.concat(String(key) + ": ")
+                inner = inner.concat(changes[key])
                 inner = inner.concat("<br>")
             }
             document.getElementById("Display_Changes").innerHTML = inner
@@ -176,25 +177,28 @@ class Data_Clear_Track extends Main_Track {
     }
 
     Update_Select_List(changes, synchronize=0){
-        // Changes is a list
+        // Changes is a dict
         if (synchronize == 0){
-            // Slect List contins dicts, thoose dicts contain: Div, Indexes[Right, Left], Changes []
+            // Slect List contins dicts, thoose dicts contain: Div, Indexes[Right, Left], Changes {}
             for (const dict of this.outputs["Select_List"]){
                 // Searching for dict that indexes matches with selected indexes
                 if (dict["Indexes"][0] == this.outputs["Left_Marker"] && dict["Indexes"][1] == this.outputs["Right_Marker"]){
                     // If we found that div (if it's exist)
-                    for (const element of changes){
+                    for (const key in changes){
                         // Looking to changes list if that element doesnt exist we adding it to the list
-                        if (dict["Changes"].includes(element) == 0)
-                            dict["Changes"].push(element)
-                        // If that element already exist we removing it from list
-                        // Splice command takes index and how many element you want to remove
+                        if (key in dict["Changes"]){
+                            // If that value already exist we removing it from list
+                            if (changes[key] == dict["Changes"][key])
+                                delete dict["Changes"][key]
+                            else
+                                dict["Changes"][key] = changes[key]
+                            }
                         else
-                            dict["Changes"].splice(dict["Changes"].indexOf(element), 1)
+                            dict["Changes"][key] = changes[key]
                     }
                     // If that section going to b deleted we marking it with red
                     // Trying becouse if we refresh the page we losing the div so we cant change it color
-                    if (dict["Changes"].includes("Delete"))
+                    if ("Delete" in dict["Changes"])
                         try{dict["Div"].style.backgroundColor = "#ff4e4e"} catch{}
                     else
                         try{dict["Div"].style.backgroundColor = "yellow"} catch{}
@@ -207,14 +211,14 @@ class Data_Clear_Track extends Main_Track {
             // If there is no selected mark here we make one
             var tmp_dict = {}
             tmp_dict["Indexes"] = [this.outputs["Left_Marker"], this.outputs["Right_Marker"]]
-            tmp_dict["Changes"] = []
+            tmp_dict["Changes"] = {}
             // We are that div for later use
             tmp_dict["Div"] = this.selected_between_div
-            for (const element of changes)
+            for (const key in changes)
                 // If there is duplicates we are not saving same thing twice
-                if (tmp_dict["Changes"].includes(element) == 0)
-                    tmp_dict["Changes"].push(element)
-            if (changes.includes("Delete"))
+                if (key in tmp_dict["Changes"] == false)
+                    tmp_dict["Changes"][key] = changes[key]
+            if ("Delete" in changes)
                 this.selected_between_div.style.backgroundColor = "#ff4e4e"
             else
                 this.selected_between_div.style.backgroundColor = "yellow"
