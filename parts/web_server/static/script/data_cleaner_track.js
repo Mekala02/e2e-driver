@@ -234,7 +234,7 @@ class Data_Clear_Track extends Main_Track {
                 // Converting indexes to % of parent div
                 var start = dict["Indexes"][0] / this.outputs["Data_Lenght"] * 100
                 var finish = dict["Indexes"][1] / this.outputs["Data_Lenght"] * 100
-                if (dict["Changes"].includes("Delete"))
+                if ("Delete" in dict["Changes"])
                     var color = "#ff4e4e"
                 else
                     var color = "yellow"
