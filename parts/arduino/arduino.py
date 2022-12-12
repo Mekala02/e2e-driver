@@ -69,7 +69,6 @@ class Arduino:
         # strings encode motor power and drive mode parameters to throttle and steering values
         # If char is between 1000, 2000 arduino will use that value to drive motors
         # If char is = 0 arduino won't use that value for controlling the actuator
-        motor_power = self.memory.memory["Motor_Power"]
         if pilot_mode_string == "Manuel":
             steering = 0
             throttle = 0
@@ -78,7 +77,9 @@ class Arduino:
             throttle = 0
         elif pilot_mode_string == "Full_Auto":
             steering = self.memory.memory["Steering"]
-            throttle = self.memory.memory["Throttle"] * motor_power
+            throttle = self.memory.memory["Motor_Power"] * self.memory.memory["Throttle"]
+            throttle = self.memory.memory["Speed_Factor"] * (throttle - 1500) + 1500
+            
         # s is for stating start of steering value t is for throttle and e is for end, \r for read ending
         formatted_data = "s" + str(steering) + "t" + str(throttle) + 'e' + '\r'
         try: self.arduino.write(formatted_data.encode())
