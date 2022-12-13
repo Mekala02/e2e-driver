@@ -75,10 +75,11 @@ class Arduino:
             steering = 0
             throttle = 0
         elif pilot_mode_string == "Angle":
-            steering = float2pwm(self.memory.memory["Steering"])
+            # Steering value increases when turning to left so we reversing it with -.
+            steering = float2pwm(-self.memory.memory["Steering"])
             throttle = 0
         elif pilot_mode_string == "Full_Auto":
-            steering = float2pwm(self.memory.memory["Steering"])
+            steering = float2pwm(-self.memory.memory["Steering"])
             throttle = self.memory.memory["Speed_Factor"] * self.memory.memory["Motor_Power"] * self.memory.memory["Throttle"]
             throttle = float2pwm(throttle)
             
