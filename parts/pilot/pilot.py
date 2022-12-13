@@ -71,9 +71,8 @@ class Pilot:
                 with torch.no_grad():
                     # Unsqueeze adds dimension to image (batch dimension)
                     steering, act_value = model(gpu_image.unsqueeze(0))
-                # We made data between -1, 1 when trainig so unpacking thoose to pwm value
-                self.shared_dict["steering"] = steering
-                self.shared_dict["act_value"] = act_value
+                self.shared_dict["steering"] = steering.item()
+                self.shared_dict["act_value"] = act_value.item()
             # Inferancing @DRIVE_LOOP_HZ
             sleep_time = 1.0 / self.thread_hz - (time.time() - start_time)
             if sleep_time > 0.0:
