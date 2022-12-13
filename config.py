@@ -1,5 +1,10 @@
 config = dict(
     DRIVE_LOOP_HZ = 50,
+    # if ACT_VALUE_TYPE == Throttle; network directly predict throttle value
+    # elif ACT_VALUE_TYPE == Speed; network will predict speed
+    # Throttle or Speed    
+    ACT_VALUE_TYPE = "Throttle",
+    K_PID = {"Kp":0.012, "Ki":0.0015, "Kd":0.0005, "I_max":0.25},
     USE_OBJECT_DETECTION = False,
     USE_DAGGER = True,
     # If REDUCED_CAMERA_RESOLUTION == None ZED_RESOLUTION will be used
