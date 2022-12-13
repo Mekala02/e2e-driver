@@ -21,15 +21,16 @@ import cv2
 logger = logging.getLogger(__name__)
 
 class Load_Data(Dataset):
-    def __init__(self, data_folder_paths, transform=None, reduce_fps=False, use_depth=False, other_inputs=False):
+    def __init__(self, data_folder_paths, act_value="Throttle", transform=None, reduce_fps=False, use_depth=False, other_inputs=False):
         self.data_folder_paths = data_folder_paths
+        self.act_value = act_value
         self.transform = transform
         self.reduce_fps = reduce_fps
         self.use_depth = use_depth
         self.other_inputs = other_inputs
         self.data_folders = []
         for folder_path in self.data_folder_paths:
-            self.data_folders.append(Data_Folder(folder_path, transform=self.transform, reduce_fps=self.reduce_fps, use_depth=self.use_depth, other_inputs=self.other_inputs))
+            self.data_folders.append(Data_Folder(folder_path, act_value=self.act_value, transform=self.transform, reduce_fps=self.reduce_fps, use_depth=self.use_depth, other_inputs=self.other_inputs))
         self.len_data_fodlers = len(self.data_folders)
         self.lenght = 0
         for datas in self.data_folders:
@@ -41,10 +42,10 @@ class Load_Data(Dataset):
     def __getitem__(self, index):
         folder_index, data_index = self.calculate_index(index)
         if self.other_inputs:
-            images, other_inputs, steering_label, throttle_label = self.data_folders[folder_index][data_index]
-            return images, other_inputs, steering_label, throttle_label
-        images, steering_label, throttle_label = self.data_folders[folder_index][data_index]
-        return images, steering_label, throttle_label
+            images, other_inputs, steering_label, act_value_label = self.data_folders[folder_index][data_index]
+            return images, other_inputs, steering_label, act_value_label
+        images, steering_label, act_value_label = self.data_folders[folder_index][data_index]
+        return images, steering_label, act_value_label
 
     def calculate_index(self, index):
         # If we use one file index will be same
@@ -59,8 +60,9 @@ class Load_Data(Dataset):
 
 
 class Data_Folder():
-    def __init__(self, data_folder_path, transform=None, reduce_fps=False, use_depth=False, other_inputs=False):
+    def __init__(self, data_folder_path, act_value="Throttle", transform=None, reduce_fps=False, use_depth=False, other_inputs=False):
         self.data_folder_path = data_folder_path
+        self.act_value = act_value
         self.transform = transform
         self.reduce_fps = reduce_fps
         self.use_depth = use_depth
@@ -176,11 +178,16 @@ class Data_Folder():
             other_inputs = torch.from_numpy(other_inputs)
 
         steering_label = torch.tensor([self.datas[index]["Steering"]], dtype=torch.float)
-        throttle_label = torch.tensor([self.datas[index]["Throttle"]], dtype=torch.float)
+        if self.act_value == "Throttle":
+            act_value_label = torch.tensor([self.datas[index]["Throttle"]], dtype=torch.float)
+        elif self.act_value == "Speed":
+            act_value_label = torch.tensor([self.datas[index]["Speed"]], dtype=torch.float)
+        else:
+            logger.warning("Invalid Act Value Type")
 
         if self.other_inputs:
-            return images, other_inputs, steering_label, throttle_label
-        return images, steering_label, throttle_label
+            return images, other_inputs, steering_label, act_value_label
+        return images, steering_label, act_value_label
 
 
 if __name__ == "__main__":
@@ -189,15 +196,15 @@ if __name__ == "__main__":
     data_folders = args["<data_dir>"]
     other_inputs = ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
     test = Load_Data(data_folders, transform=None, other_inputs=other_inputs, use_depth=False)
-    # images, steering_label, throttle_label = test[10]
+    # images, steering_label, act_value_label = test[10]
 
-    images, other_inputs, steering_label, throttle_label = test[10]
+    images, other_inputs, steering_label, act_value_label = test[10]
     print(images.shape)
     print(other_inputs.shape)
     print(steering_label.shape)
-    print(throttle_label.shape)
+    print(act_value_label.shape)
 
     print(images.type())
     print(other_inputs.type())
     print(steering_label.type())
-    print(throttle_label.type())
+    print(act_value_label.type())

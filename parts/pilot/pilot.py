@@ -1,4 +1,4 @@
-from common_functions import pwm2folat, float2pwm
+from common_functions import PID, pwm2folat, float2pwm
 from config import config as cfg
 
 import logging
@@ -15,13 +15,17 @@ class Pilot:
         self.thread_hz = cfg["DRIVE_LOOP_HZ"]
         self.run = True
         self.outputs = {"Steering": 0, "Throttle": 0}
+        self.act_value_type = cfg["ACT_VALUE_TYPE"]
         self.pilot_mode = 0
         self.model_path = None
         self.steering = 0
+        self.act_value = 0
         self.throttle = 0
         self.steering_min = pwm2folat(cfg["STEERING_MIN_PWM"])
         self.steering_max = pwm2folat(cfg["STEERING_MAX_PWM"])
         self.throttle_max = pwm2folat(cfg["THROTTLE_MAX_PWM"])
+        if self.act_value_type == "Speed":
+            self.pid = PID(Kp=cfg["K_PID"]["Kp"], Ki=cfg["K_PID"]["Ki"], Kd=cfg["K_PID"]["Kd"], I_max=cfg["K_PID"]["I_max"])
 
         # Shared memory for multiprocessing
         if "Model_Path" in  memory.memory.keys():
@@ -33,7 +37,7 @@ class Pilot:
             self.shared_dict["pilot_mode"] = 0
             self.shared_dict["cpu_image"] = 0
             self.shared_dict["steering"] = 0
-            self.shared_dict["throttle"] = 0
+            self.shared_dict["act_value"] = 0
         
         logger.info("Successfully Added")
     
@@ -66,10 +70,10 @@ class Pilot:
                 gpu_image = color_image.to(device, non_blocking=True)
                 with torch.no_grad():
                     # Unsqueeze adds dimension to image (batch dimension)
-                    steering, throttle = model(gpu_image.unsqueeze(0))
+                    steering, act_value = model(gpu_image.unsqueeze(0))
                 # We made data between -1, 1 when trainig so unpacking thoose to pwm value
                 self.shared_dict["steering"] = steering
-                self.shared_dict["throttle"] = throttle
+                self.shared_dict["act_value"] = act_value
             # Inferancing @DRIVE_LOOP_HZ
             sleep_time = 1.0 / self.thread_hz - (time.time() - start_time)
             if sleep_time > 0.0:
@@ -83,12 +87,18 @@ class Pilot:
             self.shared_dict["cpu_image"] = self.memory.memory["Color_Image"]
             if self.pilot_mode == "Angle" or self.pilot_mode == "Full_Auto":
                 self.steering = self.shared_dict["steering"]
-                self.throttle = self.shared_dict["throttle"]
                 if self.steering < self.steering_min: self.steering=self.steering_min
                 if self.steering > self.steering_max: self.steering=self.steering_max
-                if self.throttle > self.throttle_max: self.throttle=self.throttle_max
                 self.memory.memory["Steering"] = self.steering
                 if self.pilot_mode == "Full_Auto":
+                    self.act_value = self.shared_dict["act_value"]
+                    if self.act_value_type == "Throttle":
+                        self.throttle = self.act_value
+                    elif self.act_value_type == "Speed":
+                        self.throttle = self.pid(self.memory.memory["Speed"], self.act_value)
+                    else:
+                        logger.warning("Invalid Act Value Type")
+                    if self.throttle > self.throttle_max: self.throttle=self.throttle_max
                     self.memory.memory["Throttle"] = self.throttle
     
     def shut_down(self):
