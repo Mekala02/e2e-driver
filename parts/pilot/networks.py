@@ -38,9 +38,9 @@ class Linear(nn.Module):
         x = self.drop(x)
 
         steering = self.out1(x)
-        throttle = self.out2(x)
+        act_value = self.out2(x)
 
-        return steering, throttle
+        return steering, act_value
 
 class Linear_With_Others(nn.Module):
     def __init__(self, in_channels=3, other_len=0):
@@ -95,6 +95,6 @@ class Linear_With_Others(nn.Module):
         z = self.drop(z)
 
         steering = self.out1(z)
-        throttle = self.out2(z)
+        act_value = self.out2(z)
 
-        return steering, throttle
+        return steering, act_value
