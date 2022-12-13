@@ -1,9 +1,11 @@
 """
 Usage:
-    drive.py  [--model=None] [--data_folder=None]
+    drive.py  [<model>] [--data_folder=<data_folder>]
 
 Options:
-  -h --help     Show this screen.
+  -h --help                         Show this screen.
+  [<model>]                         Load model to pilot
+  [--data_folder=<data_folder>]     Specify Data Folders Name
 """
 
 from config import config as cfg
@@ -32,7 +34,7 @@ if __name__ == '__main__':
     vehicle_memory = Memory()
     vehicle = Vehicle(vehicle_memory)
 
-    model_path = args["--model"]
+    model_path = args["<model>"]
     if model_path:
         vehicle_memory.memory["Model_Path"] = model_path
 
