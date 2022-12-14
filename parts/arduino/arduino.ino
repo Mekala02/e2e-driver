@@ -14,7 +14,7 @@ Servo SERVO;
 
 String pyserial_data;
 int pyserial_throttle, pyserial_steering;
-int steering, throttle, mod1, mod2;
+int steering, throttle;
 
 // current time, previous time
 unsigned long int t, pt = 0;
@@ -78,9 +78,6 @@ void loop() {
     else
         throttle = 1500;
 
-    mod1 = mode(ch[5]);
-    mod2 = mode(ch[6]);
-
     // Arming the esc according to ch7
     SERVO.writeMicroseconds(steering);
     if (ch[7] > 1900 && ch[7] < 2100)
@@ -97,7 +94,8 @@ void loop() {
 
     // Sending data 100 times per second
     if (current_time - serialOut_last_time > 10){
-        Serial.println("s" + String(steering) + "t" + String(throttle) + "m" + String(mod1) + "m" + String(mod2) + "v" + String(dpulses) + "e");
+        // sending transmitters steering pwm, transmitters throttle pwm, mode, mode, encoder pulses
+        Serial.println("s" + String(ch[1]) + "t" + String(ch[3]) + "m" + String(mode(ch[5])) + "m" + String(mode(ch[6])) + "v" + String(dpulses) + "e");
         serialOut_last_time = current_time;
     }
 }
