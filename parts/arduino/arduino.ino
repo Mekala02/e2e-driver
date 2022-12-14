@@ -23,6 +23,7 @@ int c, d = 0;
 int ch[15];
 
 unsigned long current_time;
+unsigned long last_serial;
 unsigned long serialOut_last_time;
 unsigned long encoder_last_time;
 unsigned int pulses = 0;
@@ -48,7 +49,7 @@ void loop() {
     current_time = millis();
     // Reading serial input
     // Serial inputs shape: s(float)t(float)e
-    if(Serial.available() > 0) {
+    if(Serial.available() > 0){
         pyserial_data =  Serial.readStringUntil('\r');
         int deliminator_index = 0;
         if (pyserial_data[0] == 's'){
@@ -62,6 +63,14 @@ void loop() {
                     break;
                 }
             }
+        }
+        last_serial = current_time;
+    }
+    else{
+        // If python program stoped (no response for 50ms)
+        if (current_time - last_serial > 50){
+            pyserial_steering = 0;
+            pyserial_throttle = 0;
         }
     }
 
