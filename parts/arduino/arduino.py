@@ -79,9 +79,9 @@ class Arduino:
                 self.Throttle = pwm2float(self.Act_Value_A)
                 Throttle_Signal = 0
             elif self.act_value_type == "Speed":
-                self.Throttle = self.pid(self.Speed, 100*pwm2float(self.Act_Value_A))
+                self.Throttle = self.pid(self.Speed, 150 * pwm2float(self.Act_Value_A))
                 if self.Throttle > self.throttle_max: self.Throttle=self.throttle_max
-                if self.Throttle < 0: self.Throttle=0
+                if self.Throttle < 0: self.Throttle = 0
                 Throttle_Signal = float2pwm(self.Throttle)
             if pilot_mode_string == "Manuel":
                 # Steering value increases when turning to left so we reversing it with -.
@@ -92,7 +92,7 @@ class Arduino:
                 Steering_Signal = float2pwm(-self.memory.memory["Steering"])
         elif pilot_mode_string == "Full_Auto":
             if self.act_value_type == "Throttle":
-                self.throttle = self.memory.memory["Throttle"]
+                self.throttle = self.memory.memory["Act_Value"]
             elif self.act_value_type == "Speed":
                 self.throttle = self.pid(self.speed, self.memory.memory["Act_Value"])
             Steering_Signal = float2pwm(self.memory.memory["Steering"])
