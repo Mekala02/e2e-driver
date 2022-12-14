@@ -97,9 +97,9 @@ class PID():
 
         return self.P + self.I + self.D
 
-def pwm2folat(value):
+def pwm2float(value):
     return (value - 1500) / 500
 
 def float2pwm(value):
-    return value * 500 + 1500
+    return int(value * 500 + 1500)
 
