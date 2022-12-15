@@ -98,7 +98,8 @@ class Arduino:
             elif self.act_value_type == "Speed":
                 self.throttle = self.throttle_limiter(self.pid(self.speed, self.memory.memory["Act_Value"]))
             Steering_Signal = float2pwm(self.memory.memory["Steering"])
-            Throttle_Signal = float2pwm(self.throttle)
+            # Motor power: 0 or 1
+            Throttle_Signal = float2pwm(self.throttle * self.memory.memory["Motor_Power"])
         
         self.memory.memory["Throttle"] = self.Throttle
         self.memory.memory["Speed"] = self.Speed
