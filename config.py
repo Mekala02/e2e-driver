@@ -3,9 +3,9 @@ config = dict(
     # if ACT_VALUE_TYPE == Throttle; network directly predict throttle value
     # elif ACT_VALUE_TYPE == Speed; network will predict speed
     # Throttle or Speed    
-    ACT_VALUE_TYPE = "Throttle",
-    TRANSMITTER_STICK_SPEED_MULTIPLIER = 150,
-    K_PID = {"Kp":0.012, "Ki":0.0015, "Kd":0.0005, "I_max":0.25},
+    ACT_VALUE_TYPE = "Speed",
+    TRANSMITTER_STICK_SPEED_MULTIPLIER = 1.5,
+    K_PID = {"Kp":1, "Ki":0, "Kd":0, "I_max":0.25},
     
     USE_OBJECT_DETECTION = False,
     USE_DAGGER = True,
@@ -37,9 +37,8 @@ config = dict(
     STEERING_MID_PWM = 1540,
     # Ful left
     STEERING_MAX_PWM = 1900,
-    ENCODER_UNITS = "cm/s",
-    ENCODER_TICKS = 600,
-    TICKS_PER_CM = 11.7,
+    ENCODER_UNITS = "m/s",
+    ENCODER_TICKS_PER_UNIT = 11.7 * 10**2,
 
     # Copilot
     # Thresholds for turning off turn signals (pwm)

@@ -29,7 +29,7 @@ class Arduino:
         self.Act_Value = 0
         self.Speed = 0
         self.Throttle = 0
-        self.ticks_per_cm = cfg["TICKS_PER_CM"]
+        self.ticks_per_unit = cfg["ENCODER_TICKS_PER_UNIT"]
         self.Stick_Multiplier = cfg["TRANSMITTER_STICK_SPEED_MULTIPLIER"]
         self.steering_limiter = Limiter(min_=pwm2float(cfg["STEERING_MIN_PWM"]), max_=pwm2float(cfg["STEERING_MAX_PWM"]))
         self.throttle_limiter = Limiter(min_=pwm2float(cfg["THROTTLE_MIN_PWM"]), max_=pwm2float(cfg["THROTTLE_MAX_PWM"]))
@@ -71,8 +71,8 @@ class Arduino:
         If char is between 1000, 2000 arduino will use that value to drive motors
         If char is = 0 arduino won't use that value for controlling the actuator
         '''
-        # Speed_A is ticks/sec we converting it to cm/sec
-        self.Speed = self.Speed_A / self.ticks_per_cm
+        # Speed_A is ticks/sec we converting it to unit/sec
+        self.Speed = self.Speed_A / self.ticks_per_unit
         pilot_mode_string = self.memory.memory["Pilot_Mode"]
         if pilot_mode_string == "Manuel" or pilot_mode_string == "Angle":
             if self.act_value_type == "Throttle":

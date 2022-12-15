@@ -235,7 +235,7 @@ class Main_Track {
 
     Update_Speed(speed){
         this.speed = speed
-        document.getElementById("Speed").innerHTML = Math.round(this.speed) + " cm/s"
+        document.getElementById("Speed").innerHTML = this.speed.toFixed(2) + " m/s"
         // console.log('You selected: ', this.speed)
     }
 
