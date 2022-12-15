@@ -84,7 +84,8 @@ class Pilot:
                 self.Steering = self.steering_limiter(self.shared_dict["Steering"])
                 self.memory.memory["Steering"] = self.Steering
                 if self.pilot_mode == "Full_Auto":
-                    self.Act_Value = self.shared_dict["Act_Value"]
+                    # Speed_Factor: Multiplier
+                    self.Act_Value = self.shared_dict["Act_Value"] * self.memory.memory["Speed_Factor"]
                     self.memory.memory["Act_Value"] = self.Act_Value
     
     def shut_down(self):
