@@ -30,7 +30,7 @@ class Arduino:
         self.Speed = 0
         self.Throttle = 0
         self.ticks_per_unit = cfg["ENCODER_TICKS_PER_UNIT"]
-        self.Stick_Multiplier = cfg["TRANSMITTER_STICK_SPEED_MULTIPLIER"]
+        self.stick_multiplier = cfg["TRANSMITTER_STICK_SPEED_MULTIPLIER"]
         self.steering_limiter = Limiter(min_=pwm2float(cfg["STEERING_MIN_PWM"]), max_=pwm2float(cfg["STEERING_MAX_PWM"]))
         self.throttle_limiter = Limiter(min_=pwm2float(cfg["THROTTLE_MIN_PWM"]), max_=pwm2float(cfg["THROTTLE_MAX_PWM"]))
         if self.act_value_type == "Speed":
@@ -87,7 +87,7 @@ class Arduino:
             if pilot_mode_string == "Manuel":
                 # Steering value increases when turning to left so we reversing it with -
                 self.Steering = self.steering_limiter(-pwm2float(self.Steering_A))
-                self.memory.memory["Steering"] = self.Steering
+                self.memory.memory["Steering"] = self.stick_multiplier * pwm2float(self.Act_Value_A)
                 Steering_Signal = 0
             elif pilot_mode_string == "Angle":
                 # Rereversing with -
@@ -105,7 +105,7 @@ class Arduino:
         self.memory.memory["Speed"] = self.Speed
         self.memory.memory["Mode1"] = self.Mode1
         self.memory.memory["Mode2"] = self.Mode2
-
+        
         # s is for stating start of steering value t is for throttle and e is for end, \r for read ending
         formatted_data = "s" + str(Steering_Signal) + "t" + str(Throttle_Signal) + 'e' + '\r'
         try: self.arduino.write(formatted_data.encode())
