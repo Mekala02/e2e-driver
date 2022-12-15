@@ -81,7 +81,7 @@ class Arduino:
             elif self.act_value_type == "Speed":
                 # Act_Value_A is between 0, 1 we multipliying it by Stick_Multiplier
                 # for converting to speed
-                self.Throttle = self.pid(self.Speed, self.Stick_Multiplier * pwm2float(self.Act_Value_A))
+                self.Throttle = self.pid(self.Speed, self.stick_multiplier * pwm2float(self.Act_Value_A))
                 self.Throttle = self.throttle_limiter(self.Throttle)
                 Throttle_Signal = float2pwm(self.Throttle)
             if pilot_mode_string == "Manuel":
@@ -105,7 +105,7 @@ class Arduino:
         self.memory.memory["Speed"] = self.Speed
         self.memory.memory["Mode1"] = self.Mode1
         self.memory.memory["Mode2"] = self.Mode2
-        
+
         # s is for stating start of steering value t is for throttle and e is for end, \r for read ending
         formatted_data = "s" + str(Steering_Signal) + "t" + str(Throttle_Signal) + 'e' + '\r'
         try: self.arduino.write(formatted_data.encode())
