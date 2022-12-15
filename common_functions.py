@@ -97,6 +97,20 @@ class PID():
 
         return self.P + self.I + self.D
 
+class Limiter():
+    def __init__(self, min_=0, max_=1):
+        self.min = min_
+        self.max = max_
+
+    def __call__(self, value):
+        if value > self.max:
+            return self.max
+        elif value < self.min:
+            return self.min
+        else:
+            return value
+
+
 def pwm2float(value):
     return (value - 1500) / 500
 
