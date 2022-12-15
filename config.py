@@ -4,8 +4,8 @@ config = dict(
     # elif ACT_VALUE_TYPE == Speed; network will predict speed
     # Throttle or Speed    
     ACT_VALUE_TYPE = "Speed",
-    TRANSMITTER_STICK_SPEED_MULTIPLIER = 1.5,
-    K_PID = {"Kp":1, "Ki":0, "Kd":0, "I_max":0.25},
+    TRANSMITTER_STICK_SPEED_MULTIPLIER = 2.5,
+    K_PID = {"Kp":0.2, "Ki":0.4, "Kd":0.001, "I_max":0.35},
     
     USE_OBJECT_DETECTION = False,
     USE_DAGGER = True,
