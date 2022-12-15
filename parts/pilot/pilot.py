@@ -1,4 +1,4 @@
-from common_functions import pwm2float, float2pwm
+from common_functions import Limiter, pwm2float, float2pwm
 from config import config as cfg
 
 import logging
@@ -21,8 +21,7 @@ class Pilot:
         self.model_path = None
         self.Steering = 0
         self.Act_Value = 0
-        self.steering_min = pwm2float(cfg["STEERING_MIN_PWM"])
-        self.steering_max = pwm2float(cfg["STEERING_MAX_PWM"])
+        self.steering_limiter = Limiter(min_=pwm2float(cfg["STEERING_MIN_PWM"]), max_=pwm2float(cfg["STEERING_MAX_PWM"]))
 
         # Shared memory for multiprocessing
         if "Model_Path" in  memory.memory.keys():
@@ -82,9 +81,7 @@ class Pilot:
             self.shared_dict["pilot_mode"] = self.pilot_mode
             self.shared_dict["cpu_image"] = self.memory.memory["Color_Image"]
             if self.pilot_mode == "Angle" or self.pilot_mode == "Full_Auto":
-                self.Steering = self.shared_dict["Steering"]
-                if self.Steering < self.steering_min: self.Steering=self.steering_min
-                if self.Steering > self.steering_max: self.Steering=self.steering_max
+                self.Steering = self.steering_limiter(self.shared_dict["Steering"])
                 self.memory.memory["Steering"] = self.Steering
                 if self.pilot_mode == "Full_Auto":
                     self.Act_Value = self.shared_dict["Act_Value"]

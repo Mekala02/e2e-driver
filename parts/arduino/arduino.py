@@ -1,4 +1,4 @@
-from common_functions import PID, pwm2float, float2pwm
+from common_functions import PID, Limiter, pwm2float, float2pwm
 from config import config as cfg
 
 import threading
@@ -30,9 +30,9 @@ class Arduino:
         self.Speed = 0
         self.Throttle = 0
         self.ticks_per_cm = cfg["TICKS_PER_CM"]
-        self.steering_min = pwm2float(cfg["STEERING_MIN_PWM"])
-        self.steering_max = pwm2float(cfg["STEERING_MAX_PWM"])
-        self.throttle_max = pwm2float(cfg["THROTTLE_MAX_PWM"])
+        self.Stick_Multiplier = cfg["TRANSMITTER_STICK_SPEED_MULTIPLIER"]
+        self.steering_limiter = Limiter(min_=pwm2float(cfg["STEERING_MIN_PWM"]), max_=pwm2float(cfg["STEERING_MAX_PWM"]))
+        self.throttle_limiter = Limiter(min_=pwm2float(cfg["THROTTLE_MIN_PWM"]), max_=pwm2float(cfg["THROTTLE_MAX_PWM"]))
         if self.act_value_type == "Speed":
             self.pid = PID(Kp=cfg["K_PID"]["Kp"], Ki=cfg["K_PID"]["Ki"], Kd=cfg["K_PID"]["Kd"], I_max=cfg["K_PID"]["I_max"])
         self.arduino = serial.Serial(port='/dev/ttyUSB0', baudrate=115200, timeout=0.006, write_timeout=0.006)
@@ -76,25 +76,27 @@ class Arduino:
         pilot_mode_string = self.memory.memory["Pilot_Mode"]
         if pilot_mode_string == "Manuel" or pilot_mode_string == "Angle":
             if self.act_value_type == "Throttle":
-                self.Throttle = pwm2float(self.Act_Value_A)
+                self.Throttle = self.throttle_limiter(pwm2float(self.Act_Value_A))
                 Throttle_Signal = 0
             elif self.act_value_type == "Speed":
-                self.Throttle = self.pid(self.Speed, 150 * pwm2float(self.Act_Value_A))
-                if self.Throttle > self.throttle_max: self.Throttle=self.throttle_max
-                if self.Throttle < 0: self.Throttle = 0
+                # Act_Value_A is between 0, 1 we multipliying it by Stick_Multiplier
+                # for converting to speed
+                self.Throttle = self.pid(self.Speed, self.Stick_Multiplier * pwm2float(self.Act_Value_A))
+                self.Throttle = self.throttle_limiter(self.Throttle)
                 Throttle_Signal = float2pwm(self.Throttle)
             if pilot_mode_string == "Manuel":
-                # Steering value increases when turning to left so we reversing it with -.
-                self.Steering = -pwm2float(self.Steering_A)
-                Steering_Signal = 0
+                # Steering value increases when turning to left so we reversing it with -
+                self.Steering = self.steering_limiter(-pwm2float(self.Steering_A))
                 self.memory.memory["Steering"] = self.Steering
+                Steering_Signal = 0
             elif pilot_mode_string == "Angle":
+                # Rereversing with -
                 Steering_Signal = float2pwm(-self.memory.memory["Steering"])
         elif pilot_mode_string == "Full_Auto":
             if self.act_value_type == "Throttle":
-                self.throttle = self.memory.memory["Act_Value"]
+                self.throttle = self.throttle_limiter(self.memory.memory["Act_Value"])
             elif self.act_value_type == "Speed":
-                self.throttle = self.pid(self.speed, self.memory.memory["Act_Value"])
+                self.throttle = self.throttle_limiter(self.pid(self.speed, self.memory.memory["Act_Value"]))
             Steering_Signal = float2pwm(self.memory.memory["Steering"])
             Throttle_Signal = float2pwm(self.throttle)
         
