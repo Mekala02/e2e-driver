@@ -110,6 +110,8 @@ class Limiter():
         else:
             return value
 
+def sgn(x):
+    return (x > 0) - (x < 0)
 
 def pwm2float(value):
     return (value - 1500) / 500
