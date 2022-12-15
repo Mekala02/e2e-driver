@@ -4,7 +4,9 @@ config = dict(
     # elif ACT_VALUE_TYPE == Speed; network will predict speed
     # Throttle or Speed    
     ACT_VALUE_TYPE = "Throttle",
+    TRANSMITTER_STICK_SPEED_MULTIPLIER = 150,
     K_PID = {"Kp":0.012, "Ki":0.0015, "Kd":0.0005, "I_max":0.25},
+    
     USE_OBJECT_DETECTION = False,
     USE_DAGGER = True,
     # If REDUCED_CAMERA_RESOLUTION == None ZED_RESOLUTION will be used
@@ -27,9 +29,9 @@ config = dict(
     DEPTH_IMAGE_FORMAT = "jpg",
     OBJECT_DETECTION_FORMAT = "npy",
 
+    THROTTLE_MIN_PWM = 1350,
+    THROTTLE_MID_PWM = 1500,
     THROTTLE_MAX_PWM = 1800,
-    THROTTLE_STOPPED_PWM = 1500,
-    THROTTLE_REVERSE_PWM = 1000,
     # Full right
     STEERING_MIN_PWM = 1200,
     STEERING_MID_PWM = 1540,
