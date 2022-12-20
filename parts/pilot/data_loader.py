@@ -21,16 +21,16 @@ import cv2
 logger = logging.getLogger(__name__)
 
 class Load_Data(Dataset):
-    def __init__(self, data_folder_paths, act_value="Throttle", transform=None, reduce_fps=False, use_depth=False, other_inputs=False):
+    def __init__(self, data_folder_paths, act_value_type="Throttle", transform=None, reduce_fps=False, use_depth=False, other_inputs=False):
         self.data_folder_paths = data_folder_paths
-        self.act_value = act_value
+        self.act_value_type = act_value_type
         self.transform = transform
         self.reduce_fps = reduce_fps
         self.use_depth = use_depth
         self.other_inputs = other_inputs
         self.data_folders = []
         for folder_path in self.data_folder_paths:
-            self.data_folders.append(Data_Folder(folder_path, act_value=self.act_value, transform=self.transform, reduce_fps=self.reduce_fps, use_depth=self.use_depth, other_inputs=self.other_inputs))
+            self.data_folders.append(Data_Folder(folder_path, act_value_type=self.act_value_type, transform=self.transform, reduce_fps=self.reduce_fps, use_depth=self.use_depth, other_inputs=self.other_inputs))
         self.len_data_fodlers = len(self.data_folders)
         self.lenght = 0
         for datas in self.data_folders:
@@ -60,9 +60,9 @@ class Load_Data(Dataset):
 
 
 class Data_Folder():
-    def __init__(self, data_folder_path, act_value="Throttle", transform=None, reduce_fps=False, use_depth=False, other_inputs=False):
+    def __init__(self, data_folder_path, act_value_type="Throttle", transform=None, reduce_fps=False, use_depth=False, other_inputs=False):
         self.data_folder_path = data_folder_path
-        self.act_value = act_value
+        self.act_value_type = act_value_type
         self.transform = transform
         self.reduce_fps = reduce_fps
         self.use_depth = use_depth
@@ -84,6 +84,9 @@ class Data_Folder():
                 self.changes = json.load(changes_file)
         with open(self.memory_file_path) as data_file:
             self.datas = json.load(data_file)
+
+        if self.act_value_type != self.cfg["ACT_VALUE_TYPE"]:
+            logger.warning(f"Training And Config Act Vaule Type Is Different !!!")
 
         # Applying changes (came from data_clear_app) to our datas in memory
         if self.changes:
@@ -178,9 +181,11 @@ class Data_Folder():
             other_inputs = torch.from_numpy(other_inputs)
 
         steering_label = torch.tensor([self.datas[index]["Steering"]], dtype=torch.float)
-        if self.act_value == "Throttle":
+        if self.act_value_type == "Throttle":
             act_value_label = torch.tensor([self.datas[index]["Throttle"]], dtype=torch.float)
-        elif self.act_value == "Speed":
+        elif self.act_value_type == "Speed":
+            act_value_label = torch.tensor([self.datas[index]["act_value"]], dtype=torch.float)
+        elif self.act_value_type == "Encoder_Speed":
             act_value_label = torch.tensor([self.datas[index]["Speed"]], dtype=torch.float)
         else:
             logger.warning("Invalid Act Value Type")
