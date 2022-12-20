@@ -184,7 +184,7 @@ class Data_Folder():
         if self.act_value_type == "Throttle":
             act_value_label = torch.tensor([self.datas[index]["Throttle"]], dtype=torch.float)
         elif self.act_value_type == "Speed":
-            act_value_label = torch.tensor([self.datas[index]["act_value"]], dtype=torch.float)
+            act_value_label = torch.tensor([self.datas[index]["Act_Value"]], dtype=torch.float)
         elif self.act_value_type == "Encoder_Speed":
             act_value_label = torch.tensor([self.datas[index]["Speed"]], dtype=torch.float)
         else:
