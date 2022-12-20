@@ -33,7 +33,7 @@ logger = logging.getLogger("train")
 
 def main():
     '''
-    act_value_type:         if setted as speed network will predict speed; elif setted as throttle network directly predict throttle value
+    act_value_type:         if throttle network predict throttle value; elif speed network will predict speed; elif encoder_speed network will predict encoder speed
     learning_rate:          2e-3 for startup then reduce to 1e-3
     validation_split:       Splits the training data [0,1]
     image_resolution:       None or {"height": x, "width": y} if None zed's resolution will be used
@@ -102,18 +102,18 @@ def main():
     if model_path:
         model.load_state_dict(torch.load(model_path))
 
-    train_set = Load_Data(data_dirs, act_value=act_value_type, transform=train_transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
+    train_set = Load_Data(data_dirs, act_value_type=act_value_type, transform=train_transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
 
     test_sets = []
     if validation_split:
-        test_set = Load_Data(data_dirs, act_value=act_value_type, transform=transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
+        test_set = Load_Data(data_dirs, act_value_type=act_value_type, transform=transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
         assert len(train_set) == len(test_set)
         len_dataset = len(train_set)
         test_len = math.floor(len_dataset * validation_split)
         train_set = torch.utils.data.random_split(train_set, [len_dataset-test_len, test_len])[0]
         test_sets.append(torch.utils.data.random_split(test_set, [len_dataset-test_len, test_len])[1])
     if test_dirs:
-        test_sets.append(Load_Data(test_dirs, act_value=act_value_type, transform=transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs))
+        test_sets.append(Load_Data(test_dirs, act_value_type=act_value_type, transform=transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs))
 
     trainloader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
     if test_sets:
