@@ -18,7 +18,7 @@ class Arduino:
         self.thread_hz = 120
         self.run = True
         self.outputs = {"Steering": 0, "Throttle": 0, "Speed": 0, "Mode1": 0, "Mode2": 0}
-        # Also It can output Record and drive mode acoording to mode button
+        # Also It can output Act_Value, Record and drive mode acoording to mode button
         self.act_value_type = cfg["ACT_VALUE_TYPE"]
         self.Steering_A = 1500
         self.Act_Value_A = 1500
@@ -75,23 +75,25 @@ class Arduino:
         self.Speed = self.Speed_A / self.ticks_per_unit
         pilot_mode_string = self.memory.memory["Pilot_Mode"]
         if pilot_mode_string == "Manuel" or pilot_mode_string == "Angle":
+            self.Act_Value = pwm2float(self.Act_Value_A)
             if self.act_value_type == "Throttle":
-                self.Throttle = self.throttle_limiter(pwm2float(self.Act_Value_A))
+                self.Throttle = self.throttle_limiter(self.Act_Value)
                 Throttle_Signal = 0
             elif self.act_value_type == "Speed":
-                # Act_Value_A is between 0, 1 we multipliying it by Stick_Multiplier
+                # Act_Value is between 0, 1 we multipliying it by Stick_Multiplier
                 # for converting to speed
-                self.Throttle = self.pid(self.Speed, self.stick_multiplier * pwm2float(self.Act_Value_A))
+                self.Throttle = self.pid(self.Speed, self.stick_multiplier * self.Act_Value)
                 self.Throttle = self.throttle_limiter(self.Throttle)
                 Throttle_Signal = float2pwm(self.Throttle)
             if pilot_mode_string == "Manuel":
                 # Steering value increases when turning to left so we reversing it with -
                 self.Steering = self.steering_limiter(-pwm2float(self.Steering_A))
-                self.memory.memory["Steering"] = self.stick_multiplier * pwm2float(self.Act_Value_A)
+                self.memory.memory["Steering"] = self.Steering
                 Steering_Signal = 0
             elif pilot_mode_string == "Angle":
                 # Rereversing with -
                 Steering_Signal = float2pwm(-self.memory.memory["Steering"])
+            self.memory.memory["Act_Value"] = self.Act_Value
         elif pilot_mode_string == "Full_Auto":
             if self.act_value_type == "Throttle":
                 self.throttle = self.throttle_limiter(self.memory.memory["Act_Value"])
