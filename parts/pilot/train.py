@@ -121,7 +121,7 @@ def main():
     else:
         testlaoder = None
 
-    trainer = Trainer(model, criterion, optimizer, device, num_epochs, trainloader, writer=writer, testlaoder=testlaoder, model_name=model_save_name, other_inputs=other_inputs, patience=5, delta=0.000005)
+    trainer = Trainer(model, criterion, optimizer, device, num_epochs, trainloader, act_value_type, writer=writer, testlaoder=testlaoder, model_name=model_save_name, other_inputs=other_inputs, patience=5, delta=0.000005)
 
     example_input = torch.ones((1, in_channels, image_resolution["height"], image_resolution["width"]), device=device)
     if other_inputs:
@@ -144,12 +144,13 @@ def main():
     writer.close()
 
 class Trainer:
-    def __init__(self, model, criterion, optimizer, device, num_epochs, trainloader, writer=None, testlaoder=None, model_name="model", other_inputs=False, patience=5, delta=0.00005):
+    def __init__(self, model, criterion, optimizer, device, num_epochs, trainloader, act_value_type, writer=None, testlaoder=None, model_name="model", other_inputs=False, patience=5, delta=0.00005):
         self.model = model
         self.criterion = criterion
         self.optimizer = optimizer
         self.device = device
         self.trainloader = trainloader
+        self.act_value_type = act_value_type
         self.writer = writer
         self.testlaoder = testlaoder
         self.model_name = model_name
@@ -161,7 +162,7 @@ class Trainer:
         self.delta = delta
 
         self.loss_table = PrettyTable()
-        self.loss_table.field_names = ["", "Total", "Steering", "Act Value"]
+        self.loss_table.field_names = ["", "Total", "Steering", self.act_value_type]
         # If we don't know the inverse of self.criterion it will return None
         self.convert_loss_to_pwm = self.inverse_loss(0) != None
         self.nu_of_train_batches = len(self.trainloader)
@@ -205,7 +206,7 @@ class Trainer:
                 batch_losses["steering"].append(batch_steering_loss.item())
                 batch_losses["act_value"].append(batch_act_value_loss.item())
                 batch_losses["loss"].append(batch_loss.item())
-                logger.info(f"\nBatch[{batch_no}/{self.nu_of_train_batches}] Loss: {batch_loss:.4f}, Steering Loss: {batch_steering_loss:.4f}, act_value Loss: {batch_act_value_loss:.4f}")
+                logger.info(f"\nBatch[{batch_no}/{self.nu_of_train_batches}] Loss: {batch_loss:.4f}, Steering Loss: {batch_steering_loss:.4f}, {self.act_value_type} Loss: {batch_act_value_loss:.4f}")
                 batch_loss.backward()
                 # Gradient clipping
                 # torch.nn.utils.clip_grad_norm_(self.model.parameters(), 5)
@@ -231,13 +232,13 @@ class Trainer:
             self.loss_table.clear_rows()
 
             if self.writer:
-                self.writer.add_scalar('Train/Loss', epoch_loss, epoch)
-                self.writer.add_scalar('Train/Steering_Loss', epoch_steering_loss, epoch)
-                self.writer.add_scalar('Train/Act_Value_Loss', epoch_act_value_loss, epoch)
+                self.writer.add_scalar("Train/Loss", epoch_loss, epoch)
+                self.writer.add_scalar("Train/Steering_Loss", epoch_steering_loss, epoch)
+                self.writer.add_scalar(f"Train/{self.act_value_type}_Loss", epoch_act_value_loss, epoch)
                 if self.testlaoder:
-                    self.writer.add_scalar('Test/Loss', eval_loss, global_step=epoch)
-                    self.writer.add_scalar('Test/Steering_Loss', eval_steering_loss, global_step=epoch)
-                    self.writer.add_scalar('Test/Act_Value_Loss', eval_act_value_loss, global_step=epoch)
+                    self.writer.add_scalar("Test/Loss", eval_loss, global_step=epoch)
+                    self.writer.add_scalar("Test/Steering_Loss", eval_steering_loss, global_step=epoch)
+                    self.writer.add_scalar(f"Test/{self.act_value_type}_Loss", eval_act_value_loss, global_step=epoch)
                 self.writer.flush()
 
             # If this model is better than previous model we saving it
