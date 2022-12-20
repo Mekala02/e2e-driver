@@ -82,12 +82,14 @@ class Arduino:
             elif self.act_value_type == "Speed":
                 # Act_Value is between 0, 1 we multipliying it by Stick_Multiplier
                 # for converting to speed
-                self.Throttle = self.pid(self.Speed, self.stick_multiplier * self.Act_Value)
+                self.Act_Value = self.stick_multiplier * self.Act_Value
+                self.Throttle = self.pid(self.Speed, self.Act_Value)
                 self.Throttle = self.throttle_limiter(self.Throttle)
                 Throttle_Signal = float2pwm(self.Throttle)
             if pilot_mode_string == "Manuel":
                 # Steering value increases when turning to left so we reversing it with -
-                self.Steering = self.steering_limiter(-pwm2float(self.Steering_A))
+                self.Steering = -pwm2float(self.Steering_A)
+                self.Steering = self.steering_limiter(self.Steering)
                 self.memory.memory["Steering"] = self.Steering
                 Steering_Signal = 0
             elif pilot_mode_string == "Angle":
@@ -96,12 +98,12 @@ class Arduino:
             self.memory.memory["Act_Value"] = self.Act_Value
         elif pilot_mode_string == "Full_Auto":
             if self.act_value_type == "Throttle":
-                self.throttle = self.throttle_limiter(self.memory.memory["Act_Value"])
+                self.Throttle = self.throttle_limiter(self.memory.memory["Act_Value"])
             elif self.act_value_type == "Speed":
-                self.throttle = self.throttle_limiter(self.pid(self.speed, self.memory.memory["Act_Value"]))
-            Steering_Signal = float2pwm(self.memory.memory["Steering"])
+                self.Throttle = self.throttle_limiter(self.pid(self.Speed, self.memory.memory["Act_Value"]))
+            Steering_Signal = float2pwm(-self.memory.memory["Steering"])
             # Motor power: 0 or 1
-            Throttle_Signal = float2pwm(self.throttle * self.memory.memory["Motor_Power"])
+            Throttle_Signal = float2pwm(self.Throttle * self.memory.memory["Motor_Power"])
         
         self.memory.memory["Throttle"] = self.Throttle
         self.memory.memory["Speed"] = self.Speed
