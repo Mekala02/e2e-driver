@@ -59,27 +59,28 @@ document.getElementById('C_Depth_Image').addEventListener("click", function() {t
 document.getElementById('C_Object_Detection_Image').addEventListener("click", function() {track.Update_Camera_Mode("Object_Detection_Image")});
 
 document.getElementById('G1_Steering').addEventListener("click", function() {track.Update_Graph_Mode("Steering", 1)});
+document.getElementById('G1_Act_Value').addEventListener("click", function() {track.Update_Graph_Mode("Act_Value", 1)});
 document.getElementById('G1_Throttle').addEventListener("click", function() {track.Update_Graph_Mode("Throttle", 1)});
-document.getElementById('G1_Speed').addEventListener("click", function() {track.Update_Graph_Mode("Speed", 1)});
-
 document.getElementById('G1_IMU_Accel_X').addEventListener("click", function() {track.Update_Graph_Mode("IMU_Accel_X", 1)});
 document.getElementById('G1_IMU_Accel_Y').addEventListener("click", function() {track.Update_Graph_Mode("IMU_Accel_Y", 1)});
 document.getElementById('G1_IMU_Accel_Z').addEventListener("click", function() {track.Update_Graph_Mode("IMU_Accel_Z", 1)});
 document.getElementById('G1_IMU_Gyro_X').addEventListener("click", function() {track.Update_Graph_Mode("IMU_Gyro_X", 1)});
 document.getElementById('G1_IMU_Gyro_Y').addEventListener("click", function() {track.Update_Graph_Mode("IMU_Gyro_Y", 1)});
 document.getElementById('G1_IMU_Gyro_Z').addEventListener("click", function() {track.Update_Graph_Mode("IMU_Gyro_Z", 1)});
+document.getElementById('G1_Speed').addEventListener("click", function() {track.Update_Graph_Mode("Speed", 1)});
 
 // document.getElementById('G1_IMU_Mode_Select').addEventListener("click", function() {track.Update_Graph_Mode("IMU_Mode_Select", 1)});
 
 document.getElementById('G2_Steering').addEventListener("click", function() {track.Update_Graph_Mode("Steering", 2)});
+document.getElementById('G2_Act_Value').addEventListener("click", function() {track.Update_Graph_Mode("Act_Value", 2)});
 document.getElementById('G2_Throttle').addEventListener("click", function() {track.Update_Graph_Mode("Throttle", 2)});
-document.getElementById('G2_Speed').addEventListener("click", function() {track.Update_Graph_Mode("Speed", 2)});
 document.getElementById('G2_IMU_Accel_X').addEventListener("click", function() {track.Update_Graph_Mode("IMU_Accel_X", 2)});
 document.getElementById('G2_IMU_Accel_Y').addEventListener("click", function() {track.Update_Graph_Mode("IMU_Accel_Y", 2)});
 document.getElementById('G2_IMU_Accel_Z').addEventListener("click", function() {track.Update_Graph_Mode("IMU_Accel_Z", 2)});
 document.getElementById('G2_IMU_Gyro_X').addEventListener("click", function() {track.Update_Graph_Mode("IMU_Gyro_X", 2)});
 document.getElementById('G2_IMU_Gyro_Y').addEventListener("click", function() {track.Update_Graph_Mode("IMU_Gyro_Y", 2)});
 document.getElementById('G2_IMU_Gyro_Z').addEventListener("click", function() {track.Update_Graph_Mode("IMU_Gyro_Z", 2)});
+document.getElementById('G2_Speed').addEventListener("click", function() {track.Update_Graph_Mode("Speed", 2)});
 
 const  speed_slider = document.getElementById("Speed_Slider")
 speed_slider.addEventListener("input", function() {track.Update_Speed_Factor(speed_slider.value)})
