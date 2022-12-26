@@ -51,7 +51,7 @@
   margin-left: -40px;
 }
 
-#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select #G2_IMU_Menu .IMU_Select_Button, #Graph2 #Graph2_Mode_Select #G2_Menu .Graph_Select_Button, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu .IMU_Select_Button, #Graph1 #Graph1_Mode_Select #G1_Menu .Graph_Select_Button, #Camera_Brodcast #Camera_Mode_Select #C_Menu .Camera_Select_Button {
+#Graph2 #Graph2_Mode_Select #G2_Menu #G2_Other_Mode_Select #G2_Other_Menu .Other_Select_Button, #Graph2 #Graph2_Mode_Select #G2_Menu .Graph_Select_Button, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_Other_Mode_Select #G1_Other_Menu .Other_Select_Button, #Graph1 #Graph1_Mode_Select #G1_Menu .Graph_Select_Button, #Camera_Brodcast #Camera_Mode_Select #C_Menu .Camera_Select_Button {
   height: 100%;
   width: 100%;
   color: white;
@@ -114,7 +114,7 @@
   border-radius: 10px;
 }
 
-#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select {
+#Graph2 #Graph2_Mode_Select #G2_Menu #G2_Other_Mode_Select, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_Other_Mode_Select {
   height: 25px;
   width: calc(100% - 5px);
   margin: 0;
@@ -124,7 +124,7 @@
   background-color: black;
 }
 
-#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select #G2_IMU_Menu, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu {
+#Graph2 #Graph2_Mode_Select #G2_Menu #G2_Other_Mode_Select #G2_Other_Menu, #Graph1 #Graph1_Mode_Select #G1_Menu #G1_Other_Mode_Select #G1_Other_Menu {
   display: none;
   flex-direction: row;
   position: absolute;
@@ -379,10 +379,10 @@
 #Graph1 #Graph1_Mode_Select #G1_Menu {
   right: -5px;
 }
-#Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select:hover > #G1_IMU_Menu {
+#Graph1 #Graph1_Mode_Select #G1_Menu #G1_Other_Mode_Select:hover > #G1_Other_Menu {
   display: flex;
 }
-#Graph1 #Graph1_Mode_Select #G1_Menu #G1_IMU_Mode_Select #G1_IMU_Menu .IMU_Select_Button {
+#Graph1 #Graph1_Mode_Select #G1_Menu #G1_Other_Mode_Select #G1_Other_Menu .Other_Select_Button {
   width: 69px;
 }
 
@@ -401,10 +401,10 @@
 #Graph2 #Graph2_Mode_Select #G2_Menu {
   right: -5px;
 }
-#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select:hover > #G2_IMU_Menu {
+#Graph2 #Graph2_Mode_Select #G2_Menu #G2_Other_Mode_Select:hover > #G2_IMU_Menu {
   display: flex;
 }
-#Graph2 #Graph2_Mode_Select #G2_Menu #G2_IMU_Mode_Select #G2_IMU_Menu .IMU_Select_Button {
+#Graph2 #Graph2_Mode_Select #G2_Menu #G2_Other_Mode_Select #G2_Other_Menu .Other_Select_Button {
   width: 70px;
 }
 
@@ -621,4 +621,4 @@ body, html {
   height: 1px;
   width: 80%;
   background-color: white;
-}/*# sourceMappingURL=main.css.map */
+}/*# sourceMappingURL=drive_main.css.map */
