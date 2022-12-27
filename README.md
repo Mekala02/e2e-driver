@@ -12,29 +12,26 @@ Currently Using:
 <img src="https://github.com/Mekala02/e2e-driver/blob/main/docs/car_1.jpg" title="Web_Interface" alt="Web_Interface"/>&nbsp;
 
 <h1>Features</h1>
-Modular architecture. New parts can be added easily<br/>
-Parts can work threaded and multithreaded.<br/>
-High speed, all parts can run min @100 FPS.<br/>
-Easy to setup and configure.<br/>
-Fast data saving.<br/>
-DAgger(Dataset Aggregation)<br/>
-Data Augmentation<br/>
-Cruise Control<br/>
-Merge multiple datasets<br/>
-Reduced fps sampling<br/>
-Depth input<br/>
-Imu, encoder input<br/>
-Tensorrt<br/>
-Tensorboard<br/>
-Fast inferance<br/>
-Fast training<br/>
-Early stoping<br/>
-Web interface<br/>
+- Modular architecture. New parts can be added easily<br/>
+- Parts works at high speed and low latency thanks to threading and multithreading,<br/>
+&ensp;all parts can run min @100 cycles per second.<br/>
+- Easy to setup and configure.<br/>
+- Fast training and inferance<br/>
+- Tensorrt support<br/>
+- Tensorboard support<br/>
+- DAgger(Dataset Aggregation) support<br/>
+- Data Augmentation support<br/>
+- Cruise Control<br/>
+- Merge multiple datasets with ease<br/>
+- Reduced data sampling<br/>
+- Early stoping<br/>
+- Web interface<br/>
 <br/>
+<h1>Web Interface</h1>
 <h3>Low Latency Live Data:</h3>
 <img src="https://github.com/Mekala02/e2e-driver/blob/main/docs/16.jpg" title="Web_Interface" alt="Web_Interface"/>&nbsp;
 
-<h3>User finedly Data Editing:</h3>
+<h3>Data Editing:</h3>
 <img src="https://github.com/Mekala02/e2e-driver/blob/main/docs/data_edit_web_interface.gif" title="Data_Edit_Web_Interface" alt="Data_Edit_Web_Interface"/>&nbsp;
 
 <h1>Getting Started</h1>
