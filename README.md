@@ -12,9 +12,10 @@ Currently Using:
 <img src="https://github.com/Mekala02/e2e-driver/blob/main/docs/car_1.jpg" title="Web_Interface" alt="Web_Interface"/>&nbsp;
 
 <h1>Features</h1>
+- Currently using behavioral cloning for driving autonomously</br>
 - Modular architecture. New parts can be added easily<br/>
 - Parts works at high speed and low latency thanks to threading and multi threading,<br/>
-&ensp;all parts can run min @100 cycles per second.<br/>
+&ensp;all parts can run min @100 Hz.<br/>
 - Easy to set up and configure.<br/>
 - Fast training and inferance<br/>
 - TensorRT support<br/>
