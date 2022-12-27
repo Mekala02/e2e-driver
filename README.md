@@ -13,18 +13,18 @@ Currently Using:
 
 <h1>Features</h1>
 - Modular architecture. New parts can be added easily<br/>
-- Parts works at high speed and low latency thanks to threading and multithreading,<br/>
+- Parts works at high speed and low latency thanks to threading and multi threading,<br/>
 &ensp;all parts can run min @100 cycles per second.<br/>
-- Easy to setup and configure.<br/>
+- Easy to set up and configure.<br/>
 - Fast training and inferance<br/>
-- Tensorrt support<br/>
-- Tensorboard support<br/>
+- TensorRT support<br/>
+- TensorBoard support<br/>
 - DAgger(Dataset Aggregation) support<br/>
 - Data Augmentation support<br/>
 - Cruise Control<br/>
-- Merge multiple datasets with ease<br/>
+- Merge multiple data sets with ease<br/>
 - Reduced data sampling<br/>
-- Early stoping<br/>
+- Early stopping<br/>
 - Web interface<br/>
 <br/>
 <h1>Web Interface</h1>
