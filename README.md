@@ -22,7 +22,7 @@ Currently Using:
 - DAgger(Dataset Aggregation) support<br/>
 - Data Augmentation support<br/>
 - Cruise Control<br/>
-- Merge multiple data sets with ease<br/>
+- Merge multiple datasets with ease<br/>
 - Reduced data sampling<br/>
 - Early stopping<br/>
 - Web interface<br/>
