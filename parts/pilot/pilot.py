@@ -1,4 +1,4 @@
-from common_functions import Limiter, pwm2float, float2pwm
+from common_functions import PID, Limiter, pwm2float, float2pwm
 from config import config as cfg
 
 import logging
@@ -14,14 +14,18 @@ class Pilot:
         self.thread = None
         self.thread_hz = cfg["DRIVE_LOOP_HZ"]
         self.run = True
-        self.outputs = {"Act_Value": 0}
-        # It can output Steering and throttle if pilot equals to Full_Auto or Angle
+        self.outputs = {}
+        # It can output steering, throttle and target_speed if pilot equals to Full_Auto or Angle
         self.act_value_type = cfg["ACT_VALUE_TYPE"]
         self.pilot_mode = 0
         self.model_path = None
         self.Steering = 0
         self.Act_Value = 0
+        if self.act_value_type == "Speed":
+            self.Target_Speed = 0
+            self.pid = PID(Kp=cfg["K_PID"]["Kp"], Ki=cfg["K_PID"]["Ki"], Kd=cfg["K_PID"]["Kd"], I_max=cfg["K_PID"]["I_max"])
         self.steering_limiter = Limiter(min_=pwm2float(cfg["STEERING_MIN_PWM"]), max_=pwm2float(cfg["STEERING_MAX_PWM"]))
+        self.throttle_limiter = Limiter(min_=pwm2float(cfg["THROTTLE_MIN_PWM"]), max_=pwm2float(cfg["THROTTLE_MAX_PWM"]))
 
         # Shared memory for multiprocessing
         if "Model_Path" in  memory.memory.keys():
@@ -84,9 +88,13 @@ class Pilot:
                 self.Steering = self.steering_limiter(self.shared_dict["Steering"])
                 self.memory.memory["Steering"] = self.Steering
                 if self.pilot_mode == "Full_Auto":
-                    # Speed_Factor: Multiplier
-                    self.Act_Value = self.shared_dict["Act_Value"] * self.memory.memory["Speed_Factor"]
-                    self.memory.memory["Act_Value"] = self.Act_Value
+                    if self.act_value_type == "Speed":
+                        self.Target_Speed = self.shared_dict["Act_Value"] * self.memory.memory["Speed_Factor"]
+                        self.memory.memory["Target_Speed"] = self.Target_Speed
+                        self.memory.memory["Throttle"] = self.throttle_limiter(self.pid(self.memory.memory["Speed"], self.Target_Speed))
+                    elif self.act_value_type == "Throttle":
+                        self.memory.memory["Throttle"] = self.throttle_limiter(self.shared_dict["Act_Value"] * self.memory.memory["Speed_Factor"])
+
     
     def shut_down(self):
         self.run = False

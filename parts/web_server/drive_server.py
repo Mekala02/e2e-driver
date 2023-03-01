@@ -20,7 +20,7 @@ inputs = {}
 # tracking if there is new image on it
 camera = {"Is_New": False}
 
-web_special = {"Camera_Mode": "Color_Image", "Graph1_Mode": ["Act_Value", "Throttle"], "Graph2_Mode": ["Steering"]}
+web_special = {"Camera_Mode": "Color_Image", "Graph1_Mode": ["Throttle"], "Graph2_Mode": ["Steering"]}
 
 image_refresh_rate = 30
 def generate_frames():

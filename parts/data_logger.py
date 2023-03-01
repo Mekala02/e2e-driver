@@ -15,8 +15,10 @@ class Data_Logger:
         self.run = True
         self.outputs = {"Data_Id": 0, "Timestamp": 0}
         self.index = 0
-        self.save_it = {"Data_Id", "Zed_Data_Id", "Timestamp", "Zed_Timestamp", "Steering", "Throttle", "Act_Value", "Speed", "Mode1", "Mode2", "IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z",
+        self.save_it = {"Data_Id", "Zed_Data_Id", "Timestamp", "Zed_Timestamp", "Steering", "Throttle", "Speed", "Mode1", "Mode2", "IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z",
             "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Stop", "Taxi", "Direction", "Lane", "Pilot_Mode", "Route_Mode", "Motor_Power", "Record", "Speed_Factor", "Fps"}
+        if cfg["ACT_VALUE_TYPE"] == "Speed":
+            self.save_it.add("Target_Speed")
 
         # If user not specified data folder name it will named according to date
         if "Data_Folder" not in self.memory.memory:

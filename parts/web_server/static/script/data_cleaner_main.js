@@ -78,7 +78,7 @@ document.getElementById('C_Depth_Image').addEventListener("click", function() {d
 document.getElementById('C_Object_Detection_Image').addEventListener("click", function() {data_clear_track.Update_Camera_Mode("Object_Detection_Image")})
 
 document.getElementById('G1_Steering').addEventListener("click", function() {update_graph("Steering")})
-document.getElementById('G1_Act_Value').addEventListener("click", function() {update_graph("Act_Value")});
+document.getElementById('G1_Target_Speed').addEventListener("click", function() {update_graph("Target_Speed")});
 document.getElementById('G1_Throttle').addEventListener("click", function() {update_graph("Throttle")})
 document.getElementById('G1_IMU_Accel_X').addEventListener("click", function() {update_graph("IMU_Accel_X")})
 document.getElementById('G1_IMU_Accel_Y').addEventListener("click", function() {update_graph("IMU_Accel_Y")})

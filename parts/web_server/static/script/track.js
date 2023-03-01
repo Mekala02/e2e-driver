@@ -8,7 +8,7 @@ class Main_Track {
         this.indicator_color = "red"
         // Memory for client side javasript. On startup server will send necessery data for that output dict
         this.outputs = {}
-        this.graph = {Steering: [], Act_Value: [], Throttle: [], Speed: [], Timestamp: [],
+        this.graph = {Steering: [], Target_Speed: [], Throttle: [], Speed: [], Timestamp: [],
             IMU_Accel_X: [], IMU_Accel_Y: [], IMU_Accel_Z: [], IMU_Gyro_X: [], IMU_Gyro_Y: [], IMU_Gyro_Z: []}
         this.graph_layout = {
             autosize: true, margin: {l: 25, r: 25, b: 25, t: 25, pad: 0},

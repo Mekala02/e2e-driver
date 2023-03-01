@@ -184,7 +184,7 @@ class Data_Folder():
         if self.act_value_type == "Throttle":
             act_value_label = torch.tensor([self.datas[index]["Throttle"]], dtype=torch.float)
         elif self.act_value_type == "Speed":
-            act_value_label = torch.tensor([self.datas[index]["Act_Value"]], dtype=torch.float)
+            act_value_label = torch.tensor([self.datas[index]["Target_Speed"]], dtype=torch.float)
         elif self.act_value_type == "Encoder_Speed":
             act_value_label = torch.tensor([self.datas[index]["Speed"]], dtype=torch.float)
         else:
@@ -200,7 +200,7 @@ if __name__ == "__main__":
     args = docopt(__doc__)
     data_folders = args["<data_dir>"]
     other_inputs = ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
-    test = Load_Data(data_folders, transform=None, other_inputs=other_inputs, use_depth=False)
+    test = Load_Data(data_folders, act_value_type="Speed", transform=None, other_inputs=other_inputs, use_depth=False)
     # images, steering_label, act_value_label = test[10]
 
     images, other_inputs, steering_label, act_value_label = test[10]

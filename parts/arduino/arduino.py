@@ -17,7 +17,7 @@ class Arduino:
         self.thread = "Single"
         self.thread_hz = 120
         self.run = True
-        self.outputs = {"Steering": 0, "Throttle": 0, "Speed": 0, "Mode1": 0, "Mode2": 0}
+        self.outputs = {"Steering": 0, "Throttle": 0, "Speed": 0, "Mode1": 0, "Mode2": 0, "Target_Speed": None}
         # Also It can output Act_Value, Record and drive mode acoording to mode button
         self.act_value_type = cfg["ACT_VALUE_TYPE"]
         self.Steering_A = 1500
@@ -34,6 +34,7 @@ class Arduino:
         self.steering_limiter = Limiter(min_=pwm2float(cfg["STEERING_MIN_PWM"]), max_=pwm2float(cfg["STEERING_MAX_PWM"]))
         self.throttle_limiter = Limiter(min_=pwm2float(cfg["THROTTLE_MIN_PWM"]), max_=pwm2float(cfg["THROTTLE_MAX_PWM"]))
         if self.act_value_type == "Speed":
+            self.Target_Speed = 0
             self.pid = PID(Kp=cfg["K_PID"]["Kp"], Ki=cfg["K_PID"]["Ki"], Kd=cfg["K_PID"]["Kd"], I_max=cfg["K_PID"]["I_max"])
         self.arduino = serial.Serial(port='/dev/ttyUSB0', baudrate=115200, timeout=0.006, write_timeout=0.006)
         time.sleep(0.04)
@@ -74,38 +75,27 @@ class Arduino:
         # Speed_A is ticks/sec we converting it to unit/sec
         self.Speed = self.Speed_A / self.ticks_per_unit
         pilot_mode_string = self.memory.memory["Pilot_Mode"]
-        if pilot_mode_string == "Manuel" or pilot_mode_string == "Angle":
-            self.Act_Value = pwm2float(self.Act_Value_A)
+        self.Act_Value = pwm2float(self.Act_Value_A)
+        if pilot_mode_string == "Full_Auto":
+            Steering_Signal = float2pwm(-self.memory.memory["Steering"])
+            Throttle_Signal = float2pwm(self.memory.memory["Throttle"] * self.memory.memory["Motor_Power"])
+        elif pilot_mode_string == "Manuel" or pilot_mode_string == "Angle":
             if self.act_value_type == "Throttle":
-                self.Throttle = self.throttle_limiter(self.Act_Value)
+                self.Throttle = self.Act_Value
                 Throttle_Signal = 0
             elif self.act_value_type == "Speed":
-                # Act_Value is between 0, 1 we multipliying it by Stick_Multiplier
-                # for converting to speed
-                self.Act_Value = self.stick_multiplier * self.Act_Value
-                self.Throttle = self.pid(self.Speed, self.Act_Value)
-                self.Throttle = self.throttle_limiter(self.Throttle)
+                self.Target_Speed = self.stick_multiplier * self.Act_Value
+                self.Throttle = self.throttle_limiter(self.pid(self.Speed, self.Target_Speed))
                 Throttle_Signal = float2pwm(self.Throttle)
+                self.memory.memory["Target_Speed"] = self.Target_Speed
+            self.memory.memory["Throttle"] = self.Throttle
             if pilot_mode_string == "Manuel":
-                # Steering value increases when turning to left so we reversing it with -
                 self.Steering = -pwm2float(self.Steering_A)
-                self.Steering = self.steering_limiter(self.Steering)
                 self.memory.memory["Steering"] = self.Steering
                 Steering_Signal = 0
-            elif pilot_mode_string == "Angle":
-                # Rereversing with -
+            if pilot_mode_string == "Angle":
                 Steering_Signal = float2pwm(-self.memory.memory["Steering"])
-            self.memory.memory["Act_Value"] = self.Act_Value
-        elif pilot_mode_string == "Full_Auto":
-            if self.act_value_type == "Throttle":
-                self.Throttle = self.throttle_limiter(self.memory.memory["Act_Value"])
-            elif self.act_value_type == "Speed":
-                self.Throttle = self.throttle_limiter(self.pid(self.Speed, self.memory.memory["Act_Value"]))
-            Steering_Signal = float2pwm(-self.memory.memory["Steering"])
-            # Motor power: 0 or 1
-            Throttle_Signal = float2pwm(self.Throttle * self.memory.memory["Motor_Power"])
-        
-        self.memory.memory["Throttle"] = self.Throttle
+
         self.memory.memory["Speed"] = self.Speed
         self.memory.memory["Mode1"] = self.Mode1
         self.memory.memory["Mode2"] = self.Mode2
