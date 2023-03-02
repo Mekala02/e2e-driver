@@ -8,16 +8,13 @@ Options:
   --model=<pretrained_model>    Pretrained model
   --name=<models_name>          Model's name
 """
-
-from networks import Linear
-from networks import Linear_With_Others
 from data_loader import Load_Data
-import custom_transforms as CustomTransforms
+from train_config import Train_Config as t_cfg
+from train_config import TRANSFORMS, TRAIN_TRANSFORMS
 
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 from prettytable import PrettyTable
-import albumentations as A
 from docopt import docopt
 from tqdm import tqdm
 import torchvision
@@ -32,116 +29,63 @@ logger = logging.getLogger("train")
 
 
 def main():
-    '''
-    act_value_type:         if throttle network predict throttle value; elif speed network will predict speed; elif encoder_speed network will predict encoder speed
-    learning_rate:          2e-3 for startup then reduce to 1e-3
-    validation_split:       Splits the training data [0,1]
-    image_resolution:       None or {"height": x, "width": y} if None zed's resolution will be used
-    reduce_fps:             If set to value like 30 it will make training data ~30fps. It wont work great if datasets fps is close to reduce_fps
-    other_inputs:           None or list like ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
-    detailed_tensorboard:   Saves image grid for first train and test set batch
-    transforms:             Thoose transformations will be applied to all data
-    train_transforms:       Thoose transformations will be applied only to train set
-    '''
-    act_value_type = "Throttle"
-    use_depth = False
-    learning_rate = 2e-3
-    batch_size = 1024
-    num_epochs = 512
-    shuffle_dataset = True
-    validation_split = 0.2
-    image_resolution = {"height": 120, "width": 160}
-    reduce_fps = 10
-    other_inputs = None
-    detailed_tensorboard = True
+    in_channels = 4 if t_cfg["USE_DEPTH"] else 3
+    model = t_cfg["MODEL"](in_channels=in_channels).to(device)
+    criterion = t_cfg["CRITERION"]()
+    optimizer = t_cfg["OPTIMIZER"](model.parameters(), lr=t_cfg["LEARNING_RATE"])
 
-    transforms = {
-        "color_image": [
-            ["custom", CustomTransforms.Resize(image_resolution["width"], image_resolution["height"])]
-        ],
-        "depth_image": [
-            ["custom", CustomTransforms.Resize(image_resolution["width"], image_resolution["height"])]
-        ]
-    }
-    train_transforms = {
-        "color_image": [
-            *transforms["color_image"],
-            ["albumation", 
-                A.Compose([
-                    A.RandomBrightnessContrast(p=0.6, brightness_limit=(-0.30, 0.35), contrast_limit=(-0.2, 0.2), brightness_by_max=True),
-                    A.RandomGamma(p=0.15, gamma_limit=(80, 120), eps=None),
-                    A.Blur(p=0.15, blur_limit=(3, 7)),
-                    A.Sharpen(p=0.1, alpha=(0.2, 0.5), lightness=(0.5, 1.0)),
-                    A.CLAHE(p=0.03, clip_limit=(2, 5), tile_grid_size=(8, 8)),
-                    A.Equalize(p=0.05, mode='cv', by_channels=True),
-                    A.FancyPCA(p=0.05, alpha=0.1),
-                    A.RandomToneCurve(p=0.1, scale=0.1),
-                    A.CoarseDropout(p=0.06, max_holes=8, max_height=6, max_width=6, min_holes=4, min_height=6, min_width=6, fill_value=(0, 0, 0), mask_fill_value=None),
-                    A.RandomRain(p=0.02, slant_lower=-5, slant_upper=5, drop_length=10, drop_width=1, drop_color=(0, 0, 0), blur_value=4, brightness_coefficient=0.7, rain_type='drizzle'),
-                    A.GaussNoise(p=0.15, var_limit=(10.0, 50.0), per_channel=True, mean=0.0),
-                ])
-            ],
-            ["custom", CustomTransforms.Crop_Without_Remove(p=0.5, crop_top=45)],
-            ["custom", CustomTransforms.Crop_Without_Remove(p=0.35, crop_left=30, crop_right=30)]
-        ],
-        "depth_image": [
-            *transforms["depth_image"]
-        ]
-    }
-
-    in_channels = 4 if use_depth else 3
-    model = Linear(in_channels=4 if use_depth else 3).to(device)
-    criterion = torch.nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-
-    writer = SummaryWriter(f"tb_logs/{model_save_name}")
     torch.manual_seed(22)
-    # Our input size is not changing so we can use cudnn's optimization
-    torch.backends.cudnn.benchmark = True
+    if t_cfg["USE_CUDNN_BENCHMARK"]:
+        torch.backends.cudnn.benchmark = True
 
     if model_path:
         model.load_state_dict(torch.load(model_path))
 
-    train_set = Load_Data(data_dirs, act_value_type=act_value_type, transform=train_transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
+    train_set = Load_Data(data_dirs, act_value_type=t_cfg["ACT_VALUE_TYPE"], transform=TRAIN_TRANSFORMS, reduce_fps=t_cfg["REDUCE_FPS"], use_depth=t_cfg["USE_DEPTH"], other_inputs=t_cfg["OTHER_INPUTS"])
 
     test_sets = []
-    if validation_split:
-        test_set = Load_Data(data_dirs, act_value_type=act_value_type, transform=transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs)
+    if t_cfg["VALIDATION_SPLIT"]:
+        test_set = Load_Data(data_dirs, act_value_type=t_cfg["ACT_VALUE_TYPE"], transform=TRANSFORMS, reduce_fps=t_cfg["REDUCE_FPS"], use_depth=t_cfg["USE_DEPTH"], other_inputs=t_cfg["OTHER_INPUTS"])
         assert len(train_set) == len(test_set)
         len_dataset = len(train_set)
-        test_len = math.floor(len_dataset * validation_split)
+        test_len = math.floor(len_dataset * t_cfg["VALIDATION_SPLIT"])
         train_set = torch.utils.data.random_split(train_set, [len_dataset-test_len, test_len])[0]
         test_sets.append(torch.utils.data.random_split(test_set, [len_dataset-test_len, test_len])[1])
     if test_dirs:
-        test_sets.append(Load_Data(test_dirs, act_value_type=act_value_type, transform=transforms, reduce_fps=reduce_fps, use_depth=use_depth, other_inputs=other_inputs))
+        test_sets.append(Load_Data(test_dirs, act_value_type=t_cfg["ACT_VALUE_TYPE"], transform=TRANSFORMS, reduce_fps=t_cfg["REDUCE_FPS"], use_depth=t_cfg["USE_DEPTH"], other_inputs=t_cfg["OTHER_INPUTS"]))
 
-    trainloader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
+    trainloader = DataLoader(dataset=train_set, batch_size=t_cfg["BATCH_SIZE"], shuffle=t_cfg["SHUFFLE_TRAINSET"], num_workers=4, pin_memory=True, drop_last=True)
     if test_sets:
-        testlaoder = DataLoader(dataset=torch.utils.data.ConcatDataset(test_sets), batch_size=batch_size, num_workers=4, pin_memory=True)
+        testlaoder = DataLoader(dataset=torch.utils.data.ConcatDataset(test_sets), batch_size=t_cfg["BATCH_SIZE"], num_workers=4, pin_memory=True)
     else:
         testlaoder = None
 
-    trainer = Trainer(model, criterion, optimizer, device, num_epochs, trainloader, act_value_type, writer=writer, testlaoder=testlaoder, model_name=model_save_name, other_inputs=other_inputs, patience=5, delta=0.000005)
-
-    example_input = torch.ones((1, in_channels, image_resolution["height"], image_resolution["width"]), device=device)
-    if other_inputs:
-        example_input = (example_input, torch.ones(1, (len(other_inputs)), device=device))
-    writer.add_graph(model, input_to_model=example_input, verbose=False, use_strict_trace=True)
-    if detailed_tensorboard:
-        # Adding train and test images from first batch to tensorboard
-        data = next(iter(trainloader))
-        # We using BGR image format but tensorboard expects rgb so we converting it to RGB with flip on channel dimension
-        images = torch.flip(data[0], [1])
-        grid = torchvision.utils.make_grid(images)
-        writer.add_image(f"Train Set First Batch", grid, 0)
-        if testlaoder:
-            data = next(iter(testlaoder))
+    if t_cfg["USE_TB"]:
+        writer = SummaryWriter(f"tb_logs/{model_save_name}")
+        if t_cfg["TB_ADD_GRAPH"]:
+            example_input = torch.ones((1, in_channels, t_cfg["IMAGE_RESOLUTION"]["height"], t_cfg["IMAGE_RESOLUTION"]["width"]), device=device)
+            if t_cfg["OTHER_INPUTS"]:
+                example_input = (example_input, torch.ones(1, (len(t_cfg["OTHER_INPUTS"])), device=device))
+            writer.add_graph(model, input_to_model=example_input, verbose=False, use_strict_trace=True)
+        if t_cfg["DETAILED_TB"]:
+            # Adding train and test images from first batch to tensorboard
+            data = next(iter(trainloader))
+            # We using BGR image format but tensorboard expects rgb so we converting it to RGB with flip on channel dimension
             images = torch.flip(data[0], [1])
             grid = torchvision.utils.make_grid(images)
-            writer.add_image(f"Test Set First Batch", grid, 0)
+            writer.add_image(f"Train Set First Batch", grid, 0)
+            if testlaoder:
+                data = next(iter(testlaoder))
+                images = torch.flip(data[0], [1])
+                grid = torchvision.utils.make_grid(images)
+                writer.add_image(f"Test Set First Batch", grid, 0)
+    else: writer=None
 
+    trainer = Trainer(model, criterion, optimizer, device, t_cfg["NUM_EPOCHS"], trainloader, t_cfg["ACT_VALUE_TYPE"], writer=writer, testlaoder=testlaoder,
+                    model_name=model_save_name, other_inputs=t_cfg["OTHER_INPUTS"], patience=t_cfg["PATIENCE"], delta=t_cfg["DELTA"])
     trainer.fit()
-    writer.close()
+    if t_cfg["USE_TB"]:
+        writer.close()
 
 class Trainer:
     def __init__(self, model, criterion, optimizer, device, num_epochs, trainloader, act_value_type, writer=None, testlaoder=None, model_name="model", other_inputs=False, patience=5, delta=0.00005):
@@ -156,8 +100,6 @@ class Trainer:
         self.model_name = model_name
         self.other_inputs = other_inputs
         self.num_epochs = num_epochs
-        # Delta: Minimum change to qualify as an improvement.
-        # Patience:  How many times we wait for change < delta before stop training.
         self.patience = patience
         self.delta = delta
 
