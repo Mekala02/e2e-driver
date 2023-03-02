@@ -13,11 +13,11 @@ from parts.memory import Memory
 from vehicle import Vehicle
 from parts.data_logger import Data_Logger
 from parts.cameraImu import Camera_IMU
-from parts.copilot.copilot import Copilot
-from parts.pilot.pilot import Pilot
+from parts.e2e.copilot.copilot import Copilot
+from parts.e2e.pilot.pilot import Pilot
 from parts.arduino.arduino import Arduino
 from parts.web_server.drive_server import Web_Server
-from parts.mode_selector import Mode_Selector
+from parts.e2e.mode_selector import Mode_Selector
 from parts.fps_counter import FPS_Counter
 
 from docopt import docopt
