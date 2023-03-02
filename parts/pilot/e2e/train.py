@@ -54,7 +54,7 @@ def main():
     if test_dirs:
         test_sets.append(Load_Data(test_dirs, act_value_type=t_cfg["ACT_VALUE_TYPE"], transform=TRANSFORMS, reduce_fps=t_cfg["REDUCE_FPS"], use_depth=t_cfg["USE_DEPTH"], other_inputs=t_cfg["OTHER_INPUTS"]))
 
-    trainloader = DataLoader(dataset=train_set, batch_size=t_cfg["BATCH_SIZE"], shuffle=t_cfg["SHUFFLE_TRAINSET"], num_workers=4, pin_memory=True, drop_last=True)
+    trainloader = DataLoader(dataset=train_set, batch_size=t_cfg["BATCH_SIZE"], shuffle=t_cfg["SHUFFLE_TRAINSET"], num_workers=4, pin_memory=True, drop_last=t_cfg["DROP_LAST"])
     if test_sets:
         testlaoder = DataLoader(dataset=torch.utils.data.ConcatDataset(test_sets), batch_size=t_cfg["BATCH_SIZE"], num_workers=4, pin_memory=True)
     else:

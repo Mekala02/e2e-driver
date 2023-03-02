@@ -1,45 +1,58 @@
 import custom_transforms as CustomTransforms
+from networks import Linear
+
 import albumentations as A
 from torch.nn import MSELoss
 from torch.optim import Adam
 
-from networks import Linear
 '''
-act_value_type:         if throttle network predict throttle value; elif speed network will predict speed; elif encoder_speed network will predict encoder speed
-learning_rate:          2e-3 for startup then reduce to 1e-3
-validation_split:       Splits the training data [0,1]
-image_resolution:       None or {"height": x, "width": y} if None zed's resolution will be used
-reduce_fps:             If set to value like 30 it will make training data ~30fps. It wont work great if datasets fps is close to reduce_fps
-other_inputs:           None or list like ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
-detailed_tensorboard:   Saves image grid for first train and test set batch
-transforms:             Thoose transformations will be applied to all data
-train_transforms:       Thoose transformations will be applied only to train set
-Delta: Minimum change to qualify as an improvement
-Patience:  How many times we wait for change < delta before stop training
+MODEL
+CRITERION
+OPTIMIZER
+IMAGE_RESOLUTION:       None or {"height": x, "width": y} if None zed's resolution will be used
+ACT_VALUE_TYPE:         if throttle network predict throttle value; elif speed network will predict speed; elif encoder_speed network will predict encoder speed
+USE_DEPTH:              If you want to use depth data
+REDUCE_FPS:             If set to value like 30 it will make training data ~30fps. It wont work great if datasets fps is close to reduce_fps
+OTHER_INPUTS:           None or list like ["IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z", "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Speed"]
+VALIDATION_SPLIT:       Splits the training data [0,1]
+SHUFFLE_TRAINSET:       If you want to shuffle train set
+LEARNING_RATE:          2e-3 for startup then reduce to 1e-3
+PATIENCE:               How many times we wait for change < delta before stop training
+DELTA:                  Minimum change to qualify as an improvement
+USE_CUDNN_BENCHMARK:    If input size is not changing enabling it will increase training speed
+DROP_LAST:              If using cudnn benchmark make it true we want our input size same on every batch
+USE_TB:                 Use TensorBoard
+TB_ADD_GRAPH:           Add graph to tensorboard
+DETAILED_TB:            (Detailed Tensorboard) Saves image grid for first train and test set batch
 '''
 Train_Config = dict(
     MODEL = Linear,
     CRITERION = MSELoss,
     OPTIMIZER = Adam,
-    # Our input size is not changing so we can use cudnn's optimization
-    USE_CUDNN_BENCHMARK = True,
-    PATIENCE = 5 ,
-    DELTA = 0.000005,
+    IMAGE_RESOLUTION = {"height": 120, "width": 160},
     ACT_VALUE_TYPE = "Speed",
     USE_DEPTH = False,
+    REDUCE_FPS = 10,
+    OTHER_INPUTS = None,
+    VALIDATION_SPLIT = 0.2,
+    SHUFFLE_TRAINSET = True,
     LEARNING_RATE = 2e-3,
     BATCH_SIZE = 1024,
     NUM_EPOCHS = 512,
-    SHUFFLE_TRAINSET = True,
-    VALIDATION_SPLIT = 0.2,
-    IMAGE_RESOLUTION = {"height": 120, "width": 160},
-    REDUCE_FPS = 10,
-    OTHER_INPUTS = None,
+    PATIENCE = 5 ,
+    DELTA = 0.000005,
+    USE_CUDNN_BENCHMARK = True,
+    DROP_LAST = True,
     USE_TB = False,
     TB_ADD_GRAPH = False,
     DETAILED_TB = False,
 )
 
+'''
+Data Augmentation
+TRANSFORMS:             Thoose transformations will be applied to all data
+TRAIN_TRANSFORMS:       Thoose transformations will be applied only to train set
+'''
 TRANSFORMS = dict(
     color_image = [
         ["custom", CustomTransforms.Resize(Train_Config["IMAGE_RESOLUTION"]["width"], Train_Config["IMAGE_RESOLUTION"]["height"])]
@@ -73,6 +86,3 @@ TRAIN_TRANSFORMS = dict(
         *TRANSFORMS["depth_image"]
     ]
 )
-
-
-
