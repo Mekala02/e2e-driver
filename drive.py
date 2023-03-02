@@ -8,7 +8,7 @@ Options:
   [--data_folder=<data_folder>]     Specify Data Folders Name
 """
 
-from config import config as cfg
+from parts.e2e.config import Config
 from parts.memory import Memory
 from vehicle import Vehicle
 from parts.data_logger import Data_Logger
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: @ %(name)s %(message)s")
     logger = logging.getLogger("drive")
 
-    vehicle_memory = Memory()
+    vehicle_memory = Memory(Config)
     vehicle = Vehicle(vehicle_memory)
 
     model_path = args["<model>"]
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     logger.info("Adding parts to vehicle ... \n")
     vehicle.add(Data_Logger(vehicle_memory))
     vehicle.add(Camera_IMU(vehicle_memory))
-    if cfg["USE_OBJECT_DETECTION"]:
+    if Config["USE_OBJECT_DETECTION"]:
         from parts.object_detection.yolo import Yolo
         vehicle.add(Yolo(vehicle_memory))
     vehicle.add(Copilot(vehicle_memory))
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     vehicle.start()
 
     logger.info("Starting the drive loop \n")
-    rate_hz = cfg["DRIVE_LOOP_HZ"]
+    rate_hz = Config["DRIVE_LOOP_HZ"]
     try:
         while True:
             start_time = time.time()

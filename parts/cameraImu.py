@@ -1,5 +1,3 @@
-from config import config as cfg
-
 import pyzed.sl as sl
 import time
 import logging
@@ -13,11 +11,11 @@ class Camera_IMU:
     def __init__(self, memory=0):
         self.memory = memory
         self.thread = "Single"
-        self.thread_hz = cfg["DRIVE_LOOP_HZ"]
+        self.thread_hz = memory.cfg["DRIVE_LOOP_HZ"]
         self.run = True
-        self.use_depth = cfg["DEPTH_MODE"]
-        self.svo_mode = True if cfg["SVO_COMPRESSION_MODE"] else False
-        self.reduced_camera_resolution = cfg["REDUCED_CAMERA_RESOLUTION"]
+        self.use_depth = memory.cfg["DEPTH_MODE"]
+        self.svo_mode = True if memory.cfg["SVO_COMPRESSION_MODE"] else False
+        self.reduced_camera_resolution = memory.cfg["REDUCED_CAMERA_RESOLUTION"]
         self.outputs = {"Color_Image": 0, "Zed_Timestamp": 0, "Zed_Data_Id": 0,
             "IMU_Accel_X": 0, "IMU_Accel_Y": 0, "IMU_Accel_Z": 0, "IMU_Gyro_X": 0, "IMU_Gyro_Y": 0, "IMU_Gyro_Z": 0}
         if self.use_depth:
@@ -38,19 +36,19 @@ class Camera_IMU:
 
         self.zed = sl.Camera()
         self.init_params = sl.InitParameters(
-            camera_resolution=getattr(sl.RESOLUTION, cfg["ZED_RESOLUTION"]),
-            camera_fps=cfg["CAMERA_FPS"],
-            camera_image_flip=getattr(sl.FLIP_MODE, cfg["CAMERA_IMAGE_FLIP"]),
-            depth_mode=getattr(sl.DEPTH_MODE, cfg["DEPTH_MODE"]),
-            coordinate_units=getattr(sl.UNIT, cfg["COORDINATE_UNITS"]),
-            coordinate_system=getattr(sl.COORDINATE_SYSTEM, cfg["COORDINATE_SYSTEM"])
+            camera_resolution=getattr(sl.RESOLUTION, memory.cfg["ZED_RESOLUTION"]),
+            camera_fps=memory.cfg["CAMERA_FPS"],
+            camera_image_flip=getattr(sl.FLIP_MODE, memory.cfg["CAMERA_IMAGE_FLIP"]),
+            depth_mode=getattr(sl.DEPTH_MODE, memory.cfg["DEPTH_MODE"]),
+            coordinate_units=getattr(sl.UNIT, memory.cfg["COORDINATE_UNITS"]),
+            coordinate_system=getattr(sl.COORDINATE_SYSTEM, memory.cfg["COORDINATE_SYSTEM"])
         )
         if (err:=self.zed.open(self.init_params)) != sl.ERROR_CODE.SUCCESS:
             logger.error(err)
         # If we save data in svo format we opening svo file and activating recording
         if self.svo_mode:
             svo_path = os.path.join(self.memory.memory["Data_Folder"], "zed_record.svo")
-            recording_param = sl.RecordingParameters(svo_path, getattr(sl.SVO_COMPRESSION_MODE, cfg["SVO_COMPRESSION_MODE"]))
+            recording_param = sl.RecordingParameters(svo_path, getattr(sl.SVO_COMPRESSION_MODE, memory.cfg["SVO_COMPRESSION_MODE"]))
             if ((err:=self.zed.enable_recording(recording_param)) == sl.ERROR_CODE.SUCCESS):
                 self.zed.pause_recording(True)
             else:

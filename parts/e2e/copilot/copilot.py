@@ -1,5 +1,4 @@
 import logging
-from config import config as cfg
 
 logger = logging.getLogger(__name__)
 
@@ -13,9 +12,9 @@ class Copilot:
 
         self.current_mode = 0
         self.direction = None
-        self.cancel_turn_signal = cfg["CANCEL_TURN_SIGNAL"]
-        self.left_threshold = cfg["LEFT_THRESHOLD"]
-        self.right_threshold = cfg["RIGHT_THRESHOLD"]
+        self.cancel_turn_signal = memory.cfg["CANCEL_TURN_SIGNAL"]
+        self.left_threshold = memory.cfg["LEFT_THRESHOLD"]
+        self.right_threshold = memory.cfg["RIGHT_THRESHOLD"]
         self.prev_steering = 0
 
     def update(self):

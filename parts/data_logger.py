@@ -1,5 +1,3 @@
-from config import config as cfg
-
 import logging
 import time
 import json
@@ -17,8 +15,11 @@ class Data_Logger:
         self.index = 0
         self.save_it = {"Data_Id", "Zed_Data_Id", "Timestamp", "Zed_Timestamp", "Steering", "Throttle", "Speed", "Mode1", "Mode2", "IMU_Accel_X", "IMU_Accel_Y", "IMU_Accel_Z",
             "IMU_Gyro_X", "IMU_Gyro_Y", "IMU_Gyro_Z", "Stop", "Taxi", "Direction", "Lane", "Pilot_Mode", "Route_Mode", "Motor_Power", "Record", "Speed_Factor", "Fps"}
-        if cfg["ACT_VALUE_TYPE"] == "Speed":
+        if memory.cfg["ACT_VALUE_TYPE"] == "Speed":
             self.save_it.add("Target_Speed")
+        self.svo_compression_mode = memory.cfg["SVO_COMPRESSION_MODE"]
+        self.color_image_format = memory.cfg["COLOR_IMAGE_FORMAT"]
+        self.depth_image_format = memory.cfg["DEPTH_IMAGE_FORMAT"]
 
         # If user not specified data folder name it will named according to date
         if "Data_Folder" not in self.memory.memory:
@@ -32,17 +33,17 @@ class Data_Logger:
 
         # Saving the config file to the folder
         with open(os.path.join(self.data_folder, "cfg.json"), "w+") as config_log:
-            json.dump(cfg, config_log)
+            json.dump(memory.cfg, config_log)
         
         # If we not saving image data to SVO file creating folders and importing necessary libraries accordingly
-        if cfg["SVO_COMPRESSION_MODE"] is None:
+        if self.svo_compression_mode is None:
             import numpy as np
             import threading
             import cv2
             os.mkdir(os.path.join(self.data_folder, "Color_Image"))
-            if cfg["DEPTH_MODE"]:
+            if memory.cfg["DEPTH_MODE"]:
                 os.mkdir(os.path.join(self.data_folder, "Depth_Image"))
-            if cfg["USE_OBJECT_DETECTION"]:
+            if memory.cfg["USE_OBJECT_DETECTION"]:
                 os.mkdir(os.path.join(self.data_folder, "Object_Detection"))
 
         self.file = open(os.path.join(self.data_folder, "memory.json"), "w+")
@@ -72,13 +73,13 @@ class Data_Logger:
         if self.memory.memory["Record"]:
             data = {key:self.memory.memory[key] for key in self.save_it}
             self.save_json(self.file, data)
-            if cfg["SVO_COMPRESSION_MODE"] is None:
+            if self.svo_compression_mode is None:
                 threading.Thread(target=self.save_to_file,
-                    args=([cfg["COLOR_IMAGE_FORMAT"], os.path.join(self.data_folder, "Color_Image"), str(self.index), self.memory.big_memory["RGB_Image"]]),
+                    args=([self.color_image_format, os.path.join(self.data_folder, "Color_Image"), str(self.index), self.memory.big_memory["RGB_Image"]]),
                     daemon=True,
                     name="Rgb_Image").start()
                 threading.Thread(target=self.save_to_file,
-                    args=([cfg["DEPTH_IMAGE_FORMAT"], os.path.join(self.data_folder, "Depth_Image"), str(self.index), self.memory.big_memory["Depth_Array"]]),
+                    args=([self.depth_image_format, os.path.join(self.data_folder, "Depth_Image"), str(self.index), self.memory.big_memory["Depth_Array"]]),
                     daemon=True,
                     name="Depth_Array").start()
             self.index += 1

@@ -1,4 +1,4 @@
-config = dict(
+Config = dict(
     DRIVE_LOOP_HZ = 50,
     # if ACT_VALUE_TYPE == Throttle; network directly predict throttle value
     # elif ACT_VALUE_TYPE == Speed; network will predict speed

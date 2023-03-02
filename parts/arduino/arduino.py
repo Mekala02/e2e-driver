@@ -1,5 +1,4 @@
 from common_functions import PID, Limiter, pwm2float, float2pwm
-from config import config as cfg
 
 import threading
 import logging
@@ -19,7 +18,7 @@ class Arduino:
         self.run = True
         self.outputs = {"Steering": 0, "Throttle": 0, "Speed": 0, "Mode1": 0, "Mode2": 0, "Target_Speed": None}
         # Also It can output Act_Value, Record and drive mode acoording to mode button
-        self.act_value_type = cfg["ACT_VALUE_TYPE"]
+        self.act_value_type = memory.cfg["ACT_VALUE_TYPE"]
         self.Steering_A = 1500
         self.Act_Value_A = 1500
         self.Speed_A = 0
@@ -29,13 +28,13 @@ class Arduino:
         self.Act_Value = 0
         self.Speed = 0
         self.Throttle = 0
-        self.ticks_per_unit = cfg["ENCODER_TICKS_PER_UNIT"]
-        self.stick_multiplier = cfg["TRANSMITTER_STICK_SPEED_MULTIPLIER"]
-        self.steering_limiter = Limiter(min_=pwm2float(cfg["STEERING_MIN_PWM"]), max_=pwm2float(cfg["STEERING_MAX_PWM"]))
-        self.throttle_limiter = Limiter(min_=pwm2float(cfg["THROTTLE_MIN_PWM"]), max_=pwm2float(cfg["THROTTLE_MAX_PWM"]))
+        self.ticks_per_unit = memory.cfg["ENCODER_TICKS_PER_UNIT"]
+        self.stick_multiplier = memory.cfg["TRANSMITTER_STICK_SPEED_MULTIPLIER"]
+        self.steering_limiter = Limiter(min_=pwm2float(memory.cfg["STEERING_MIN_PWM"]), max_=pwm2float(memory.cfg["STEERING_MAX_PWM"]))
+        self.throttle_limiter = Limiter(min_=pwm2float(memory.cfg["THROTTLE_MIN_PWM"]), max_=pwm2float(memory.cfg["THROTTLE_MAX_PWM"]))
         if self.act_value_type == "Speed":
             self.Target_Speed = 0
-            self.pid = PID(Kp=cfg["K_PID"]["Kp"], Ki=cfg["K_PID"]["Ki"], Kd=cfg["K_PID"]["Kd"], I_max=cfg["K_PID"]["I_max"])
+            self.pid = PID(Kp=memory.cfg["K_PID"]["Kp"], Ki=memory.cfg["K_PID"]["Ki"], Kd=memory.cfg["K_PID"]["Kd"], I_max=memory.cfg["K_PID"]["I_max"])
         self.arduino = serial.Serial(port='/dev/ttyUSB0', baudrate=115200, timeout=0.006, write_timeout=0.006)
         time.sleep(0.04)
         logger.info("Successfully Added")

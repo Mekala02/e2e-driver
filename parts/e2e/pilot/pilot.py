@@ -1,5 +1,4 @@
 from common_functions import PID, Limiter, pwm2float, float2pwm
-from config import config as cfg
 
 import logging
 import torch
@@ -12,20 +11,20 @@ class Pilot:
     def __init__(self, memory):
         self.memory = memory
         self.thread = None
-        self.thread_hz = cfg["DRIVE_LOOP_HZ"]
+        self.thread_hz = memory.cfg["DRIVE_LOOP_HZ"]
         self.run = True
         self.outputs = {}
         # It can output steering, throttle and target_speed if pilot equals to Full_Auto or Angle
-        self.act_value_type = cfg["ACT_VALUE_TYPE"]
+        self.act_value_type = memory.cfg["ACT_VALUE_TYPE"]
         self.pilot_mode = 0
         self.model_path = None
         self.Steering = 0
         self.Act_Value = 0
         if self.act_value_type == "Speed":
             self.Target_Speed = 0
-            self.pid = PID(Kp=cfg["K_PID"]["Kp"], Ki=cfg["K_PID"]["Ki"], Kd=cfg["K_PID"]["Kd"], I_max=cfg["K_PID"]["I_max"])
-        self.steering_limiter = Limiter(min_=pwm2float(cfg["STEERING_MIN_PWM"]), max_=pwm2float(cfg["STEERING_MAX_PWM"]))
-        self.throttle_limiter = Limiter(min_=pwm2float(cfg["THROTTLE_MIN_PWM"]), max_=pwm2float(cfg["THROTTLE_MAX_PWM"]))
+            self.pid = PID(Kp=memory.cfg["K_PID"]["Kp"], Ki=memory.cfg["K_PID"]["Ki"], Kd=memory.cfg["K_PID"]["Kd"], I_max=memory.cfg["K_PID"]["I_max"])
+        self.steering_limiter = Limiter(min_=pwm2float(memory.cfg["STEERING_MIN_PWM"]), max_=pwm2float(memory.cfg["STEERING_MAX_PWM"]))
+        self.throttle_limiter = Limiter(min_=pwm2float(memory.cfg["THROTTLE_MIN_PWM"]), max_=pwm2float(memory.cfg["THROTTLE_MAX_PWM"]))
 
         # Shared memory for multiprocessing
         if "Model_Path" in  memory.memory.keys():
