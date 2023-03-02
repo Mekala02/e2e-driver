@@ -21,6 +21,7 @@ PATIENCE:               How many times we wait for change < delta before stop tr
 DELTA:                  Minimum change to qualify as an improvement
 USE_CUDNN_BENCHMARK:    If input size is not changing enabling it will increase training speed
 DROP_LAST:              If using cudnn benchmark make it true we want our input size same on every batch
+CALC_DIFF:              Calculates and prints diff (L1 Loss)
 USE_TB:                 Use TensorBoard
 TB_ADD_GRAPH:           Add graph to tensorboard
 DETAILED_TB:            (Detailed Tensorboard) Saves image grid for first train and test set batch
@@ -43,6 +44,7 @@ Train_Config = dict(
     DELTA = 0.000005,
     USE_CUDNN_BENCHMARK = True,
     DROP_LAST = True,
+    CALC_DIFF = True,
     USE_TB = False,
     TB_ADD_GRAPH = False,
     DETAILED_TB = False,

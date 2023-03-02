@@ -81,20 +81,21 @@ def main():
                 writer.add_image(f"Test Set First Batch", grid, 0)
     else: writer=None
 
-    trainer = Trainer(model, criterion, optimizer, device, t_cfg["NUM_EPOCHS"], trainloader, t_cfg["ACT_VALUE_TYPE"], writer=writer, testlaoder=testlaoder,
-                    model_name=model_save_name, other_inputs=t_cfg["OTHER_INPUTS"], patience=t_cfg["PATIENCE"], delta=t_cfg["DELTA"])
+    trainer = Trainer(model, criterion, optimizer, device, t_cfg["NUM_EPOCHS"], trainloader, t_cfg["ACT_VALUE_TYPE"], calc_diff=t_cfg["CALC_DIFF"], writer=writer,
+                    testlaoder=testlaoder, model_name=model_save_name, other_inputs=t_cfg["OTHER_INPUTS"], patience=t_cfg["PATIENCE"], delta=t_cfg["DELTA"])
     trainer.fit()
     if t_cfg["USE_TB"]:
         writer.close()
 
 class Trainer:
-    def __init__(self, model, criterion, optimizer, device, num_epochs, trainloader, act_value_type, writer=None, testlaoder=None, model_name="model", other_inputs=False, patience=5, delta=0.00005):
+    def __init__(self, model, criterion, optimizer, device, num_epochs, trainloader, act_value_type, calc_diff=False, writer=None, testlaoder=None, model_name="model", other_inputs=False, patience=5, delta=0.00005):
         self.model = model
         self.criterion = criterion
         self.optimizer = optimizer
         self.device = device
         self.trainloader = trainloader
         self.act_value_type = act_value_type
+        self.calc_diff = calc_diff
         self.writer = writer
         self.testlaoder = testlaoder
         self.model_name = model_name
@@ -106,7 +107,8 @@ class Trainer:
         self.loss_table = PrettyTable()
         self.loss_table.field_names = ["", "Total", "Steering", self.act_value_type]
         # If we don't know the inverse of self.criterion it will return None
-        self.convert_loss_to_pwm = self.inverse_loss(0) != None
+        if self.calc_diff:
+            self.diff_criterion = torch.nn.L1Loss()
         self.nu_of_train_batches = len(self.trainloader)
         if self.testlaoder:
             self.nu_of_test_batches = len(self.testlaoder)
@@ -122,10 +124,12 @@ class Trainer:
         # logger.info(self.model)
         logger.info(f"Trainig on {self.device}...")
         epoch_losses = dict(steering=[], act_value=[], loss=[])
+        epoch_diffs = dict(steering=[], act_value=[], diff=[])
         for epoch in range(1, self.num_epochs+1):
             self.model.train()
             pbar = tqdm(self.trainloader, desc=f"Epoch: {epoch} ", file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}')
             batch_losses = dict(steering=[], act_value=[], loss=[])
+            batch_diffs = dict(steering=[], act_value=[], diff=[])
             for batch_no, data in enumerate(pbar, 1):
                 for param in self.model.parameters():
                     param.grad = None
@@ -148,6 +152,13 @@ class Trainer:
                 batch_losses["steering"].append(batch_steering_loss.item())
                 batch_losses["act_value"].append(batch_act_value_loss.item())
                 batch_losses["loss"].append(batch_loss.item())
+                if self.calc_diff:
+                    batch_steering_diff = self.diff_criterion(steering_prediction, steering_labels)
+                    batch_act_value_diff = self.diff_criterion(act_value_prediction, act_value_labels)
+                    batch_diff = self.steering_weight * batch_steering_diff + self.act_value_weight * batch_act_value_diff
+                    batch_diffs["steering"].append(batch_steering_diff.item())
+                    batch_diffs["act_value"].append(batch_act_value_diff.item())
+                    batch_diffs["diff"].append(batch_diff.item())
                 logger.info(f"\nBatch[{batch_no}/{self.nu_of_train_batches}] Loss: {batch_loss:.4f}, Steering Loss: {batch_steering_loss:.4f}, {self.act_value_type} Loss: {batch_act_value_loss:.4f}")
                 batch_loss.backward()
                 # Gradient clipping
@@ -161,14 +172,22 @@ class Trainer:
             epoch_losses["act_value"].append(epoch_act_value_loss)
             epoch_losses["loss"].append(epoch_loss)
             self.loss_table.add_row(["Train", f"{epoch_loss:.4f}", f"{epoch_steering_loss:.4f}", f"{epoch_act_value_loss:.4f}"])
-            if self.convert_loss_to_pwm:
-                self.loss_table.add_row(["I Train", f"{self.inverse_loss(epoch_loss):.4f}", f"{self.inverse_loss(epoch_steering_loss):.4f}", f"{self.inverse_loss(epoch_act_value_loss):.4f}"])
+            if self.calc_diff:
+                epoch_steering_diff = sum(epoch_losses["steering"]) / batch_no
+                epoch_act_value_diff = sum(epoch_losses["act_value"]) / batch_no
+                epoch_diff = sum(epoch_losses["loss"]) / batch_no
+                epoch_diffs["steering"].append(epoch_steering_diff)
+                epoch_diffs["act_value"].append(epoch_act_value_diff)
+                epoch_diffs["diff"].append(epoch_diff)
+                self.loss_table.add_row(["Diff Train", f"{epoch_diff:.4f}", f"{epoch_steering_diff:.4f}", f"{epoch_act_value_diff:.4f}"])
             if self.testlaoder:
                 logger.info("\nEvaluating on test set ...")
-                eval_loss, eval_steering_loss, eval_act_value_loss = self.evaluate()
+                if self.calc_diff:
+                    eval_loss, eval_steering_loss, eval_act_value_loss, eval_diff, eval_steering_diff, eval_act_value_diff = self.evaluate()
+                    self.loss_table.add_row(["Diff Val", f"{eval_diff:.4f}", f"{eval_steering_diff:.4f}", f"{eval_act_value_diff:.4f}"])
+                else:
+                    eval_loss, eval_steering_loss, eval_act_value_loss = self.evaluate()
                 self.loss_table.add_row(["Val", f"{eval_loss:.4f}", f"{eval_steering_loss:.4f}", f"{eval_act_value_loss:.4f}"])
-                if self.convert_loss_to_pwm:
-                    self.loss_table.add_row(["I Val", f"{self.inverse_loss(eval_loss):.4f}", f"{self.inverse_loss(eval_steering_loss):.4f}", f"{self.inverse_loss(eval_act_value_loss):.4f}"])
             self.loss_table.sortby = 'Total'
             logger.info(f"\n{self.loss_table}\n")
             self.loss_table.clear_rows()
@@ -212,18 +231,10 @@ class Trainer:
                 logger.info(f"Stopped Training: Delta Loss Is Smaller Than {self.delta} For {self.patience} Times")
                 break
 
-
-    def inverse_loss(self, loss):
-        # If you want to convert loss to pwm differance you must add the loss functions inverse here
-        # If loss functions inverse isn't written, this functionality won't be used
-        if str(self.criterion) == "MSELoss()":
-            # Inverse of MSELoss
-            return math.sqrt(loss)
-        return None
-
     def evaluate(self):
         self.model.eval()
         losses = dict(steering=[], act_value=[], loss=[])
+        diffs = dict(steering=[], act_value=[], diff=[])
         with torch.no_grad():
             for batch_no, data in enumerate(tqdm(self.testlaoder, file=sys.stdout, bar_format='{desc}{percentage:3.0f}%|{bar:100}'), 1):
                 if self.other_inputs:
@@ -244,9 +255,21 @@ class Trainer:
                 losses["steering"].append(steering_loss)
                 losses["act_value"].append(act_value_loss)
                 losses["loss"].append(loss)
+                if self.calc_diff:
+                    steering_diff = self.diff_criterion(steering_prediction, steering_labels)
+                    act_value_diff = self.diff_criterion(act_value_prediction, act_value_labels)
+                    diff = self.steering_weight * steering_diff + self.act_value_weight * act_value_diff
+                    diffs["steering"].append(steering_diff)
+                    diffs["act_value"].append(act_value_diff)
+                    diffs["diff"].append(diff)
         eval_steering_loss = sum(losses["steering"]) / batch_no
         eval_act_value_loss = sum(losses["act_value"]) / batch_no
         eval_loss = sum(losses["loss"]) / batch_no
+        if self.calc_diff:
+            eval_steering_diff = sum(diffs["steering"]) / batch_no
+            eval_act_value_diff = sum(diffs["act_value"]) / batch_no
+            eval_diff = sum(diffs["diff"]) / batch_no
+            return eval_loss, eval_steering_loss, eval_act_value_loss, eval_diff, eval_steering_diff, eval_act_value_diff
         return eval_loss, eval_steering_loss, eval_act_value_loss
 
     @staticmethod
