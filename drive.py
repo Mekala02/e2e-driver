@@ -15,7 +15,8 @@ from parts.data_logger import Data_Logger
 from parts.cameraImu import Camera_IMU
 from parts.e2e.copilot.copilot import Copilot
 from parts.e2e.pilot.pilot import Pilot
-from parts.arduino.arduino import Arduino
+from parts.gamepad.gamepad import Gamepad
+from parts.vesc.vesc import Vesc
 from parts.web_server.drive_server import Web_Server
 from parts.e2e.mode_selector import Mode_Selector
 from parts.fps_counter import FPS_Counter
@@ -50,7 +51,8 @@ if __name__ == '__main__':
         vehicle.add(Yolo(vehicle_memory))
     vehicle.add(Copilot(vehicle_memory))
     vehicle.add(Pilot(vehicle_memory))
-    vehicle.add(Arduino(vehicle_memory))
+    vehicle.add(Gamepad(vehicle_memory))
+    vehicle.add(Vesc(vehicle_memory))
     vehicle.add(Web_Server(vehicle_memory))
     vehicle.add(Mode_Selector(vehicle_memory))
     vehicle.add(FPS_Counter(vehicle_memory))

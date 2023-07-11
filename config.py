@@ -3,7 +3,7 @@ Config = dict(
     # if ACT_VALUE_TYPE == Throttle; network directly predict throttle value
     # elif ACT_VALUE_TYPE == Speed; network will predict speed
     # Throttle or Speed    
-    ACT_VALUE_TYPE = "Speed",
+    ACT_VALUE_TYPE = "Throttle",
     TRANSMITTER_STICK_SPEED_MULTIPLIER = 2.5,
     K_PID = {"Kp":0.2, "Ki":0.4, "Kd":0.001, "I_max":0.35},
     
@@ -15,7 +15,7 @@ Config = dict(
 
     ZED_RESOLUTION = "VGA",
     CAMERA_FPS = 50,
-    CAMERA_IMAGE_FLIP = "ON",
+    CAMERA_IMAGE_FLIP = "OFF",
     # NONE, PERFORMANCE, QUALITY, ULTRA
     DEPTH_MODE = "NONE",
     COORDINATE_UNITS = "CENTIMETER",
