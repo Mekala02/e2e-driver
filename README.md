@@ -37,6 +37,10 @@ Configuration 2:
 - Early stopping<br/>
 - Web interface<br/>
 <br/>
+
+[![Video](https://github.com/Mekala02/e2e-driver/blob/main/docs/itu_car_1.gif)](https://youtu.be/opY1HBGR5Mw)
+
+
 <h1>Web Interface</h1>
 <h3>Low Latency Live Data:</h3>
 <img src="https://github.com/Mekala02/e2e-driver/blob/main/docs/16.jpg" title="Web_Interface" alt="Web_Interface"/>&nbsp;
