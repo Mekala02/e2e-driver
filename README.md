@@ -1,15 +1,24 @@
 # E2E Driver (Self Driving Library)
-This is an ongoing project!</br>
 
-Currently Using:
-* Custom 3D Printed Body on top of modified Wltoys 124017 chassis</br>
+Using:
 * Jetson AGX Xavier JetPack 5.0.2 --- r35.1.0</br>
-* ZED Mini Stereo Camera</br>
 * Arduino Nano</br>
+
+Configuration 1:
+* Custom 3D Printed Body on top of modified Wltoys 124017 chassis</br>
+* ZED Mini Stereo Camera</br>
 * HC-020K Optical Encoder</br>
 * Turnigy Evolution Radio Control System</br>
 
 <img src="https://github.com/Mekala02/e2e-driver/blob/main/docs/car_1.jpg" title="Web_Interface" alt="Web_Interface"/>&nbsp;
+
+Configuration 2:
+* Traxxas chassis</br>
+* ZED Stereo Camera</br>
+* Flysky FS-i6X Radio Control System</br>
+* VESC</br>
+
+<img src="https://github.com/Mekala02/e2e-driver/blob/main/docs/car_itu_1.jpg" title="Web_Interface" alt="Web_Interface"/>&nbsp;
 
 <h1>Features</h1>
 - Currently using behavioral cloning for driving autonomously</br>
@@ -28,6 +37,10 @@ Currently Using:
 - Early stopping<br/>
 - Web interface<br/>
 <br/>
+
+[![Video](https://github.com/Mekala02/e2e-driver/blob/main/docs/itu_car_1.gif)](https://youtu.be/opY1HBGR5Mw)
+
+
 <h1>Web Interface</h1>
 <h3>Low Latency Live Data:</h3>
 <img src="https://github.com/Mekala02/e2e-driver/blob/main/docs/16.jpg" title="Web_Interface" alt="Web_Interface"/>&nbsp;
