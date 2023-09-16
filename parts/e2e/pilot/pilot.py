@@ -4,6 +4,8 @@ import logging
 import torch
 import time
 import os
+import cv2
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +27,8 @@ class Pilot:
             self.pid = PID(Kp=memory.cfg["K_PID"]["Kp"], Ki=memory.cfg["K_PID"]["Ki"], Kd=memory.cfg["K_PID"]["Kd"], I_max=memory.cfg["K_PID"]["I_max"])
         self.steering_limiter = Limiter(min_=pwm2float(memory.cfg["STEERING_MIN_PWM"]), max_=pwm2float(memory.cfg["STEERING_MAX_PWM"]))
         self.throttle_limiter = Limiter(min_=pwm2float(memory.cfg["THROTTLE_MIN_PWM"]), max_=pwm2float(memory.cfg["THROTTLE_MAX_PWM"]))
+        self.network_input_type = memory.cfg["NETWORK_INPUT_TYPE"]
+        self.use_depth = False if self.network_input_type == "RGB" else True
 
         # Shared memory for multiprocessing
         if "Model_Path" in  memory.memory.keys():
@@ -35,6 +39,8 @@ class Pilot:
             self.shared_dict["run"] = True
             self.shared_dict["pilot_mode"] = 0
             self.shared_dict["cpu_image"] = 0
+            if self.use_depth:
+                self.shared_dict["depth_image"] = 0
             self.shared_dict["Steering"] = 0
             self.shared_dict["Act_Value"] = 0
         
@@ -59,17 +65,43 @@ class Pilot:
         # First pass is slow so we are warming up
         logger.info("Warming Up The Model...")
         with torch.no_grad():
-            model((torch.from_numpy(self.shared_dict["cpu_image"].transpose(2, 0, 1))/255).to(device, non_blocking=True).unsqueeze(0))
+            #logger.info(self.shared_dict["cpu_image"].shape)
+            images = self.shared_dict["cpu_image"]
+            if self.use_depth:
+                depth_image = self.shared_dict["depth_image"]
+                depth_array = cv2.cvtColor(depth_image, cv2.COLOR_BGR2GRAY)
+                depth_array = depth_array.reshape(images.shape[0], images.shape[1], 1)
+                # np.nan_to_num(depth_array, copy=False)
+                if self.network_input_type == "D":
+                    images = depth_array
+                elif self.network_input_type == "RGBD":
+                    images = np.concatenate((images, depth_array), axis=2)
+                else: 
+                    raise Exception("Config settings network_input_type and use_depth contradict each other!")
+            model((torch.from_numpy(images.transpose(2, 0, 1))/255).to(device, non_blocking=True).unsqueeze(0))
+
         logger.info("Warmup Done")
         while self.shared_dict["run"]:
             start_time = time.time()
             if self.shared_dict["pilot_mode"] == "Angle" or self.shared_dict["pilot_mode"] == "Full_Auto":
                 # (H x W x C) to (C x H x W) then [0, 1]
-                color_image = torch.from_numpy(self.shared_dict["cpu_image"].transpose(2, 0, 1))/255
-                gpu_image = color_image.to(device, non_blocking=True)
+                images = self.shared_dict["cpu_image"] 
+                if self.use_depth:
+                    depth_image = self.shared_dict["depth_image"]
+                    depth_array = cv2.cvtColor(depth_image, cv2.COLOR_BGR2GRAY)
+                    depth_array = depth_array.reshape(images.shape[0], images.shape[1], 1)
+                    # np.nan_to_num(depth_array, copy=False)
+                    if self.network_input_type == "D":
+                        images = depth_array
+                    elif self.network_input_type == "RGBD":
+                        images = np.concatenate((images, depth_array), axis=2)
+                    else: 
+                        raise Exception("Config settings network_input_type and use_depth contradict each other!")
+
+                # Unsqueeze adds dimension to image (batch dimension)
+                gpu_image = (torch.from_numpy(images.transpose(2, 0, 1))/255).to(device, non_blocking=True).unsqueeze(0)                
                 with torch.no_grad():
-                    # Unsqueeze adds dimension to image (batch dimension)
-                    Steering, Act_Value = model(gpu_image.unsqueeze(0))
+                    Steering, Act_Value = model(gpu_image)
                 self.shared_dict["Steering"] = Steering.item()
                 self.shared_dict["Act_Value"] = Act_Value.item()
             # Inferancing @DRIVE_LOOP_HZ
@@ -82,6 +114,8 @@ class Pilot:
         if self.model_path:
             self.pilot_mode = self.memory.memory["Pilot_Mode"]
             self.shared_dict["pilot_mode"] = self.pilot_mode
+            if self.use_depth:
+                self.shared_dict["depth_image"] = self.memory.memory["Depth_Image"]
             self.shared_dict["cpu_image"] = self.memory.memory["Color_Image"]
             if self.pilot_mode == "Angle" or self.pilot_mode == "Full_Auto":
                 self.Steering = self.steering_limiter(self.shared_dict["Steering"])
