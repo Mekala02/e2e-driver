@@ -1,4 +1,4 @@
-from common_functions import PID, Limiter, pwm2float, float2pwm
+from common_functions import Limiter, pwm2float, float2pwm
 
 import threading
 import logging
@@ -33,8 +33,18 @@ class Arduino:
         self.steering_limiter = Limiter(min_=pwm2float(memory.cfg["STEERING_MIN_PWM"]), max_=pwm2float(memory.cfg["STEERING_MAX_PWM"]))
         self.throttle_limiter = Limiter(min_=pwm2float(memory.cfg["THROTTLE_MIN_PWM"]), max_=pwm2float(memory.cfg["THROTTLE_MAX_PWM"]))
         if self.act_value_type == "Speed":
+            self.controller_type = memory.cfg["CONTROLLER_TYPE"]
             self.Target_Speed = 0
-            self.pid = PID(Kp=memory.cfg["K_PID"]["Kp"], Ki=memory.cfg["K_PID"]["Ki"], Kd=memory.cfg["K_PID"]["Kd"], I_max=memory.cfg["K_PID"]["I_max"])
+            if self.controller_type == "PID":
+                from common_functions import PID
+                self.controller = PID(Kp=memory.cfg["K_PID"]["Kp"], Ki=memory.cfg["K_PID"]["Ki"], Kd=memory.cfg["K_PID"]["Kd"], I_max=memory.cfg["K_PID"]["I_max"])
+            elif self.controller_type == "BANGBANG":
+                from common_functions import BangBang
+                self.controller = BangBang(Km=memory.cfg["K_m"])
+            else:
+                logger.warning("Unknown Controller Type")
+                return
+
         self.arduino = serial.Serial(port='/dev/ttyUSB0', baudrate=115200, timeout=0.006, write_timeout=0.006)
         time.sleep(0.04)
         logger.info("Successfully Added")
@@ -84,7 +94,7 @@ class Arduino:
                 Throttle_Signal = 0
             elif self.act_value_type == "Speed":
                 self.Target_Speed = self.stick_multiplier * self.Act_Value
-                self.Throttle = self.throttle_limiter(self.pid(self.Speed, self.Target_Speed))
+                self.Throttle = self.throttle_limiter(self.controller(self.Speed, self.Target_Speed))
                 Throttle_Signal = float2pwm(self.Throttle)
                 self.memory.memory["Target_Speed"] = self.Target_Speed
             self.memory.memory["Throttle"] = self.Throttle

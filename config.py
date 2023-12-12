@@ -5,7 +5,10 @@ Config = dict(
     # Throttle or Speed    
     ACT_VALUE_TYPE = "Speed",
     TRANSMITTER_STICK_SPEED_MULTIPLIER = 2.5,
+    # NONE, PID, BANGBANG
+    CONTROLLER_TYPE = "PID",
     K_PID = {"Kp":0.2, "Ki":0.4, "Kd":0.001, "I_max":0.35},
+    K_m = 0.25,
     
     USE_OBJECT_DETECTION = False,
     USE_DAGGER = True,

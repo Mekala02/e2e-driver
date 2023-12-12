@@ -96,6 +96,17 @@ class PID():
         self.previous_error = self.current_error
 
         return self.P + self.I + self.D
+    
+class BangBang():
+    def __init__(self, Km=0):
+        self.Km = Km
+        self.current_error = 0
+        self.resolution = 0.1
+
+    def __call__(self, current_value, requested_value):
+        if requested_value > current_value:
+            return self.Km
+        return 0
 
 class Limiter():
     def __init__(self, min_=0, max_=1):
