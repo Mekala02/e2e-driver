@@ -164,7 +164,7 @@ class Main_Track {
         else{
             for (let value of this.outputs[`Graph${graph}_Mode`]) {
                 this.activated_color(`G${graph}_${value}`, this.button_clicked_color)
-              }
+            }
         }
     }
 
@@ -180,14 +180,14 @@ class Main_Track {
         this.axis_length = this.graph["Timestamp"].length
         var traces = []
         for (let mode of this.outputs[`Graph${graph_no}_Mode`]){
-          traces.push({
-            x: this.graph["Timestamp"].slice(Math.max(0, this.axis_length - 500), this.axis_length - 1),
-            y: this.graph[mode].slice(Math.max(0, this.axis_length - 500), this.axis_length - 1),
-            name: mode,
-            type:'line',
-            line: {
-            width: 4
-          }})
+            traces.push({
+                x: this.graph["Timestamp"].slice(Math.max(0, this.axis_length - 500), this.axis_length - 1),
+                y: this.graph[mode].slice(Math.max(0, this.axis_length - 500), this.axis_length - 1),
+                name: mode,
+                type:'line',
+                line: {
+                width: 4
+            }})
         }
         this.graph_layout["xaxis"]["range"] = [this.graph_trace["x"][0], this.graph_trace["x"][500]]
         Plotly.react(`Graph${graph_no}`, traces, this.graph_layout, {displayModeBar: false})
